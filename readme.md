@@ -222,7 +222,7 @@ dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 });
 ```
 
-## I'm stuck!
+## I'm stuck.  Help!
 
 Check out the included SimplifiedCoreDataExample for a working example.  You can also contact me if you have any questions or comments.
 

@@ -1,6 +1,6 @@
 //
 //  RHManagedObject.m
-//  Version: 0.6
+//  Version: 0.7
 //
 //  Copyright (C) 2012 by Christopher Meyer
 //  http://schwiiz.org/
@@ -27,12 +27,27 @@
 #import "RHManagedObject.h"
 #import "RHManagedObjectContextManager.h"
 
+@interface RHManagedObject()
+
+@end
+
+
 @implementation RHManagedObject
 
-// Abstract class.  Implement in your entity subclass to return the name of the entity superclass
+// Abstract class.  Implement in your entity subclass to return the name of the entity superclass.
 +(NSString *)entityName {
 	NSLog(@"You must implement an entityName class method in your entity subclass.  Aborting.");
 	abort();
+}
+
+// Abstract class.  Implement in your entity subclass to return the name of the model without the .xcdatamodeld extension.
++(NSString *)modelName {
+    NSLog(@"You must implement a modelName class method in your entity subclass.  Aborting.");
+	abort();
+}
+
++(void)deleteStore {
+	[[self managedObjectContextManager] deleteStore];
 }
 
 +(NSEntityDescription *)entityDescription {
@@ -40,14 +55,14 @@
 }
 
 +(void)commit {
-	[[RHManagedObjectContextManager sharedInstance] commit];
+	[[self managedObjectContextManager] commit];
 }
 
-+(RHManagedObject *)newEntity {
++(id)newEntity {
 	return [NSEntityDescription insertNewObjectForEntityForName:[self entityName] inManagedObjectContext:[self managedObjectContext]];
 }
 
-+(RHManagedObject *)getWithPredicate:(NSPredicate *)predicate {
++(id)getWithPredicate:(NSPredicate *)predicate {
 	NSArray *results = [self fetchWithPredicate:predicate];
 	
 	if ([results count] > 0) {
@@ -57,14 +72,14 @@
 	return nil;
 }
 
-+(RHManagedObject *)getWithPredicate:(NSPredicate *)predicate withSortDescriptor:(NSSortDescriptor *)descriptor {
++(id)getWithPredicate:(NSPredicate *)predicate withSortDescriptor:(NSSortDescriptor *)descriptor {
 	NSArray *results = [self fetchWithPredicate:predicate withSortDescriptor:descriptor];
 	
 	if ([results count] > 0) {
 		return [results objectAtIndex:0];
 	}
 	
-	return nil;	
+	return nil;
 }
 
 +(NSArray *)fetchAll {
@@ -80,10 +95,9 @@
 }
 
 +(NSArray *)fetchWithPredicate:(NSPredicate *)predicate withSortDescriptor:(NSSortDescriptor *)descriptor withLimit:(NSUInteger)limit {
-	NSFetchRequest *fetch = [[[NSFetchRequest alloc] init] autorelease];	
+	NSFetchRequest *fetch = [[[NSFetchRequest alloc] init] autorelease];
 	
-	[fetch setEntity:[NSEntityDescription entityForName:[self entityName] inManagedObjectContext:[self managedObjectContext]]];
-	
+	[fetch setEntity:[self entityDescription]];
 	
 	if (predicate) {
 		[fetch setPredicate:predicate];
@@ -102,21 +116,18 @@
 	return [[self managedObjectContext] executeFetchRequest:fetch error:nil];
 }
 
-
 +(NSUInteger)count {
 	return [self countWithPredicate:nil];
 }
 
 +(NSUInteger)countWithPredicate:(NSPredicate *)predicate {
-	NSFetchRequest *fetch = [[[NSFetchRequest alloc] init] autorelease];	
+	NSFetchRequest *fetch = [[[NSFetchRequest alloc] init] autorelease];
 	
-	[fetch setEntity:[NSEntityDescription entityForName:[self entityName] inManagedObjectContext:self.managedObjectContext]];
+	[fetch setEntity:[self entityDescription]];
 	
 	if (predicate) {
 		[fetch setPredicate:predicate];
 	}
-	
-	// [fetch setIncludesPendingChanges:YES];
 	
 	return [self.managedObjectContext countForFetchRequest:fetch error:nil];
 }
@@ -124,93 +135,77 @@
 +(NSArray *)distinctValuesForAttribute:(NSString *)attribute withPredicate:(NSPredicate *)predicate {
 	NSArray *items = [self fetchWithPredicate:predicate];
 	NSString *keyPath = [@"@distinctUnionOfObjects." stringByAppendingString:attribute];
-	
 	return [[items valueForKeyPath:keyPath] sortedArrayUsingSelector:@selector(compare:)];
 }
 
-+(NSDate *)maxDateForKey:(NSString *)key withPredicate:(NSPredicate *)predicate {
-	NSFetchRequest *request = [[NSFetchRequest alloc] init];
-	
-	if (predicate) {
-		[request setPredicate:predicate];
-	}
-	
-	NSEntityDescription *entity = [NSEntityDescription entityForName:[self entityName] inManagedObjectContext:[self managedObjectContext]];
-	[request setEntity:entity];
-	[request setResultType:NSDictionaryResultType];
-	
-	NSExpression *keyPathExpression = [NSExpression expressionForKeyPath:key];
-	NSExpression *maxExpression = [NSExpression expressionForFunction:@"max:" arguments:[NSArray arrayWithObject:keyPathExpression]];
-	
-	NSExpressionDescription *expressionDescription = [[NSExpressionDescription alloc] init];
-	[expressionDescription setName:key];
-	[expressionDescription setExpression:maxExpression];
-	[expressionDescription setExpressionResultType:NSDateAttributeType];
-	
-	[request setPropertiesToFetch:[NSArray arrayWithObject:expressionDescription]];
-	
-	NSError *error;
-	NSArray *objects = [[self managedObjectContext] executeFetchRequest:request error:&error];
-	
-	NSDate *maxValue = nil;
-	
-	if (objects != nil) {
-		if ([objects count] > 0) {
-			maxValue = [[objects objectAtIndex:0] valueForKey:key];
-		}
-	}
-	
-	if (maxValue == nil) {
-		maxValue = [NSDate dateWithTimeIntervalSince1970:0];	
-	}
-	
-	[expressionDescription release];
-	[request release];
-	
-	return maxValue;
++(NSString*)aggregateToString:(RHAggregate)aggregate {
+    switch(aggregate) {
+        case RHAggregateMax:
+            return @"max:";
+        case RHAggregateMin:
+            return @"min:";
+		case RHAggregateAverage:
+            return @"average:";
+		case RHAggregateSum:
+			return @"sum:";
+        default:
+            [NSException raise:NSGenericException format:@"Unexpected FormatType."];
+    }
 }
 
-+(NSNumber *)averageForKey:(NSString *)key withPredicate:(NSPredicate *)predicate {
-	NSFetchRequest *request = [[NSFetchRequest alloc] init];
++(NSAttributeType)attributeTypeFromKey:(NSString *)key {
+	NSEntityDescription *entityDescription = [self entityDescription];
+	NSDictionary *properties = [entityDescription propertiesByName];
+	NSAttributeDescription *attribute = [properties objectForKey:key];
+	return [attribute attributeType];
+}
+
++(id)aggregateWithType:(RHAggregate)aggregate key:(NSString *)key predicate:(NSPredicate *)predicate defaultValue:(id)defaultValue {
+	NSFetchRequest *fetch = [[NSFetchRequest alloc] init];
 	
 	if (predicate) {
-		[request setPredicate:predicate];
+		[fetch setPredicate:predicate];
 	}
 	
-	NSEntityDescription *entity = [NSEntityDescription entityForName:[self entityName] inManagedObjectContext:[self managedObjectContext]];
-	[request setEntity:entity];
-	[request setResultType:NSDictionaryResultType];
+	NSString *aggregateString = [self aggregateToString:aggregate];
+	NSAttributeType attributeType = [self attributeTypeFromKey:key];
+	
+	NSEntityDescription *entity = [self entityDescription]; // [NSEntityDescription entityForName:[self entityName] inManagedObjectContext:[self managedObjectContext]];
+	[fetch setEntity:entity];
+	[fetch setResultType:NSDictionaryResultType];
 	
 	NSExpression *keyPathExpression = [NSExpression expressionForKeyPath:key];
-	NSExpression *avgExpression = [NSExpression expressionForFunction:@"average:" arguments:[NSArray arrayWithObject:keyPathExpression]];
+	NSExpression *expression = [NSExpression expressionForFunction:aggregateString arguments:[NSArray arrayWithObject:keyPathExpression]];
 	
 	NSExpressionDescription *expressionDescription = [[NSExpressionDescription alloc] init];
 	[expressionDescription setName:key];
-	[expressionDescription setExpression:avgExpression];
-	[expressionDescription setExpressionResultType:NSFloatAttributeType];
+	[expressionDescription setExpression:expression];
+	[expressionDescription setExpressionResultType:attributeType];
 	
-	[request setPropertiesToFetch:[NSArray arrayWithObject:expressionDescription]];
+	[fetch setPropertiesToFetch:[NSArray arrayWithObject:expressionDescription]];
 	
 	NSError *error;
-	NSArray *objects = [[self managedObjectContext] executeFetchRequest:request error:&error];
+	NSArray *objects = [[self managedObjectContext] executeFetchRequest:fetch error:&error];
 	
-	NSNumber *average = [NSNumber numberWithInt:0];
+	id returnValue = nil;
 	
-	if (objects != nil) {
-		if ([objects count] > 0) {
-			average = [[objects objectAtIndex:0] valueForKey:key];
-		}
+	if ((objects != nil) && ([objects count] > 0) ) {
+		returnValue = [[objects lastObject] valueForKey:key];
+	}
+	
+	if (returnValue == nil) {
+		returnValue = defaultValue;
 	}
 	
 	[expressionDescription release];
-	[request release];
+	[fetch release];
 	
-	return average;
+	return returnValue;
 }
 
 +(void)deleteAll {
-	NSFetchRequest *fetch = [[[NSFetchRequest alloc] init] autorelease];	
-	[fetch setEntity:[NSEntityDescription entityForName:[self entityName] inManagedObjectContext:[self managedObjectContext]]];	
+	NSFetchRequest *fetch = [[[NSFetchRequest alloc] init] autorelease];
+	[fetch setEntity:[NSEntityDescription entityForName:[self entityName] inManagedObjectContext:[self managedObjectContext]]];
 	[fetch setIncludesPendingChanges:YES];
 	[fetch setReturnsObjectsAsFaults:YES];
 	
@@ -221,46 +216,48 @@
 
 // Returns the NSManagedObjectContext for the current thread
 +(NSManagedObjectContext *)managedObjectContext {
-	return [[RHManagedObjectContextManager sharedInstance] managedObjectContext];
+	return [[self managedObjectContextManager] managedObjectContext];
+}
+
++(RHManagedObjectContextManager *)managedObjectContextManager {
+    return [RHManagedObjectContextManager sharedInstanceWithModelName:[self modelName]];
 }
 
 -(void)delete {
 	[[self managedObjectContext] deleteObject:self];
 }
 
-// perform a shall copy of a Managed Object and return it - only handle attributes and not relationships
--(RHManagedObject *)clone {
+// perform a shallow copy of a Managed Object and return it - only handle attributes and not relationships
+-(id)clone {
 	
-	NSString *entityName = [[self class] performSelector:@selector(entityName)];
-	
+	NSEntityDescription *entityDescription = [self entity];
+	NSString *entityName = [entityDescription name];
 	NSManagedObject *cloned = [NSEntityDescription insertNewObjectForEntityForName:entityName inManagedObjectContext:[self managedObjectContext]];
 	
-    //loop through all attributes and assign them to the clone
-    NSDictionary *attributes = [[NSEntityDescription entityForName:entityName inManagedObjectContext:[self managedObjectContext]] attributesByName];
-	
-    for (NSString *attr in attributes) {
+    for (NSString *attr in [entityDescription attributesByName]) {
         [cloned setValue:[self valueForKey:attr] forKey:attr];
     }
 	
-    return (RHManagedObject *)cloned;
+    return cloned;
 }
 
--(RHManagedObject *)objectInCurrentThreadContext {
-	return (RHManagedObject *)[[self managedObjectContext] objectWithID:self.objectID];
+-(id)objectInCurrentThreadContext {
+	return [[self managedObjectContext] objectWithID:self.objectID];
 }
 
-
-+(NSArray *)serialize:(NSArray *)items {
-	NSMutableArray *mutArray = [NSMutableArray array];
-	for (RHManagedObject *item in items) {
-		[mutArray addObject:[item serialize]];
+// This function needs work
+-(NSDictionary *)serialize {
+	NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+	
+	for (NSString *key in [[self entity] attributesByName]) {
+		id value = [self valueForKey:key];
+		
+		if (value != nil) {
+			[dict setObject:value forKey:key];
+		}
 	}
-	return mutArray;	
-}
-
--(NSDictionary *)serialize{
-	// implement in subclass
-	return [NSDictionary dictionary];
+	
+	return dict;
 }
 
 @end

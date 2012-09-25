@@ -1,6 +1,6 @@
 //
 //  RHManagedObject.h
-//  Version: 0.6
+//  Version: 0.7
 //
 //  Copyright (C) 2012 by Christopher Meyer
 //  http://schwiiz.org/
@@ -23,37 +23,55 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 
+typedef enum {
+    RHAggregateMax,
+	RHAggregateMin,
+	RHAggregateAverage,
+	RHAggregateSum
+} RHAggregate;
+
+
 #import <CoreData/CoreData.h>
+@class RHManagedObjectContextManager;
 
 @interface RHManagedObject : NSManagedObject
 
+/* Abstract Classes */
 +(NSString *)entityName;
++(NSString *)modelName;
+
+
 +(NSEntityDescription *)entityDescription;
-
++(void)deleteStore;
 +(void)commit;
-+(RHManagedObject *)newEntity;
-+(RHManagedObject *)getWithPredicate:(NSPredicate *)predicate;
-+(RHManagedObject *)getWithPredicate:(NSPredicate *)predicate withSortDescriptor:(NSSortDescriptor *)descriptor;
++(id)newEntity;
++(id)getWithPredicate:(NSPredicate *)predicate;
++(id)getWithPredicate:(NSPredicate *)predicate withSortDescriptor:(NSSortDescriptor *)descriptor;
 
+/* Getters */
 +(NSArray *)fetchAll;
 +(NSArray *)fetchWithPredicate:(NSPredicate *)predicate;
 +(NSArray *)fetchWithPredicate:(NSPredicate *)predicate withSortDescriptor:(NSSortDescriptor *)descriptor;
 +(NSArray *)fetchWithPredicate:(NSPredicate *)predicate withSortDescriptor:(NSSortDescriptor *)descriptor withLimit:(NSUInteger)limit;
-+(NSArray *)serialize:(NSArray *)items;
+// +(NSArray *)serialize:(NSArray *)items;
 
 +(NSUInteger)count;
 +(NSUInteger)countWithPredicate:(NSPredicate *)predicate;
 
 +(NSArray *)distinctValuesForAttribute:(NSString *)attribute withPredicate:(NSPredicate *)predicate;
-+(NSDate *)maxDateForKey:(NSString *)key withPredicate:(NSPredicate *)predicate;
-+(NSNumber *)averageForKey:(NSString *)key withPredicate:(NSPredicate *)predicate;
++(NSString*)aggregateToString:(RHAggregate)aggregate;
++(NSAttributeType)attributeTypeFromKey:(NSString *)key;
++(id)aggregateWithType:(RHAggregate)aggregate key:(NSString *)key predicate:(NSPredicate *)predicate defaultValue:(id)defaultValue;
+
 
 +(void)deleteAll;
 +(NSManagedObjectContext *)managedObjectContext;
++(RHManagedObjectContextManager *)managedObjectContextManager;
 
+/* Instance methods */
 -(void)delete;
--(RHManagedObject *)clone;
--(RHManagedObject *)objectInCurrentThreadContext;
+-(id)clone;
+-(id)objectInCurrentThreadContext;
 -(NSDictionary *)serialize;
 
 @end

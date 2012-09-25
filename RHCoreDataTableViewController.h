@@ -1,5 +1,6 @@
 //
-//  CoreDataTableViewController.h
+//  RHCoreDataTableViewController.h
+//  Version: 0.7
 //
 //  Copyright (C) 2012 by Christopher Meyer
 //  http://schwiiz.org/
@@ -24,14 +25,16 @@
 
 #import <CoreData/CoreData.h>
 
-@interface RHCoreDataTableViewController : UITableViewController<NSFetchedResultsControllerDelegate> {
+@interface RHCoreDataTableViewController : UITableViewController<NSFetchedResultsControllerDelegate, UISearchDisplayDelegate, UISearchBarDelegate> {
 	NSFetchedResultsController *fetchedResultsController;
-	BOOL massUpdate;
 }
 
 @property (nonatomic, retain) NSFetchedResultsController *fetchedResultsController;
+@property (nonatomic, retain) UISearchDisplayController *searchController;
+@property (nonatomic, retain) NSString *searchString;
 @property (nonatomic, assign) BOOL massUpdate;
 
+-(void)addSearchBarWithPlaceHolder:(NSString *)placeholder;
 -(void)resetMassUpdate;
 
 @end

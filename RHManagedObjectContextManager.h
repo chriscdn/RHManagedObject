@@ -1,6 +1,6 @@
 //
 //  RHManagedObjectContextManager.h
-//  Version: 0.6
+//  Version: 0.7
 //
 //  Copyright (C) 2012 by Christopher Meyer
 //  http://schwiiz.org/
@@ -24,8 +24,8 @@
 //  THE SOFTWARE.
 //
 
-#define kDatabaseName @"SimplifiedCoreDataExample.sqlite"
-#define kModelName @"SimplifiedCoreDataExample" // without the .xcdatamodeld extension
+// #define kDatabaseName @"trackmytour.sqlite"
+// #define kModelName @"TrackMyTour" // without the .xcdatamodeld extension
 #define kMergePolicy NSMergeByPropertyObjectTrumpMergePolicy
 
 #define WillMassUpdateNotificationName @"WillMassUpdateNotificationName"
@@ -42,8 +42,12 @@
 @property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
 @property (nonatomic, retain) NSManagedObjectModel *managedObjectModel;
 @property (nonatomic, retain) NSPersistentStoreCoordinator *persistentStoreCoordinator;
+@property (nonatomic, retain) NSString *modelName;
 
-+(RHManagedObjectContextManager *)sharedInstance;
++(NSMutableDictionary *)sharedInstances;
++(RHManagedObjectContextManager *)sharedInstanceWithModelName:(NSString *)modelName;
+
+-(id)initWithModelName:(NSString *)_modelName;
 -(NSManagedObjectContext *)managedObjectContext;
 -(void)deleteStore;
 -(void)commit;

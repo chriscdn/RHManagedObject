@@ -1,6 +1,6 @@
 //
 //  RHManagedObjectContextManager.m
-//  Version: 0.6
+//  Version: 0.7
 //
 //  Copyright (C) 2012 by Christopher Meyer
 //  http://schwiiz.org/
@@ -26,57 +26,44 @@
 
 #import "RHManagedObjectContextManager.h"
 
-static RHManagedObjectContextManager *sharedInstance = nil;
-
 @implementation RHManagedObjectContextManager
 @synthesize managedObjectContexts;
 @synthesize managedObjectContext, managedObjectModel, persistentStoreCoordinator;
+@synthesize modelName;
 
 #pragma mark Singleton Methods
-+(RHManagedObjectContextManager *)sharedInstance {
-    @synchronized(self) {
-        if (sharedInstance == nil) {
-            [[self alloc] init]; // assignment not done here
-        }
++(RHManagedObjectContextManager *)sharedInstanceWithModelName:(NSString *)modelName {
+    if ([[self sharedInstances] objectForKey:modelName] == nil) {
+        RHManagedObjectContextManager *contextManager = [[RHManagedObjectContextManager alloc] initWithModelName:modelName];
+        [[self sharedInstances] setObject:contextManager forKey:modelName];
     }
 	
-    return sharedInstance;	
+    return [[self sharedInstances] objectForKey:modelName];
 }
 
-+(id)allocWithZone:(NSZone *)zone {
-    @synchronized(self) {
-        if (sharedInstance == nil) {
-            sharedInstance = [super allocWithZone:zone];
-            return sharedInstance;  // assignment and return on first allocation
-        }
++(NSMutableDictionary *)sharedInstances {
+    static dispatch_once_t once;
+    static NSMutableDictionary *sharedInstances;
+    dispatch_once(&once, ^ {
+        sharedInstances = [[NSMutableDictionary alloc] init];
+    });
+    return sharedInstances;
+}
+
+-(id)initWithModelName:(NSString *)_modelName {
+    if (self=[super init]) {
+        self.modelName = _modelName;
     }
-	
-    return nil; //on subsequent allocation attempts return nil	
-}
-
--(id)copyWithZone:(NSZone *)zone {	
     return self;
 }
 
--(id)retain {	
-    return self;
-}
-
--(unsigned)retainCount {
-    return UINT_MAX;  //denotes an object that cannot be released	
-}
-
--(oneway void)release {
-    //do nothing
-}
-
--(id)autorelease {
-    return self;
+-(NSString *)databaseName {
+    return [NSString stringWithFormat:@"%@.sqlite", [self.modelName lowercaseString]];
 }
 
 #pragma mark Other useful stuff
 // Used to flush and reset the database.
--(void)deleteStore {	
+-(void)deleteStore {
 	NSFileManager *fm = [NSFileManager defaultManager];
 	NSError *error;
 	
@@ -90,7 +77,7 @@ static RHManagedObjectContextManager *sharedInstance = nil;
 	} else {
 		NSPersistentStoreCoordinator *storeCoordinator = [self persistentStoreCoordinator];
 		
-		for (NSPersistentStore *store in [storeCoordinator persistentStores]) {	
+		for (NSPersistentStore *store in [storeCoordinator persistentStores]) {
 			NSURL *storeURL = store.URL;
 			NSString *storePath = storeURL.path;
 			[storeCoordinator removePersistentStore:store error:&error];
@@ -105,12 +92,14 @@ static RHManagedObjectContextManager *sharedInstance = nil;
 	self.managedObjectContext = nil;
 	self.managedObjectModel = nil;
 	self.persistentStoreCoordinator = nil;
+	
+	[[RHManagedObjectContextManager sharedInstances] removeObjectForKey:[self modelName]];
 }
 
 -(NSMutableDictionary *)managedObjectContexts {
 	if (managedObjectContexts == nil) {
 		self.managedObjectContexts = [NSMutableDictionary dictionary];
-	} 
+	}
 	return managedObjectContexts;
 }
 
@@ -121,7 +110,7 @@ static RHManagedObjectContextManager *sharedInstance = nil;
 	NSSet *deleted  = [moc deletedObjects];
 	NSSet *inserted = [moc insertedObjects];
 	
-	return [updated count] + [deleted count] + [inserted count];	
+	return [updated count] + [deleted count] + [inserted count];
 }
 
 // Do I need to lock the context?
@@ -130,11 +119,11 @@ static RHManagedObjectContextManager *sharedInstance = nil;
 	
  	NSManagedObjectContext *moc = [self managedObjectContext];
 	NSError *error = nil;
-		
+	
 	if ([self pendingChangesCount] > kPostMassUpdateNotificationThreshold) {
-//		dispatch_async(dispatch_get_main_queue(), ^{
-			[[NSNotificationCenter defaultCenter] postNotificationName:WillMassUpdateNotificationName object:nil];	
-//		});
+		//		dispatch_async(dispatch_get_main_queue(), ^{
+		[[NSNotificationCenter defaultCenter] postNotificationName:WillMassUpdateNotificationName object:nil];
+		//		});
 	}
 	
 	if ([moc hasChanges] && ![moc save:&error]) {
@@ -150,7 +139,7 @@ static RHManagedObjectContextManager *sharedInstance = nil;
 // This is the NSManagedObjectContextDidSaveNotification delegate method.  It gets called when a commit is applied
 // on a thread other than the MainThread.
 -(void)mocDidSave:(NSNotification *)saveNotification {
-    if ([NSThread isMainThread]) {		
+    if ([NSThread isMainThread]) {
 		// This ensures no updated object is fault, which would cause the NSFetchedResultsController updates to fail.
 		// http://www.mlsite.net/blog/?p=518
 		
@@ -167,12 +156,12 @@ static RHManagedObjectContextManager *sharedInstance = nil;
 }
 
 
--(NSManagedObjectContext *)managedObjectContext {	
+-(NSManagedObjectContext *)managedObjectContext {
     NSThread *thread = [NSThread currentThread];
 	
     if ([thread isMainThread]) {
         return [self mainThreadManagedObjectContext];
-    } 
+    }
 	
     // a key to cache the moc for the current thread
     NSString *threadKey = [NSString stringWithFormat:@"%p", thread];
@@ -187,9 +176,9 @@ static RHManagedObjectContextManager *sharedInstance = nil;
         [self.managedObjectContexts setObject:threadContext forKey:threadKey];
 		
 		// attach a notification thingie
-		[[NSNotificationCenter defaultCenter] addObserver:self 
+		[[NSNotificationCenter defaultCenter] addObserver:self
 												 selector:@selector(mocDidSave:)
-													 name:NSManagedObjectContextDidSaveNotification 
+													 name:NSManagedObjectContextDidSaveNotification
 												   object:threadContext];
     }
 	
@@ -200,7 +189,7 @@ static RHManagedObjectContextManager *sharedInstance = nil;
 	NSString *threadKey = [NSString stringWithFormat:@"%p", [NSThread currentThread]];
 	NSManagedObjectContext *threadContext = [self.managedObjectContexts objectForKey:threadKey];
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:threadContext];
-	[self.managedObjectContexts removeObjectForKey:threadKey];	
+	[self.managedObjectContexts removeObjectForKey:threadKey];
 }
 
 #pragma mark -
@@ -211,7 +200,7 @@ static RHManagedObjectContextManager *sharedInstance = nil;
  Returns the managed object context for the application.
  If the context doesn't already exist, it is created and bound to the persistent store coordinator for the application.
  */
--(NSManagedObjectContext *)mainThreadManagedObjectContext {	
+-(NSManagedObjectContext *)mainThreadManagedObjectContext {
 	if (managedObjectContext == nil) {
 		NSPersistentStoreCoordinator *coordinator = [self persistentStoreCoordinator];
 		if (coordinator != nil) {
@@ -232,12 +221,12 @@ static RHManagedObjectContextManager *sharedInstance = nil;
  Returns the managed object model for the application.
  If the model doesn't already exist, it is created from the application's model.
  */
--(NSManagedObjectModel *)managedObjectModel {    	
+-(NSManagedObjectModel *)managedObjectModel {
 	if (managedObjectModel == nil) {
-		NSString *modelPath = [[NSBundle mainBundle] pathForResource:kModelName ofType:@"momd"];
+		NSString *modelPath = [[NSBundle mainBundle] pathForResource:self.modelName ofType:@"momd"];
 		NSURL *modelURL = [NSURL fileURLWithPath:modelPath];
 		
-		self.managedObjectModel = [[[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL] autorelease]; 
+		self.managedObjectModel = [[[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL] autorelease];
 	}
 	
 	return managedObjectModel;
@@ -258,14 +247,14 @@ static RHManagedObjectContextManager *sharedInstance = nil;
 		NSFileManager *fileManager = [NSFileManager defaultManager];
 		
 		if (![fileManager fileExistsAtPath:storePath]) {
-			NSString *defaultStorePath = [[NSBundle mainBundle] pathForResource:kDatabaseName ofType:nil];
+			NSString *defaultStorePath = [[NSBundle mainBundle] pathForResource:[self databaseName] ofType:nil];
 			
 			if ([fileManager fileExistsAtPath:defaultStorePath]) {
 				[fileManager copyItemAtPath:defaultStorePath toPath:storePath error:NULL];
 			}
 		}
 		
-		NSURL *storeURL = [NSURL fileURLWithPath:storePath];		
+		NSURL *storeURL = [NSURL fileURLWithPath:storePath];
 		NSError *error = nil;
 		
 		self.persistentStoreCoordinator = [[[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:[self managedObjectModel]] autorelease];
@@ -288,7 +277,7 @@ static RHManagedObjectContextManager *sharedInstance = nil;
 			 * Simply deleting the existing store:
 			 [[NSFileManager defaultManager] removeItemAtURL:storeURL error:nil]
 			 
-			 * Performing automatic lightweight migration by passing the following dictionary as the options parameter: 
+			 * Performing automatic lightweight migration by passing the following dictionary as the options parameter:
 			 [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:YES],NSMigratePersistentStoresAutomaticallyOption, [NSNumber numberWithBool:YES], NSInferMappingModelAutomaticallyOption, nil];
 			 
 			 Lightweight migration will only work for a limited set of schema changes; consult "Core Data Model Versioning and Data Migration Programming Guide" for details.
@@ -296,7 +285,7 @@ static RHManagedObjectContextManager *sharedInstance = nil;
 			 */
 			NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
 			abort();
-		}    
+		}
     }
 	
     return persistentStoreCoordinator;
@@ -307,7 +296,7 @@ static RHManagedObjectContextManager *sharedInstance = nil;
 #pragma mark -
 #pragma mark Application's Documents directory
 -(NSString *)storePath {
-	return [[self applicationDocumentsDirectory] stringByAppendingPathComponent:kDatabaseName];
+	return [[self applicationDocumentsDirectory] stringByAppendingPathComponent:[self databaseName]];
 }
 
 /**

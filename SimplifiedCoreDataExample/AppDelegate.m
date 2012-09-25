@@ -9,7 +9,7 @@
 #import "AppDelegate.h"
 #import "Employee.h"
 #import "ExampleTableViewController.h"
-#import "RHManagedObjectContextManager.h"
+#import "Employee.h"
 
 @implementation AppDelegate
 
@@ -24,7 +24,7 @@
     self.window = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];
     
 	// Reset the store.
-	[[RHManagedObjectContextManager sharedInstance] deleteStore];
+	[Employee deleteStore];
 	
 	// Override point for customization after application launch.
 	ExampleTableViewController *controller = [[ExampleTableViewController alloc] initWithStyle:UITableViewStyleGrouped];

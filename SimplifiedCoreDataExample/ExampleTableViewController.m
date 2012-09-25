@@ -63,6 +63,10 @@
 		[fetchRequest release];
 		[fetchedResultsController release];
 		
+		NSError *error = nil;
+		if (![fetchedResultsController performFetch:&error]) {
+			NSLog(@"Unresolved error: %@", [error localizedDescription]);
+		}
     }
 	
 	return fetchedResultsController;

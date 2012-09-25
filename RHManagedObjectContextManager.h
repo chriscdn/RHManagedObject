@@ -24,8 +24,6 @@
 //  THE SOFTWARE.
 //
 
-// #define kDatabaseName @"trackmytour.sqlite"
-// #define kModelName @"TrackMyTour" // without the .xcdatamodeld extension
 #define kMergePolicy NSMergeByPropertyObjectTrumpMergePolicy
 
 #define WillMassUpdateNotificationName @"WillMassUpdateNotificationName"

@@ -39,7 +39,7 @@ RHManagedObject changes this to:
 
 	NSObject :: NSManagedObject :: RHManagedObject :: EmployeeEntity :: Employee
 	
-You'll notice that the RHManagedObject and `Employee` classes have been added to the hierarchy. The RHManagedObject class adds generic methods (i.e., not specific to your model) that simplifies interacting with Core Data. Its main features are:
+You'll notice that the `RHManagedObject` and `Employee` classes have been added to the hierarchy. The `RHManagedObject` class adds generic methods (i.e., not specific to your model) that simplifies interacting with Core Data. Its main features are:
 
 - It manages the object context so that you don't have to think about it.
 - It adds easier methods for fetching, creating, cloning, and deleting managed objects.

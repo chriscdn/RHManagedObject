@@ -89,14 +89,18 @@ After your entity classes have been generated you must go back to the xcdatamode
 The entity subclass requires two methods to identify which Core Data entity it extends and to which model it belongs. This is used by `RHManagedObjectContext`, and looks like this for the `Employee` example:
 
 ``` objective-c
+@implementation Employee
+
 +(NSString *)entityName {
-    return @"EmployeeEntity";
+	return @"EmployeeEntity";
 }
 
 // This returns the name of your xcdatamodeld model, without the extension
 +(NSString *)modelName {
 	return @"SimplifiedCoreDataExample";
 }
+
+@end
 ```
 
 However, it's also the place where additional methods can be added without disrupting the generated entity class. For example:

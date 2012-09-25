@@ -83,7 +83,7 @@ The `Employee` class requires two methods to identify which Core Data entity it 
 
 ``` objective-c
 +(NSString *)entityName {
-    return @”EmployeeEntity”;
+    return @"EmployeeEntity";
 }
 
 // This returns the name of your xcdatamodeld model, without the extension
@@ -106,6 +106,12 @@ Lastly, the framework also contains code to populate the store on first launch. 
 
 ## Example Usage
 
+### Add a new employee
+
+``` objective-c
+Employee *employee = [Employee newEntity];
+```
+
 ### Fetch all employees
 
 ``` objective-c
@@ -126,8 +132,79 @@ NSArray *employees = [Employee fetchWithPredicate:[NSPredicate predicateWithForm
 
 ### Get a specific employee record
 
+The `getWithPredicate:` method will return the first object if more than one is found.
+
 ``` objective-c
 Employee *employee = [Employee getWithPredicate:[NSPredicate predicateWithFormat:@"employeID=%i", 12345]];
 ```
 
+### Count total number of employees
 
+``` objective-c
+NSUInteger employeeCount = [Employee count];
+```
+
+### Count total number of employees with first name "John"
+
+``` objective-c
+NSUInteger employeeCount = [Employee countWithPredicate:[NSPredicate predicateWithFormat:@"firstName=%@", @"John"]];
+```
+
+### Get all the unique first names
+
+``` objective-c
+NSArray *uniqueFirstNames = [Employee distinctValuesForAttribute:@"firstName" withPredicate:nil];
+```
+
+### Get the average age of all employees
+
+``` objective-c
+NSNumber *averageAge = [Employee aggregateWithType:RHAggregateAverage key:@"age" predicate:nil defaultValue:nil];
+```
+
+### Fire all employees
+
+``` objective-c
+[Employee deleteAll];
+```
+
+### Fire a single employee
+
+``` objective-c
+Employee *employee = [Employee get ...];
+[employee delete];
+```
+
+### Commit changes
+
+This must be called in the same thread where the changes to your objects were made.
+
+``` objective-c
+[Employee commit];
+```
+
+### Completely destroy the Employee model (i.e., delete the .sqlite file)
+
+This is useful to reset your Core Data store after making changes to your model.
+
+``` objective-c
+[Employee deleteStore];
+```
+
+### Get an instance of a object in another thread
+
+Core Data doesn't allow you to pass managed objects among threads.  Here's how you can you fetch a valid managed object in different threads.
+
+```
+Employee *employee = [Employee getWithPredicate:[NSPredicate predicateWithFormat:@"employeID=%i", 12345]];
+
+dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+
+	// employee is not valid in this thread, so we fetch one that is:
+	Employee *employee2  = [employee objectInCurrentThreadContext];
+	
+	// do something with employee2
+	
+	[Employee commit];
+});
+```

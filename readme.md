@@ -3,7 +3,7 @@
 RHManagedObject is a library for iOS to simplify your life with Core Data.  It was motivated by the following:
 
 - Core Data is verbose.  Have a look at [Listing 1](http://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/CoreData/Articles/cdFetching.html) from the Apple Documentation and you'll see it takes ~14 lines of code for a single fetch request.  `RHManagedObject` reduces this to one line of code.
-- Core Data is not thread safe. If you wish to interact with your objects off the main thread you need to create a separate object context, attach a `NSManagedObjectContextDidSaveNotification` notification to it, and merge the context into the observer method on the main thread when performing a save.  `RHManagedObject` does all of this for you so that you can work with your objects transparently in any thread.  
+- Core Data is not thread safe. If you wish to mutate your objects off the main thread you need to create a separate object context, attach a `NSManagedObjectContextDidSaveNotification` notification to it, and merge the context into an observer method on the main thread.  `RHManagedObject` does all of this for you so that you can simply work transparently with your objects in any thread.  
 - Each managed object has an object context associated with it, and for some operations you must first fetch the object context in order to operate on the object. For example:
 
 	``` objective-c
@@ -17,9 +17,9 @@ RHManagedObject is a library for iOS to simplify your life with Core Data.  It w
 	[myManagedObject delete];
 	```
 	
-	`RHManagedObject` hides the object context in a singleton such you never have to interact with it directly.  This approach also removes the need to pass your object context among each `UIViewController` that uses it.
-- The generated managed object classes leave no room to add additional methods. You can't (or shouldn't) add extra methods to the generated classes since they will be overridden when the classes are regenerated. `RHManagedObject` provides a place for additional class and instance methods.
-- The AppDelegate gets polluted with boilerplate code. `RHManagedObject` hides most of the underlying boilerplate Core Data code, which also makes it easier to copy the library to other projects.
+	`RHManagedObject` hides the object context in a singleton such you never have to interact with it directly.  This approach also removes the need to pass the object context among each `UIViewController` that uses it.
+- The generated managed object classes leave little room to add additional methods. You can't (or shouldn't) add extra methods to the generated classes since they will be overridden when the classes are regenerated. `RHManagedObject` provides a place for additional class and instance methods.
+- The AppDelegate gets polluted with boilerplate code. `RHManagedObject` hides most of this, which also makes it easier to copy the library to other projects.
 
 ## How To Get Started
 
@@ -40,9 +40,9 @@ A typical Core Data "Employee" entity (say, with attributes firstName and lastNa
 	
 You'll notice that the `RHManagedObject` and `Employee` classes have been added to the hierarchy. The `RHManagedObject` class adds generic methods (i.e., not specific to your model) that simplifies interacting with Core Data. Its main features are:
 
-- It manages the object context for you such that you don't have to think about it.
+- It manages the object context so that you don't have to think about it.
 - It adds easier methods for fetching, creating, cloning, and deleting managed objects.
-- It provides a simplified interface for saving the context, and works regardless from which thread it's called.
+- It provides a simplified interface for saving the context, and works the same regardless from which thread it's called.
 
 For example, the newEntity method introduced in `RHManagedObject` lets you create a new managed object with a single line:
 
@@ -65,12 +65,10 @@ The delete method lets you delete an existing managed object:
 Changes can be saved with the commit method, which will handle all the nuances of creating and merging the contexts from different threads. In other words, you can call `commit` from your thread and forget about it:
 
 ``` objective-c
-[RHManagedObject commit];
-// or
 [Employee commit];
 ```
 
-You'll notice that none of these examples require direct use of a `NSManagedObjectContext`. That's handled for you within the framework. Of course, a method is available to fetch the object context for the current thread if it's required:
+You'll notice that none of these examples require direct use of `NSManagedObjectContext`. That's handled for you within the framework. Of course, a method is available to fetch the object context for the current thread if it's required:
 
 ``` objective-c
 NSManagedObjectContext *moc = [RHManagedObject managedObjectContext];
@@ -78,11 +76,11 @@ NSManagedObjectContext *moc = [RHManagedObject managedObjectContext];
 
 The `EmployeeEntity` class is still generated by Xcode, but is manually edited to inherit from `RHManagedObjectClass` instead of `NSManagedObjectClass`. It's a small hack, but only means changing two lines of code. 
 
-	The object graph must also be modified before and after the entity classes are generated.  Open your xcdatamodeld in XCode, click on your entity, and view the entity properties at the right.  The `Name` and `Class` fields must be set to your entity name when generating your `NSManagedObject` subclasses.  After they are generated you must set the `Class` to the name of your superclass.
+*Note:* The object graph must also be modified before and after the entity classes are generated.  Open your xcdatamodeld in XCode, click on your entity, and view the entity properties at the right.  The `Name` and `Class` fields must be set to your entity name when generating your `NSManagedObject` subclasses.  After they are generated you must set the `Class` to the name of your superclass.
 
-	For example, when generating the `EmployeeEntity` I set the name and class fields to `EmployeeEntity`.  After they are generated I set the class field to `Employee`.
+For example, when generating the `EmployeeEntity` I set the name and class fields to `EmployeeEntity`.  After they are generated I set the class field to `Employee`.
 
-	If there is an easier way to do this then please let me know.
+If there is an easier way to do this then please let me know.
 
 The `Employee` class requires two methods to identify which Core Data entity it extends and to which model it belongs. This is used by `RHManagedObjectContext`, and looks like this:
 

@@ -207,18 +207,18 @@ This is useful to reset your Core Data store after making changes to your model.
 
 ### Get an object instance in another thread
 
-Core Data doesn't allow you to pass managed objects between threads.  Here's how you can you fetch a valid managed object in different threads.
+Core Data doesn't allow you to pass managed objects between threads.  However you can generate a new object in a separate thread that's valid for that thread.  Here's an example using the `objectInCurrentThreadContext` method:
 
 ```
 Employee *employee = [Employee getWithPredicate:[NSPredicate predicateWithFormat:@"employeID=%i", 12345]];
 
 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+	
 	// employee is not valid in this thread, so we fetch one that is:
 	Employee *employee2  = [employee objectInCurrentThreadContext];
-	
-	// do something with employee2
-	
+	// do something with employee2	
 	[Employee commit];
+
 });
 ```
 

@@ -213,3 +213,23 @@ dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 	[Employee commit];
 });
 ```
+
+## I'm stuck!
+
+Check out the included `SimplifiedCoreDataExample` for a working example.  You can also contact me if you have any questions or comments.
+
+## Where is this being used?
+
+RHManagedObject is being used in
+
+- [TrackMyTour](http://trackmytour.com/) - Travel Sharing for iPhone and iPad
+- [Warmshowers.org](http://warmshowers.org/) - Hospitality for Touring Cyclists
+- [PubQuest.com](http://pubquest.com/) - Not yet released
+
+Contact me if you'd like your app to be listed.
+
+## Contact
+
+[Christopher Meyer](https://github.com/chriscdn)
+[@chriscdn](http://twitter.com/chriscdn)
+Follow 

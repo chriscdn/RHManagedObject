@@ -11,13 +11,13 @@ RHManagedObject is a library for iOS to simplify your life with Core Data.  It w
 	[moc deleteObject:myManagedObject];
 	```
 
-	This is more verbose than necessary since it introduces the object context when its existence is implied by the managed object. RHManagedObject replaces the above code with:
+	This is more verbose than necessary since it introduces the object context when its existence is implied by the managed object. RHManagedObject simplifies the above code to:
 
 	``` objective-c
 	[myManagedObject delete];
 	```
 	
-	RHManagedObject hides the object context in a singleton such you never have to interact with it directly.  This approach also removes the need to pass the object context between each `UIViewController` that uses it.
+- A common design pattern with Core Data is to pass the object context between each `UIViewController` that requires it.  RHManagedObject removes this hassle by placing the object context in a singleton that can be accessed from anywhere.
 - The generated managed object classes leave little room to add additional methods. You can't (or shouldn't) add extra methods to the generated classes since they will be overridden when the classes are regenerated. RHManagedObject provides a place for additional class and instance methods.
 - The AppDelegate gets polluted with boilerplate code. RHManagedObject hides most of this, which also makes it easier to copy the library to other projects.
 

@@ -2,8 +2,8 @@
 
 RHManagedObject is a library for iOS to simplify your life with Core Data.  It was motivated by the following:
 
-- Core Data is verbose.  Have a look at [Listing 1](http://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/CoreData/Articles/cdFetching.html) from the Apple Documentation and you'll see it takes ~14 lines of code for a single fetch request.  `RHManagedObject` reduces this to one line of code.
-- Core Data is not thread safe. If you wish to mutate your objects off the main thread you need to create a separate object context, attach a `NSManagedObjectContextDidSaveNotification` notification to it, and merge the context into an observer method on the main thread.  `RHManagedObject` does all of this for you so that you can simply work transparently with your objects in any thread.  
+- Core Data is verbose.  Have a look at [Listing 1](http://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/CoreData/Articles/cdFetching.html) from the Apple Documentation and you'll see it takes ~14 lines of code for a single fetch request.  RHManagedObject reduces this to one line of code.
+- Core Data is not thread safe. If you wish to mutate your objects off the main thread you need to create a separate object context, attach a `NSManagedObjectContextDidSaveNotification` notification to it, and merge the context into an observer method on the main thread.  RHManagedObject does all of this for you so that you can simply work transparently with your objects in any thread.  
 - Each managed object has an object context associated with it, and for some operations you must first fetch the object context in order to operate on the object. For example:
 
 	``` objective-c
@@ -11,15 +11,15 @@ RHManagedObject is a library for iOS to simplify your life with Core Data.  It w
 	[moc deleteObject:myManagedObject];
 	```
 
-	This is more verbose than necessary since it introduces the object context when its existence is implied by the managed object. `RHManagedObject` replaces the above code with:
+	This is more verbose than necessary since it introduces the object context when its existence is implied by the managed object. RHManagedObject replaces the above code with:
 
 	``` objective-c
 	[myManagedObject delete];
 	```
 	
-	`RHManagedObject` hides the object context in a singleton such you never have to interact with it directly.  This approach also removes the need to pass the object context among each `UIViewController` that uses it.
-- The generated managed object classes leave little room to add additional methods. You can't (or shouldn't) add extra methods to the generated classes since they will be overridden when the classes are regenerated. `RHManagedObject` provides a place for additional class and instance methods.
-- The AppDelegate gets polluted with boilerplate code. `RHManagedObject` hides most of this, which also makes it easier to copy the library to other projects.
+	RHManagedObject hides the object context in a singleton such you never have to interact with it directly.  This approach also removes the need to pass the object context among each `UIViewController` that uses it.
+- The generated managed object classes leave little room to add additional methods. You can't (or shouldn't) add extra methods to the generated classes since they will be overridden when the classes are regenerated. RHManagedObject provides a place for additional class and instance methods.
+- The AppDelegate gets polluted with boilerplate code. RHManagedObject hides most of this, which also makes it easier to copy the library to other projects.
 
 ## How To Get Started
 
@@ -34,17 +34,17 @@ A typical Core Data "Employee" entity (say, with attributes firstName and lastNa
 
 	NSObject :: NSManagedObject :: EmployeeEntity
 
-`RHManagedObject` changes this to:
+RHManagedObject changes this to:
 
 	NSObject :: NSManagedObject :: RHManagedObject :: EmployeeEntity :: Employee
 	
-You'll notice that the `RHManagedObject` and `Employee` classes have been added to the hierarchy. The `RHManagedObject` class adds generic methods (i.e., not specific to your model) that simplifies interacting with Core Data. Its main features are:
+You'll notice that the RHManagedObject and `Employee` classes have been added to the hierarchy. The RHManagedObject class adds generic methods (i.e., not specific to your model) that simplifies interacting with Core Data. Its main features are:
 
 - It manages the object context so that you don't have to think about it.
 - It adds easier methods for fetching, creating, cloning, and deleting managed objects.
 - It provides a simplified interface for saving the context, and works the same regardless from which thread it's called.
 
-For example, the newEntity method introduced in `RHManagedObject` lets you create a new managed object with a single line:
+For example, the newEntity method introduced in RHManagedObject lets you create a new managed object with a single line:
 
 ``` objective-c
 Employee *newEmployee = [Employee newEntity];
@@ -109,7 +109,7 @@ Lastly, the library also contains code to populate the store on first launch. Th
 
 ## Example Usage
 
-Once you have setup `RHManagedObject` it becomes much easier to do common tasks.  Here are some examples.
+Once you have setup RHManagedObject it becomes much easier to do common tasks.  Here are some examples.
 
 ### Add a new employee
 
@@ -232,4 +232,7 @@ Contact me if you'd like your app to be listed.
 
 [Christopher Meyer](https://github.com/chriscdn)
 [@chriscdn](http://twitter.com/chriscdn)
+
+## License
+RHManagedObject is available under the MIT license. See the LICENSE file for more info.
 Follow 

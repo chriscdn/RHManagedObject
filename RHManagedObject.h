@@ -40,7 +40,6 @@ typedef enum {
 +(NSString *)entityName;
 +(NSString *)modelName;
 
-
 +(NSEntityDescription *)entityDescription;
 +(void)deleteStore;
 +(void)commit;

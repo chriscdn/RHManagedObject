@@ -19,7 +19,7 @@ RHManagedObject is a simplified library for Core Data on iOS.  It was motivated 
 	
 	`RHManagedObject` makes it possible to interact with Core Data objects without having to ever interact with the object context.
 
-- The generated managed object classes leave no room to add additional methods. You can’t (or shouldn’t) add extra methods to the generated classes since they will be overridden when the classes are regenerated. `RHManagedObject` provides a place for additional class and instance methods.
+- The generated managed object classes leave no room to add additional methods. You can't (or shouldn't) add extra methods to the generated classes since they will be overridden when the classes are regenerated. `RHManagedObject` provides a place for additional class and instance methods.
 - The AppDelegate gets polluted with boilerplate code. `RHManagedObject` most of the underlying boilerplate Core Data code, which also makes it easier to copy the library to other projects.
 
 ## How To Get Started
@@ -27,7 +27,7 @@ RHManagedObject is a simplified library for Core Data on iOS.  It was motivated 
 - [Download RHManagedObject](https://github.com/chriscdn/RHManagedObject/zipball/master)
 - Copy `RHManagedObject.h`, `RHManagedObject.m`, `RHManagedObjectContextManager.h`, and `RHManagedObjectContextManager.m` into your project
 
-## Overview by Example
+## Overview
 
 This brief tutorial assumes you have some experience with Core Data.
 
@@ -39,11 +39,11 @@ A typical Core Data "Employee" entity (say, with attributes firstName and lastNa
 
 	NSObject :: NSManagedObject :: RHManagedObject :: EmployeeEntity :: Employee
 	
-You’ll notice that the `RHManagedObject` and `Employee` classes have been added to the hierarchy. The `RHManagedObject` class adds generic methods (i.e., not specific to your model) that simplifies interacting with Core Data. Its main features are:
+You'll notice that the `RHManagedObject` and `Employee` classes have been added to the hierarchy. The `RHManagedObject` class adds generic methods (i.e., not specific to your model) that simplifies interacting with Core Data. Its main features are:
 
-- It manages the moc for you such that you don’t have to think about it.
+- It manages the object context for you such that you don't have to think about it.
 - It adds easier methods for fetching, creating, cloning, and deleting managed objects.
-- It provides a simplified interface for saving the context, and works regardless from which thread it’s called.
+- It provides a simplified interface for saving the context, and works regardless from which thread it's called.
 
 For example, the newEntity method introduced in `RHManagedObject` lets you create a new managed object with a single line:
 
@@ -71,7 +71,7 @@ Changes can be saved with the commit method, which will handle all the nuances o
 [Employee commit];
 ```
 
-You’ll notice that none of these examples require direct use of a `NSManagedObjectContext`. That’s handled for you within the framework. Of course, a method is available to fetch the moc for the current thread if it’s required:
+You'll notice that none of these examples require direct use of a `NSManagedObjectContext`. That's handled for you within the framework. Of course, a method is available to fetch the object context for the current thread if it's required:
 
 ``` objective-c
 NSManagedObjectContext *moc = [RHManagedObject managedObjectContext];
@@ -92,7 +92,7 @@ The `Employee` class requires two methods to identify which Core Data entity it 
 }
 ```
 
-However, it’s also the place where additional methods can be added without disrupting the generated entity class. For example:
+However, it's also the place where additional methods can be added without disrupting the generated entity class. For example:
 
 ``` objective-c
 -(NSString *)fullName {
@@ -100,6 +100,24 @@ However, it’s also the place where additional methods can be added without dis
 }
 ```
 
-The framework also contains a singleton class called `RHManagedObjectContextManager`, which contains the Core Data boilerplate code that’s normally found in the AppDelegate. It also handles the managed object contexts among the different threads, and the merging of contexts when saving. Fortunately, you can ignore this class since it’s only used internally by the framework.
+The framework also contains a singleton class called `RHManagedObjectContextManager`, which contains the Core Data boilerplate code that's normally found in the AppDelegate. It also handles the managed object contexts among the different threads, and the merging of contexts when saving. You can probably ignore this class since it's only used internally by the framework.
 
 Lastly, the framework also contains code to populate the store on first launch. This was motivated by the [CoreDataBooks example](http://developer.apple.com/library/ios/#samplecode/CoreDataBooks/Introduction/Intro.html), so all you have to do is copy the sqlite file generated by the simulator into your project. The framework takes care of the rest.
+
+## Available Methods
+
+The following methods are defined in `RHManagedObject`.
+
+<table>
+
+<tr>
+	<td>`+(NSString *)entityName;`</td>
+	<td>Abstract.  This function must be overridden in your subclass and return the name of your Core Data entity.</td>
+</tr>
+
+<tr>
+	<td>`+(NSString *)modelName;`</td>
+	<td>Abstract.  This function must be overridden in your subclass and return the name of your Core Data model (i.e., the xcdatamodeld file without the extension).</td>
+</tr>
+
+</table>

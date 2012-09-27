@@ -1,6 +1,6 @@
 //
 //  RHManagedObjectContextManager.m
-//  Version: 0.7
+//  Version: 0.7.1
 //
 //  Copyright (C) 2012 by Christopher Meyer
 //  http://schwiiz.org/
@@ -119,11 +119,11 @@
 	
  	NSManagedObjectContext *moc = [self managedObjectContext];
 	NSError *error = nil;
-	
+    
 	if ([self pendingChangesCount] > kPostMassUpdateNotificationThreshold) {
-		//		dispatch_async(dispatch_get_main_queue(), ^{
-		[[NSNotificationCenter defaultCenter] postNotificationName:WillMassUpdateNotificationName object:nil];
-		//		});
+        //		dispatch_async(dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:WillMassUpdateNotificationName object:nil];
+        //		});
 	}
 	
 	if ([moc hasChanges] && ![moc save:&error]) {

@@ -1,6 +1,6 @@
 //
 //  RHManagedObject.m
-//  Version: 0.7
+//  Version: 0.7.1
 //
 //  Copyright (C) 2012 by Christopher Meyer
 //  http://schwiiz.org/
@@ -72,8 +72,8 @@
 	return nil;
 }
 
-+(id)getWithPredicate:(NSPredicate *)predicate withSortDescriptor:(NSSortDescriptor *)descriptor {
-	NSArray *results = [self fetchWithPredicate:predicate withSortDescriptor:descriptor];
++(id)getWithPredicate:(NSPredicate *)predicate sortDescriptor:(NSSortDescriptor *)descriptor {
+	NSArray *results = [self fetchWithPredicate:predicate sortDescriptor:descriptor];
 	
 	if ([results count] > 0) {
 		return [results objectAtIndex:0];
@@ -87,18 +87,18 @@
 }
 
 +(NSArray *)fetchWithPredicate:(NSPredicate *)predicate {
-	return [self fetchWithPredicate:predicate withSortDescriptor:nil];
+	return [self fetchWithPredicate:predicate sortDescriptor:nil];
 }
 
-+(NSArray *)fetchWithPredicate:(NSPredicate *)predicate withSortDescriptor:(NSSortDescriptor *)descriptor {
-	return [self fetchWithPredicate:predicate withSortDescriptor:descriptor withLimit:0];
++(NSArray *)fetchWithPredicate:(NSPredicate *)predicate sortDescriptor:(NSSortDescriptor *)descriptor {
+	return [self fetchWithPredicate:predicate sortDescriptor:descriptor withLimit:0];
 }
 
-+(NSArray *)fetchWithPredicate:(NSPredicate *)predicate withSortDescriptor:(NSSortDescriptor *)descriptor withLimit:(NSUInteger)limit {
++(NSArray *)fetchWithPredicate:(NSPredicate *)predicate sortDescriptor:(NSSortDescriptor *)descriptor withLimit:(NSUInteger)limit {
 	NSFetchRequest *fetch = [[[NSFetchRequest alloc] init] autorelease];
 	
 	[fetch setEntity:[self entityDescription]];
-	
+    
 	if (predicate) {
 		[fetch setPredicate:predicate];
 	}
@@ -132,7 +132,7 @@
 	return [self.managedObjectContext countForFetchRequest:fetch error:nil];
 }
 
-+(NSArray *)distinctValuesForAttribute:(NSString *)attribute withPredicate:(NSPredicate *)predicate {
++(NSArray *)distinctValuesWithAttribute:(NSString *)attribute predicate:(NSPredicate *)predicate {
 	NSArray *items = [self fetchWithPredicate:predicate];
 	NSString *keyPath = [@"@distinctUnionOfObjects." stringByAppendingString:attribute];
 	return [[items valueForKeyPath:keyPath] sortedArrayUsingSelector:@selector(compare:)];
@@ -153,7 +153,7 @@
     }
 }
 
-+(NSAttributeType)attributeTypeFromKey:(NSString *)key {
++(NSAttributeType)attributeTypeWithKey:(NSString *)key {
 	NSEntityDescription *entityDescription = [self entityDescription];
 	NSDictionary *properties = [entityDescription propertiesByName];
 	NSAttributeDescription *attribute = [properties objectForKey:key];
@@ -168,7 +168,7 @@
 	}
 	
 	NSString *aggregateString = [self aggregateToString:aggregate];
-	NSAttributeType attributeType = [self attributeTypeFromKey:key];
+	NSAttributeType attributeType = [self attributeTypeWithKey:key];
 	
 	NSEntityDescription *entity = [self entityDescription]; // [NSEntityDescription entityForName:[self entityName] inManagedObjectContext:[self managedObjectContext]];
 	[fetch setEntity:entity];

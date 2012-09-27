@@ -1,6 +1,6 @@
 //
 //  RHManagedObject.h
-//  Version: 0.7
+//  Version: 0.7.1
 //
 //  Copyright (C) 2012 by Christopher Meyer
 //  http://schwiiz.org/
@@ -40,26 +40,27 @@ typedef enum {
 +(NSString *)entityName;
 +(NSString *)modelName;
 
+
 +(NSEntityDescription *)entityDescription;
 +(void)deleteStore;
 +(void)commit;
 +(id)newEntity;
 +(id)getWithPredicate:(NSPredicate *)predicate;
-+(id)getWithPredicate:(NSPredicate *)predicate withSortDescriptor:(NSSortDescriptor *)descriptor;
++(id)getWithPredicate:(NSPredicate *)predicate sortDescriptor:(NSSortDescriptor *)descriptor;
 
 /* Getters */
 +(NSArray *)fetchAll;
 +(NSArray *)fetchWithPredicate:(NSPredicate *)predicate;
-+(NSArray *)fetchWithPredicate:(NSPredicate *)predicate withSortDescriptor:(NSSortDescriptor *)descriptor;
-+(NSArray *)fetchWithPredicate:(NSPredicate *)predicate withSortDescriptor:(NSSortDescriptor *)descriptor withLimit:(NSUInteger)limit;
++(NSArray *)fetchWithPredicate:(NSPredicate *)predicate sortDescriptor:(NSSortDescriptor *)descriptor;
++(NSArray *)fetchWithPredicate:(NSPredicate *)predicate sortDescriptor:(NSSortDescriptor *)descriptor withLimit:(NSUInteger)limit;
 // +(NSArray *)serialize:(NSArray *)items;
 
 +(NSUInteger)count;
 +(NSUInteger)countWithPredicate:(NSPredicate *)predicate;
 
-+(NSArray *)distinctValuesForAttribute:(NSString *)attribute withPredicate:(NSPredicate *)predicate;
++(NSArray *)distinctValuesWithAttribute:(NSString *)attribute predicate:(NSPredicate *)predicate;
 +(NSString*)aggregateToString:(RHAggregate)aggregate;
-+(NSAttributeType)attributeTypeFromKey:(NSString *)key;
++(NSAttributeType)attributeTypeWithKey:(NSString *)key;
 +(id)aggregateWithType:(RHAggregate)aggregate key:(NSString *)key predicate:(NSPredicate *)predicate defaultValue:(id)defaultValue;
 
 

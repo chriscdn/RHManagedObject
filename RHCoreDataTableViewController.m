@@ -1,6 +1,6 @@
 //
 //  RHCoreDataTableViewController.m
-//  Version: 0.7.1
+//  Version: 0.7
 //
 //  Copyright (C) 2012 by Christopher Meyer
 //  http://schwiiz.org/
@@ -209,8 +209,7 @@
 }
 
 -(void)controller:(NSFetchedResultsController *)controller didChangeSection:(id <NSFetchedResultsSectionInfo>)sectionInfo atIndex:(NSUInteger)sectionIndex forChangeType:(NSFetchedResultsChangeType)type {
-	
-    if (self.massUpdate) {
+	if (self.massUpdate) {
 		return;
 	}
 	

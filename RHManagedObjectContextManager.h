@@ -25,11 +25,12 @@
 //
 
 #define kMergePolicy NSMergeByPropertyObjectTrumpMergePolicy
-// #define kMergePolicy NSErrorMergePolicy
 
 #define WillMassUpdateNotificationName @"WillMassUpdateNotificationName"
 // If more than kPostMassUpdateNotificationThreshold updates are commited at once, post a WillMassUpdateNotificationName notification first
 #define kPostMassUpdateNotificationThreshold 10
+
+// #define kMergePolicy NSErrorMergePolicy
 
 #import <CoreData/CoreData.h>
 

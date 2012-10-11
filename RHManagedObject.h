@@ -76,5 +76,7 @@ typedef enum {
 
 @end
 
+
 @interface ImageToDataTransformer : NSValueTransformer
+
 @end

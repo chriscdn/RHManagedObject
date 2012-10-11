@@ -264,6 +264,7 @@
 
 
 @implementation ImageToDataTransformer
+
 +(BOOL)allowsReverseTransformation {
 	return YES;
 }
@@ -279,4 +280,5 @@
 -(id)reverseTransformedValue:(id)value {
 	return [UIImage imageWithData:value];
 }
+
 @end

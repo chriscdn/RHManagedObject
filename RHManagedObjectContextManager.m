@@ -1,6 +1,6 @@
 //
 //  RHManagedObjectContextManager.m
-//  Version: 0.7.1
+//  Version: 0.7.2
 //
 //  Copyright (C) 2012 by Christopher Meyer
 //  http://schwiiz.org/
@@ -290,6 +290,7 @@
 	
     return persistentStoreCoordinator;
 }
+
 
 
 #pragma mark -

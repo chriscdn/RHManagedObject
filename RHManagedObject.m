@@ -28,7 +28,6 @@
 #import "RHManagedObjectContextManager.h"
 
 @interface RHManagedObject()
-
 @end
 
 @implementation RHManagedObject

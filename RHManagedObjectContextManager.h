@@ -1,6 +1,6 @@
 //
 //  RHManagedObjectContextManager.h
-//  Version: 0.7.1
+//  Version: 0.7.2
 //
 //  Copyright (C) 2012 by Christopher Meyer
 //  http://schwiiz.org/
@@ -25,11 +25,12 @@
 //
 
 #define kMergePolicy NSMergeByPropertyObjectTrumpMergePolicy
-// #define kMergePolicy NSErrorMergePolicy
 
 #define WillMassUpdateNotificationName @"WillMassUpdateNotificationName"
 // If more than kPostMassUpdateNotificationThreshold updates are commited at once, post a WillMassUpdateNotificationName notification first
 #define kPostMassUpdateNotificationThreshold 10
+
+// #define kMergePolicy NSErrorMergePolicy
 
 #import <CoreData/CoreData.h>
 

@@ -30,7 +30,6 @@ typedef enum {
 	RHAggregateSum
 } RHAggregate;
 
-
 #import <CoreData/CoreData.h>
 @class RHManagedObjectContextManager;
 
@@ -52,7 +51,6 @@ typedef enum {
 +(NSArray *)fetchWithPredicate:(NSPredicate *)predicate;
 +(NSArray *)fetchWithPredicate:(NSPredicate *)predicate sortDescriptor:(NSSortDescriptor *)descriptor;
 +(NSArray *)fetchWithPredicate:(NSPredicate *)predicate sortDescriptor:(NSSortDescriptor *)descriptor withLimit:(NSUInteger)limit;
-// +(NSArray *)serialize:(NSArray *)items;
 
 +(NSUInteger)count;
 +(NSUInteger)countWithPredicate:(NSPredicate *)predicate;
@@ -75,7 +73,6 @@ typedef enum {
 -(NSDictionary *)serialize;
 
 @end
-
 
 @interface ImageToDataTransformer : NSValueTransformer
 

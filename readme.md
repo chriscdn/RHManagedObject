@@ -218,7 +218,7 @@ This is useful to reset your Core Data store after making changes to your model.
 
 Core Data doesn't allow you to pass managed objects between threads.  However you can generate a new object in a separate thread that's valid for that thread.  Here's an example using the `objectInCurrentThreadContext` method:
 
-```
+``` objective-c
 Employee *employee = [Employee getWithPredicate:[NSPredicate predicateWithFormat:@"employeID=%i", 12345]];
 
 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{

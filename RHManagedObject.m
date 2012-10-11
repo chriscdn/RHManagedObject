@@ -1,6 +1,6 @@
 //
 //  RHManagedObject.m
-//  Version: 0.7.2
+//  Version: 0.7.1
 //
 //  Copyright (C) 2012 by Christopher Meyer
 //  http://schwiiz.org/
@@ -31,6 +31,7 @@
 
 @end
 
+
 @implementation RHManagedObject
 
 // Abstract class.  Implement in your entity subclass to return the name of the entity superclass.
@@ -50,7 +51,7 @@
 }
 
 +(NSEntityDescription *)entityDescription {
-	return [NSEntityDescription entityForName:[self entityName] inManagedObjectContext:[self managedObjectContextForCurrentThread]];
+	return [NSEntityDescription entityForName:[self entityName] inManagedObjectContext:[self managedObjectContext]];
 }
 
 +(void)commit {
@@ -58,7 +59,7 @@
 }
 
 +(id)newEntity {
-	return [NSEntityDescription insertNewObjectForEntityForName:[self entityName] inManagedObjectContext:[self managedObjectContextForCurrentThread]];
+	return [NSEntityDescription insertNewObjectForEntityForName:[self entityName] inManagedObjectContext:[self managedObjectContext]];
 }
 
 +(id)getWithPredicate:(NSPredicate *)predicate {
@@ -112,7 +113,7 @@
 	
 	[fetch setIncludesPendingChanges:YES];
 	
-	return [[self managedObjectContextForCurrentThread] executeFetchRequest:fetch error:nil];
+	return [[self managedObjectContext] executeFetchRequest:fetch error:nil];
 }
 
 +(NSUInteger)count {
@@ -128,7 +129,7 @@
 		[fetch setPredicate:predicate];
 	}
 	
-	return [[self managedObjectContextForCurrentThread] countForFetchRequest:fetch error:nil];
+	return [self.managedObjectContext countForFetchRequest:fetch error:nil];
 }
 
 +(NSArray *)distinctValuesWithAttribute:(NSString *)attribute predicate:(NSPredicate *)predicate {
@@ -184,7 +185,7 @@
 	[fetch setPropertiesToFetch:[NSArray arrayWithObject:expressionDescription]];
 	
 	NSError *error;
-	NSArray *objects = [[self managedObjectContextForCurrentThread] executeFetchRequest:fetch error:&error];
+	NSArray *objects = [[self managedObjectContext] executeFetchRequest:fetch error:&error];
 	
 	id returnValue = nil;
 	
@@ -204,22 +205,17 @@
 
 +(void)deleteAll {
 	NSFetchRequest *fetch = [[[NSFetchRequest alloc] init] autorelease];
-	[fetch setEntity:[NSEntityDescription entityForName:[self entityName] inManagedObjectContext:[self managedObjectContextForCurrentThread]]];
+	[fetch setEntity:[NSEntityDescription entityForName:[self entityName] inManagedObjectContext:[self managedObjectContext]]];
 	[fetch setIncludesPendingChanges:YES];
 	[fetch setReturnsObjectsAsFaults:YES];
 	
-	for (RHManagedObject *basket in [[self managedObjectContextForCurrentThread] executeFetchRequest:fetch error:nil]) {
+	for (RHManagedObject *basket in [self.managedObjectContext executeFetchRequest:fetch error:nil]) {
 		[(RHManagedObject *)basket delete];
 	}
 }
 
-// deprecated
-+(NSManagedObjectContext *)managedObjectContext {
-    return [self managedObjectContextForCurrentThread];
-}
-
 // Returns the NSManagedObjectContext for the current thread
-+(NSManagedObjectContext *)managedObjectContextForCurrentThread {
++(NSManagedObjectContext *)managedObjectContext {
 	return [[self managedObjectContextManager] managedObjectContext];
 }
 
@@ -246,8 +242,7 @@
 }
 
 -(id)objectInCurrentThreadContext {
-    NSManagedObjectContext *currentMoc = [[self class] performSelector:@selector(managedObjectContextForCurrentThread)];
-	return [currentMoc objectWithID:self.objectID];
+	return [[self managedObjectContext] objectWithID:self.objectID];
 }
 
 // This function needs work
@@ -269,6 +264,7 @@
 
 
 @implementation ImageToDataTransformer
+
 +(BOOL)allowsReverseTransformation {
 	return YES;
 }
@@ -284,4 +280,5 @@
 -(id)reverseTransformedValue:(id)value {
 	return [UIImage imageWithData:value];
 }
+
 @end

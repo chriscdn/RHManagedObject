@@ -1,6 +1,6 @@
 //
 //  RHManagedObject.h
-//  Version: 0.7.1
+//  Version: 0.7.2
 //
 //  Copyright (C) 2012 by Christopher Meyer
 //  http://schwiiz.org/
@@ -40,7 +40,6 @@ typedef enum {
 +(NSString *)entityName;
 +(NSString *)modelName;
 
-
 +(NSEntityDescription *)entityDescription;
 +(void)deleteStore;
 +(void)commit;
@@ -65,7 +64,8 @@ typedef enum {
 
 
 +(void)deleteAll;
-+(NSManagedObjectContext *)managedObjectContext;
++(NSManagedObjectContext *)managedObjectContext __deprecated;
++(NSManagedObjectContext *)managedObjectContextForCurrentThread;
 +(RHManagedObjectContextManager *)managedObjectContextManager;
 
 /* Instance methods */
@@ -76,5 +76,7 @@ typedef enum {
 
 @end
 
+
 @interface ImageToDataTransformer : NSValueTransformer
+
 @end

@@ -14,10 +14,12 @@
 
 -(void)viewDidLoad {
 	[super viewDidLoad];
-
+    
 	UIBarButtonItem *button = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addRandomEmployee:)];
 	self.navigationItem.rightBarButtonItem = button;
 	[button release];
+    
+    [self addSearchBarWithPlaceHolder:@"Filter"];
 	
 }
 
@@ -42,8 +44,14 @@
 	if (fetchedResultsController == nil) {
 		NSSortDescriptor *sort1 = [[NSSortDescriptor alloc] initWithKey:@"lastName" ascending:YES];
 		
-		NSPredicate *predicate = [NSPredicate predicateWithFormat:@"1==1"];
+		NSPredicate *predicate;
 		
+        if (self.searchString) {
+            predicate = [NSPredicate predicateWithFormat:@"firstName CONTAINS[cd] %@ OR lastName CONTAINS[cd] %@", self.searchString, self.searchString];
+        } else {
+            predicate = [NSPredicate predicateWithFormat:@"1==1"];
+        }
+        
 		NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
 		[fetchRequest setEntity:[Employee entityDescription]];
 		
@@ -52,7 +60,7 @@
 		[fetchRequest setFetchBatchSize:20];
 		
 		self.fetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
-																			managedObjectContext:[Employee managedObjectContext]
+																			managedObjectContext:[Employee managedObjectContextForCurrentThread]
 																			  sectionNameKeyPath:nil
 																					   cacheName:nil];
 		
@@ -76,7 +84,7 @@
 	
 	Employee *employee = [self.fetchedResultsController objectAtIndexPath:indexPath];
 	cell.textLabel.text = [NSString stringWithFormat:@"%@ %@", employee.firstName, employee.lastName];
-
+    
 }
 
 -(UITableViewCell *)tableView:(UITableView *)_tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -88,14 +96,18 @@
 	if (cell == nil) {
 		cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
 	}
-		
+    
 	[self configureCell:cell atIndexPath:indexPath];
-	return cell;
 
+	return cell;
 }
 
 -(NSString *)tableView:(UITableView *)_tableView titleForFooterInSection:(NSInteger)section {
-	return @"Press the plus button to create a random employee.  See\n\n-(void)addRandomEmployee:(id)sender\n\nin\n\nExampleTableViewController.m";
+	if (_tableView == self.tableView) {
+        return @"Press the plus button to create a random employee.  See\n\n-(void)addRandomEmployee:(id)sender\n\nin\n\nExampleTableViewController.m";
+    } else {
+        return @""; // search tableview
+    }
 }
 
 @end

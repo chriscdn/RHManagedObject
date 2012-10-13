@@ -1,6 +1,6 @@
 //
 //  RHManagedObjectContextManager.h
-//  Version: 0.7.2
+//  Version: 0.7.3
 //
 //  Copyright (C) 2012 by Christopher Meyer
 //  http://schwiiz.org/

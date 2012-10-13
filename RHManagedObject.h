@@ -1,6 +1,6 @@
 //
 //  RHManagedObject.h
-//  Version: 0.7.2
+//  Version: 0.7.3
 //
 //  Copyright (C) 2012 by Christopher Meyer
 //  http://schwiiz.org/
@@ -60,8 +60,8 @@ typedef enum {
 +(NSAttributeType)attributeTypeWithKey:(NSString *)key;
 +(id)aggregateWithType:(RHAggregate)aggregate key:(NSString *)key predicate:(NSPredicate *)predicate defaultValue:(id)defaultValue;
 
-
 +(void)deleteAll;
++(NSUInteger)deleteWithPredicate:(NSPredicate *)predicate;
 +(NSManagedObjectContext *)managedObjectContext __deprecated;
 +(NSManagedObjectContext *)managedObjectContextForCurrentThread;
 +(RHManagedObjectContextManager *)managedObjectContextManager;

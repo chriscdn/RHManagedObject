@@ -1,6 +1,6 @@
 //
 //  RHManagedObjectContextManager.m
-//  Version: 0.7.2
+//  Version: 0.7.3
 //
 //  Copyright (C) 2012 by Christopher Meyer
 //  http://schwiiz.org/
@@ -63,7 +63,7 @@
 
 #pragma mark Other useful stuff
 // Used to flush and reset the database.
--(void)deleteStore {
+-(void)deleteStore {	
 	NSFileManager *fm = [NSFileManager defaultManager];
 	NSError *error;
 	
@@ -77,7 +77,7 @@
 	} else {
 		NSPersistentStoreCoordinator *storeCoordinator = [self persistentStoreCoordinator];
 		
-		for (NSPersistentStore *store in [storeCoordinator persistentStores]) {
+		for (NSPersistentStore *store in [storeCoordinator persistentStores]) {	
 			NSURL *storeURL = store.URL;
 			NSString *storePath = storeURL.path;
 			[storeCoordinator removePersistentStore:store error:&error];
@@ -99,7 +99,7 @@
 -(NSMutableDictionary *)managedObjectContexts {
 	if (managedObjectContexts == nil) {
 		self.managedObjectContexts = [NSMutableDictionary dictionary];
-	}
+	} 
 	return managedObjectContexts;
 }
 
@@ -110,7 +110,7 @@
 	NSSet *deleted  = [moc deletedObjects];
 	NSSet *inserted = [moc insertedObjects];
 	
-	return [updated count] + [deleted count] + [inserted count];
+	return [updated count] + [deleted count] + [inserted count];	
 }
 
 // Do I need to lock the context?
@@ -119,11 +119,11 @@
 	
  	NSManagedObjectContext *moc = [self managedObjectContext];
 	NSError *error = nil;
-    
+		
 	if ([self pendingChangesCount] > kPostMassUpdateNotificationThreshold) {
-        //		dispatch_async(dispatch_get_main_queue(), ^{
-        [[NSNotificationCenter defaultCenter] postNotificationName:WillMassUpdateNotificationName object:nil];
-        //		});
+//		dispatch_async(dispatch_get_main_queue(), ^{
+			[[NSNotificationCenter defaultCenter] postNotificationName:WillMassUpdateNotificationName object:nil];	
+//		});
 	}
 	
 	if ([moc hasChanges] && ![moc save:&error]) {
@@ -139,7 +139,7 @@
 // This is the NSManagedObjectContextDidSaveNotification delegate method.  It gets called when a commit is applied
 // on a thread other than the MainThread.
 -(void)mocDidSave:(NSNotification *)saveNotification {
-    if ([NSThread isMainThread]) {
+    if ([NSThread isMainThread]) {		
 		// This ensures no updated object is fault, which would cause the NSFetchedResultsController updates to fail.
 		// http://www.mlsite.net/blog/?p=518
 		
@@ -156,12 +156,12 @@
 }
 
 
--(NSManagedObjectContext *)managedObjectContext {
+-(NSManagedObjectContext *)managedObjectContext {	
     NSThread *thread = [NSThread currentThread];
 	
     if ([thread isMainThread]) {
         return [self mainThreadManagedObjectContext];
-    }
+    } 
 	
     // a key to cache the moc for the current thread
     NSString *threadKey = [NSString stringWithFormat:@"%p", thread];
@@ -176,9 +176,9 @@
         [self.managedObjectContexts setObject:threadContext forKey:threadKey];
 		
 		// attach a notification thingie
-		[[NSNotificationCenter defaultCenter] addObserver:self
+		[[NSNotificationCenter defaultCenter] addObserver:self 
 												 selector:@selector(mocDidSave:)
-													 name:NSManagedObjectContextDidSaveNotification
+													 name:NSManagedObjectContextDidSaveNotification 
 												   object:threadContext];
     }
 	
@@ -189,7 +189,7 @@
 	NSString *threadKey = [NSString stringWithFormat:@"%p", [NSThread currentThread]];
 	NSManagedObjectContext *threadContext = [self.managedObjectContexts objectForKey:threadKey];
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:threadContext];
-	[self.managedObjectContexts removeObjectForKey:threadKey];
+	[self.managedObjectContexts removeObjectForKey:threadKey];	
 }
 
 #pragma mark -
@@ -200,7 +200,7 @@
  Returns the managed object context for the application.
  If the context doesn't already exist, it is created and bound to the persistent store coordinator for the application.
  */
--(NSManagedObjectContext *)mainThreadManagedObjectContext {
+-(NSManagedObjectContext *)mainThreadManagedObjectContext {	
 	if (managedObjectContext == nil) {
 		NSPersistentStoreCoordinator *coordinator = [self persistentStoreCoordinator];
 		if (coordinator != nil) {
@@ -221,12 +221,12 @@
  Returns the managed object model for the application.
  If the model doesn't already exist, it is created from the application's model.
  */
--(NSManagedObjectModel *)managedObjectModel {
+-(NSManagedObjectModel *)managedObjectModel {    	
 	if (managedObjectModel == nil) {
 		NSString *modelPath = [[NSBundle mainBundle] pathForResource:self.modelName ofType:@"momd"];
 		NSURL *modelURL = [NSURL fileURLWithPath:modelPath];
 		
-		self.managedObjectModel = [[[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL] autorelease];
+		self.managedObjectModel = [[[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL] autorelease]; 
 	}
 	
 	return managedObjectModel;
@@ -254,12 +254,17 @@
 			}
 		}
 		
-		NSURL *storeURL = [NSURL fileURLWithPath:storePath];
+		NSURL *storeURL = [NSURL fileURLWithPath:storePath];		
 		NSError *error = nil;
 		
 		self.persistentStoreCoordinator = [[[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:[self managedObjectModel]] autorelease];
-		
-		if (![persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:nil error:&error]) {
+
+        // https://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/CoreDataVersioning/Articles/vmLightweightMigration.html#//apple_ref/doc/uid/TP40004399-CH4-SW1
+        NSDictionary *options = [NSDictionary dictionaryWithObjectsAndKeys:
+                                 [NSNumber numberWithBool:YES], NSMigratePersistentStoresAutomaticallyOption,
+                                 [NSNumber numberWithBool:YES], NSInferMappingModelAutomaticallyOption, nil];
+        
+		if (![persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:options error:&error]) {
 			/*
 			 Replace this implementation with code to handle the error appropriately.
 			 
@@ -277,7 +282,7 @@
 			 * Simply deleting the existing store:
 			 [[NSFileManager defaultManager] removeItemAtURL:storeURL error:nil]
 			 
-			 * Performing automatic lightweight migration by passing the following dictionary as the options parameter:
+			 * Performing automatic lightweight migration by passing the following dictionary as the options parameter: 
 			 [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:YES],NSMigratePersistentStoresAutomaticallyOption, [NSNumber numberWithBool:YES], NSInferMappingModelAutomaticallyOption, nil];
 			 
 			 Lightweight migration will only work for a limited set of schema changes; consult "Core Data Model Versioning and Data Migration Programming Guide" for details.
@@ -285,7 +290,7 @@
 			 */
 			NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
 			abort();
-		}
+		}    
     }
 	
     return persistentStoreCoordinator;

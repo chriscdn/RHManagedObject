@@ -246,6 +246,10 @@ RHManagedObject is being used with:
 
 Contact me if you'd like your app to be listed.
 
+## Contributions
+
+- James Carlson
+
 ## Contact
 
 [Christopher Meyer](https://github.com/chriscdn)  

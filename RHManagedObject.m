@@ -1,6 +1,6 @@
 //
 //  RHManagedObject.m
-//  Version: 0.7.2
+//  Version: 0.7.3
 //
 //  Copyright (C) 2012 by Christopher Meyer
 //  http://schwiiz.org/
@@ -96,7 +96,7 @@
 	NSFetchRequest *fetch = [[[NSFetchRequest alloc] init] autorelease];
 	
 	[fetch setEntity:[self entityDescription]];
-    
+		
 	if (predicate) {
 		[fetch setPredicate:predicate];
 	}
@@ -202,6 +202,10 @@
 }
 
 +(void)deleteAll {
+    
+    [self deleteWithPredicate:nil];
+    /*
+    
 	NSFetchRequest *fetch = [[[NSFetchRequest alloc] init] autorelease];
 	[fetch setEntity:[NSEntityDescription entityForName:[self entityName] inManagedObjectContext:[self managedObjectContextForCurrentThread]]];
 	[fetch setIncludesPendingChanges:YES];
@@ -210,9 +214,16 @@
 	for (RHManagedObject *basket in [[self managedObjectContextForCurrentThread] executeFetchRequest:fetch error:nil]) {
 		[(RHManagedObject *)basket delete];
 	}
+     */
 }
 
-// deprecated
++(NSUInteger)deleteWithPredicate:(NSPredicate *)predicate {
+    NSArray *itemsToDelete = [self fetchWithPredicate:predicate];
+    [itemsToDelete makeObjectsPerformSelector:@selector(delete)];
+    return [itemsToDelete count];
+}
+
+// deprecated = use managedObjectContextForCurrentThread instead
 +(NSManagedObjectContext *)managedObjectContext {
     return [self managedObjectContextForCurrentThread];
 }

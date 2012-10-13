@@ -83,7 +83,7 @@
 -(void)searchDisplayController:(UISearchDisplayController *)controller willUnloadSearchResultsTableView:(UITableView *)tableView {
 	self.searchString = nil;
 	self.fetchedResultsController = nil;
-	[self.tableView reloadData];
+	// [self.tableView reloadData];
 }
 
 -(void)willMassUpdateNotificationReceived:(id)notification {

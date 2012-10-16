@@ -17,7 +17,6 @@
     
 	UIBarButtonItem *button = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addRandomEmployee:)];
 	self.navigationItem.rightBarButtonItem = button;
-	[button release];
     
     [self addSearchBarWithPlaceHolder:@"Filter"];
 	
@@ -66,10 +65,7 @@
 		
 		fetchedResultsController.delegate = self;
 		
-		[sort1 release];
 		
-		[fetchRequest release];
-		[fetchedResultsController release];
 		
 		NSError *error = nil;
 		if (![fetchedResultsController performFetch:&error]) {
@@ -94,7 +90,7 @@
 	UITableViewCell *cell = [_tableView dequeueReusableCellWithIdentifier:CellIdentifier];
 	
 	if (cell == nil) {
-		cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
+		cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
 	}
     
 	[self configureCell:cell atIndexPath:indexPath];

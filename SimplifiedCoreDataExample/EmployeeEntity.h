@@ -12,7 +12,7 @@
 
 @interface EmployeeEntity : RHManagedObject
 
-@property (nonatomic, retain) NSString * firstName;
-@property (nonatomic, retain) NSString * lastName;
+@property (nonatomic, strong) NSString * firstName;
+@property (nonatomic, strong) NSString * lastName;
 
 @end

@@ -276,6 +276,7 @@
 		8305CABF148565290066AB52 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "SimplifiedCoreDataExample/SimplifiedCoreDataExample-Prefix.pch";
 				INFOPLIST_FILE = "SimplifiedCoreDataExample/SimplifiedCoreDataExample-Info.plist";
@@ -287,6 +288,7 @@
 		8305CAC0148565290066AB52 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "SimplifiedCoreDataExample/SimplifiedCoreDataExample-Prefix.pch";
 				INFOPLIST_FILE = "SimplifiedCoreDataExample/SimplifiedCoreDataExample-Info.plist";

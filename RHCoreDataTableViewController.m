@@ -1,6 +1,6 @@
 //
 //  RHCoreDataTableViewController.m
-//  Version: 0.7.3
+//  Version: 0.8.0
 //
 //  Copyright (C) 2012 by Christopher Meyer
 //  http://schwiiz.org/
@@ -64,12 +64,11 @@
 	UISearchBar *searchBar = [[UISearchBar alloc]initWithFrame:CGRectMake(0,0,self.tableView.frame.size.width,44)];
 	searchBar.placeholder = placeholder;
 	searchBar.delegate = self;
-	self.searchController = [[[UISearchDisplayController alloc] initWithSearchBar:searchBar contentsController:self] autorelease];
+	self.searchController = [[UISearchDisplayController alloc] initWithSearchBar:searchBar contentsController:self];
 	self.searchController.delegate = self;
 	self.searchController.searchResultsDataSource = self;
 	self.searchController.searchResultsDelegate = self;
 	self.tableView.tableHeaderView = self.searchController.searchBar;
-	[searchBar release];
 }
 
 
@@ -83,6 +82,7 @@
 -(void)searchDisplayController:(UISearchDisplayController *)controller willUnloadSearchResultsTableView:(UITableView *)tableView {
 	self.searchString = nil;
 	self.fetchedResultsController = nil;
+    // is this called automatically?
 	// [self.tableView reloadData];
 }
 
@@ -247,8 +247,6 @@
 
 -(void)dealloc {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	[fetchedResultsController release];
-	[super dealloc];
 }
 
 @end

@@ -246,6 +246,11 @@ RHManagedObject is being used with:
 
 Contact me if you'd like your app to be listed.
 
+## ARC
+
+As of v0.8.0 the example project and library uses ARC.
+
+
 ## Contributions
 
 - James Carlson

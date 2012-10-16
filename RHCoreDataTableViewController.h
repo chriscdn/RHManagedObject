@@ -1,6 +1,6 @@
 //
 //  RHCoreDataTableViewController.h
-//  Version: 0.7.3
+//  Version: 0.8.0
 //
 //  Copyright (C) 2012 by Christopher Meyer
 //  http://schwiiz.org/
@@ -29,9 +29,9 @@
 	NSFetchedResultsController *fetchedResultsController;
 }
 
-@property (nonatomic, retain) NSFetchedResultsController *fetchedResultsController;
-@property (nonatomic, retain) UISearchDisplayController *searchController;
-@property (nonatomic, retain) NSString *searchString;
+@property (nonatomic, strong) NSFetchedResultsController *fetchedResultsController;
+@property (nonatomic, strong) UISearchDisplayController *searchController;
+@property (nonatomic, strong) NSString *searchString;
 @property (nonatomic, assign) BOOL massUpdate;
 
 -(void)addSearchBarWithPlaceHolder:(NSString *)placeholder;

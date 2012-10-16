@@ -1,6 +1,6 @@
 //
 //  RHManagedObject.m
-//  Version: 0.7.3
+//  Version: 0.8.0
 //
 //  Copyright (C) 2012 by Christopher Meyer
 //  http://schwiiz.org/
@@ -93,7 +93,7 @@
 }
 
 +(NSArray *)fetchWithPredicate:(NSPredicate *)predicate sortDescriptor:(NSSortDescriptor *)descriptor withLimit:(NSUInteger)limit {
-	NSFetchRequest *fetch = [[[NSFetchRequest alloc] init] autorelease];
+	NSFetchRequest *fetch = [[NSFetchRequest alloc] init];
 	
 	[fetch setEntity:[self entityDescription]];
 		
@@ -119,7 +119,7 @@
 }
 
 +(NSUInteger)countWithPredicate:(NSPredicate *)predicate {
-	NSFetchRequest *fetch = [[[NSFetchRequest alloc] init] autorelease];
+	NSFetchRequest *fetch = [[NSFetchRequest alloc] init];
 	
 	[fetch setEntity:[self entityDescription]];
 	
@@ -195,8 +195,6 @@
 		returnValue = defaultValue;
 	}
 	
-	[expressionDescription release];
-	[fetch release];
 	
 	return returnValue;
 }

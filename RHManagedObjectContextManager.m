@@ -1,6 +1,6 @@
 //
 //  RHManagedObjectContextManager.m
-//  Version: 0.7.3
+//  Version: 0.8.0
 //
 //  Copyright (C) 2012 by Christopher Meyer
 //  http://schwiiz.org/
@@ -168,7 +168,7 @@
 	
     if ( [self.managedObjectContexts objectForKey:threadKey] == nil ) {
 		// create a moc for this thread
-        NSManagedObjectContext *threadContext = [[[NSManagedObjectContext alloc] init] autorelease];
+        NSManagedObjectContext *threadContext = [[NSManagedObjectContext alloc] init];
         [threadContext setPersistentStoreCoordinator:[self persistentStoreCoordinator]];
 		[threadContext setMergePolicy:kMergePolicy];
 		
@@ -204,7 +204,7 @@
 	if (managedObjectContext == nil) {
 		NSPersistentStoreCoordinator *coordinator = [self persistentStoreCoordinator];
 		if (coordinator != nil) {
-			self.managedObjectContext = [[[NSManagedObjectContext alloc] init] autorelease];
+			self.managedObjectContext = [[NSManagedObjectContext alloc] init];
 			[managedObjectContext setPersistentStoreCoordinator:coordinator];
 			[managedObjectContext setMergePolicy:kMergePolicy];
 			
@@ -226,7 +226,7 @@
 		NSString *modelPath = [[NSBundle mainBundle] pathForResource:self.modelName ofType:@"momd"];
 		NSURL *modelURL = [NSURL fileURLWithPath:modelPath];
 		
-		self.managedObjectModel = [[[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL] autorelease]; 
+		self.managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL]; 
 	}
 	
 	return managedObjectModel;
@@ -257,7 +257,7 @@
 		NSURL *storeURL = [NSURL fileURLWithPath:storePath];		
 		NSError *error = nil;
 		
-		self.persistentStoreCoordinator = [[[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:[self managedObjectModel]] autorelease];
+		self.persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:[self managedObjectModel]];
 
         // https://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/CoreDataVersioning/Articles/vmLightweightMigration.html#//apple_ref/doc/uid/TP40004399-CH4-SW1
         NSDictionary *options = [NSDictionary dictionaryWithObjectsAndKeys:

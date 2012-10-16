@@ -1,6 +1,6 @@
 //
 //  RHManagedObjectContextManager.h
-//  Version: 0.7.3
+//  Version: 0.8.0
 //
 //  Copyright (C) 2012 by Christopher Meyer
 //  http://schwiiz.org/
@@ -36,11 +36,11 @@
 
 @interface RHManagedObjectContextManager : NSObject
 
-@property (nonatomic, retain) NSMutableDictionary *managedObjectContexts;
-@property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
-@property (nonatomic, retain) NSManagedObjectModel *managedObjectModel;
-@property (nonatomic, retain) NSPersistentStoreCoordinator *persistentStoreCoordinator;
-@property (nonatomic, retain) NSString *modelName;
+@property (nonatomic, strong) NSMutableDictionary *managedObjectContexts;
+@property (nonatomic, strong) NSManagedObjectContext *managedObjectContext;
+@property (nonatomic, strong) NSManagedObjectModel *managedObjectModel;
+@property (nonatomic, strong) NSPersistentStoreCoordinator *persistentStoreCoordinator;
+@property (nonatomic, strong) NSString *modelName;
 
 +(NSMutableDictionary *)sharedInstances;
 +(RHManagedObjectContextManager *)sharedInstanceWithModelName:(NSString *)modelName;

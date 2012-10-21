@@ -165,7 +165,7 @@ NSArray *employees = [Employee fetchWithPredicate:[NSPredicate predicateWithForm
 The `getWithPredicate:` method will return the first object if more than one is found.
 
 ``` objective-c
-Employee *employee = [Employee getWithPredicate:[NSPredicate predicateWithFormat:@"employeID=%i", 12345]];
+Employee *employee = [Employee getWithPredicate:[NSPredicate predicateWithFormat:@"employeeID=%i", 12345]];
 ```
 
 ### Count the total number of employees

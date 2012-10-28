@@ -1,6 +1,6 @@
 //
 //  RHManagedObjectContextManager.m
-//  Version: 0.8.0
+//  Version: 0.8.1
 //
 //  Copyright (C) 2012 by Christopher Meyer
 //  http://schwiiz.org/
@@ -122,7 +122,7 @@
 		
 	if ([self pendingChangesCount] > kPostMassUpdateNotificationThreshold) {
 //		dispatch_async(dispatch_get_main_queue(), ^{
-			[[NSNotificationCenter defaultCenter] postNotificationName:WillMassUpdateNotificationName object:nil];	
+			[[NSNotificationCenter defaultCenter] postNotificationName:RHWillMassUpdateNotification object:nil];	
 //		});
 	}
 	

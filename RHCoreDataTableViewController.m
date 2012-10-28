@@ -1,6 +1,6 @@
 //
 //  RHCoreDataTableViewController.m
-//  Version: 0.8.0
+//  Version: 0.8.1
 //
 //  Copyright (C) 2012 by Christopher Meyer
 //  http://schwiiz.org/
@@ -34,7 +34,7 @@
 	if (self=[super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
 		[[NSNotificationCenter defaultCenter] addObserver:self
 												 selector:@selector(willMassUpdateNotificationReceived:)
-													 name:WillMassUpdateNotificationName
+													 name:RHWillMassUpdateNotification
 												   object:nil];
 		[self resetMassUpdate];
 	}

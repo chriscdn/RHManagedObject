@@ -1,6 +1,6 @@
 //
 //  RHManagedObjectContextManager.h
-//  Version: 0.8.0
+//  Version: 0.8.1
 //
 //  Copyright (C) 2012 by Christopher Meyer
 //  http://schwiiz.org/
@@ -26,8 +26,8 @@
 
 #define kMergePolicy NSMergeByPropertyObjectTrumpMergePolicy
 
-#define WillMassUpdateNotificationName @"WillMassUpdateNotificationName"
-// If more than kPostMassUpdateNotificationThreshold updates are commited at once, post a WillMassUpdateNotificationName notification first
+#define RHWillMassUpdateNotification @"RHWillMassUpdateNotification"
+// If more than kPostMassUpdateNotificationThreshold updates are commited at once, post a RHWillMassUpdateNotification notification first
 #define kPostMassUpdateNotificationThreshold 10
 
 // #define kMergePolicy NSErrorMergePolicy
@@ -51,7 +51,6 @@
 -(void)commit;
 -(void)discardManagedObjectContext;
 -(NSUInteger)pendingChangesCount;
-
 -(NSManagedObjectContext *)mainThreadManagedObjectContext;
 -(NSString *)storePath;
 -(NSString *)applicationDocumentsDirectory;

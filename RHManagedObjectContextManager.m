@@ -1,6 +1,6 @@
 //
 //  RHManagedObjectContextManager.m
-//  Version: 0.8.1
+//  Version: 0.9
 //
 //  Copyright (C) 2012 by Christopher Meyer
 //  http://schwiiz.org/
@@ -26,11 +26,32 @@
 
 #import "RHManagedObjectContextManager.h"
 
+@interface RHManagedObjectContextManager()
+
+@property (nonatomic, strong) NSManagedObjectContext *managedObjectContextBackground;
+@property (nonatomic, strong) NSManagedObjectContext *managedObjectContextForMainThread;
+@property (nonatomic, strong) NSMutableDictionary *managedObjectContexts;
+@property (nonatomic, strong) NSManagedObjectModel *managedObjectModel;
+@property (nonatomic, strong) NSPersistentStoreCoordinator *persistentStoreCoordinator;
+@property (nonatomic, strong) NSString *modelName;
+
++(NSMutableDictionary *)sharedInstances;
+-(void)discardManagedObjectContext;
+-(NSString *)storePath;
+-(NSURL *)storeURL;
+-(NSString *)databaseName;
+-(void)backgroundMocDidSave:(NSNotification *)saveNotification;
+@end
+
 @implementation RHManagedObjectContextManager
+@synthesize managedObjectContextBackground;
+@synthesize managedObjectContextForMainThread;
 @synthesize managedObjectContexts;
-@synthesize managedObjectContext, managedObjectModel, persistentStoreCoordinator;
+@synthesize managedObjectModel;
+@synthesize persistentStoreCoordinator;
 @synthesize modelName;
 
+#pragma mark -
 #pragma mark Singleton Methods
 +(RHManagedObjectContextManager *)sharedInstanceWithModelName:(NSString *)modelName {
     if ([[self sharedInstances] objectForKey:modelName] == nil) {
@@ -57,13 +78,17 @@
     return self;
 }
 
--(NSString *)databaseName {
-    return [NSString stringWithFormat:@"%@.sqlite", [self.modelName lowercaseString]];
+-(NSMutableDictionary *)managedObjectContexts {
+	if (managedObjectContexts == nil) {
+		self.managedObjectContexts = [NSMutableDictionary dictionary];
+	}
+	return managedObjectContexts;
 }
 
+#pragma mark -
 #pragma mark Other useful stuff
 // Used to flush and reset the database.
--(void)deleteStore {	
+-(void)deleteStore {
 	NSFileManager *fm = [NSFileManager defaultManager];
 	NSError *error;
 	
@@ -77,7 +102,7 @@
 	} else {
 		NSPersistentStoreCoordinator *storeCoordinator = [self persistentStoreCoordinator];
 		
-		for (NSPersistentStore *store in [storeCoordinator persistentStores]) {	
+		for (NSPersistentStore *store in [storeCoordinator persistentStores]) {
 			NSURL *storeURL = store.URL;
 			NSString *storePath = storeURL.path;
 			[storeCoordinator removePersistentStore:store error:&error];
@@ -88,42 +113,36 @@
 		}
 	}
 	
+	
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:self.managedObjectContextBackground];
+		
+	self.managedObjectContextBackground = nil;
+	self.managedObjectContextForMainThread = nil;
 	self.managedObjectContexts = nil;
-	self.managedObjectContext = nil;
 	self.managedObjectModel = nil;
 	self.persistentStoreCoordinator = nil;
 	
 	[[RHManagedObjectContextManager sharedInstances] removeObjectForKey:[self modelName]];
 }
 
--(NSMutableDictionary *)managedObjectContexts {
-	if (managedObjectContexts == nil) {
-		self.managedObjectContexts = [NSMutableDictionary dictionary];
-	} 
-	return managedObjectContexts;
-}
-
 -(NSUInteger)pendingChangesCount {
-	NSManagedObjectContext *moc = [self managedObjectContext];
+	NSManagedObjectContext *moc = [self managedObjectContextForCurrentThread];
 	
 	NSSet *updated  = [moc updatedObjects];
 	NSSet *deleted  = [moc deletedObjects];
 	NSSet *inserted = [moc insertedObjects];
 	
-	return [updated count] + [deleted count] + [inserted count];	
+	return [updated count] + [deleted count] + [inserted count];
 }
 
-// Do I need to lock the context?
 // http://stackoverflow.com/questions/5236860/app-freeze-on-coredata-save
 -(void)commit {
 	
- 	NSManagedObjectContext *moc = [self managedObjectContext];
+ 	NSManagedObjectContext *moc = [self managedObjectContextForCurrentThread];
 	NSError *error = nil;
-		
+	
 	if ([self pendingChangesCount] > kPostMassUpdateNotificationThreshold) {
-//		dispatch_async(dispatch_get_main_queue(), ^{
-			[[NSNotificationCenter defaultCenter] postNotificationName:RHWillMassUpdateNotification object:nil];	
-//		});
+		[[NSNotificationCenter defaultCenter] postNotificationName:RHWillMassUpdateNotification object:nil];
 	}
 	
 	if ([moc hasChanges] && ![moc save:&error]) {
@@ -131,113 +150,103 @@
 		abort();
 	}
 	
-	// Is this safe to do here?  Probably... I think the moc will still have a retain within the NSNotification
-	// and will be gracefully trashed once mocDidSave: is called.
-	[self discardManagedObjectContext];
-}
-
-// This is the NSManagedObjectContextDidSaveNotification delegate method.  It gets called when a commit is applied
-// on a thread other than the MainThread.
--(void)mocDidSave:(NSNotification *)saveNotification {
-    if ([NSThread isMainThread]) {		
-		// This ensures no updated object is fault, which would cause the NSFetchedResultsController updates to fail.
-		// http://www.mlsite.net/blog/?p=518
+	NSManagedObjectContext *parentContext = [moc parentContext];
+	
+	[parentContext performBlock:^{
+		NSError *error = nil;
 		
-		NSArray* updates = [[saveNotification.userInfo objectForKey:@"updated"] allObjects];
-		
-		for (NSInteger i = [updates count]-1; i >= 0; i--) {
-			[[[self managedObjectContext] objectWithID:[[updates objectAtIndex:i] objectID]] willAccessValueForKey:nil];
+		if (![parentContext save:&error])			{
+			NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+			abort();
 		}
-		
-        [[self managedObjectContext] mergeChangesFromContextDidSaveNotification:saveNotification];
-    } else {
-        [self performSelectorOnMainThread:@selector(mocDidSave:) withObject:saveNotification waitUntilDone:NO];
-    }
-}
-
-
--(NSManagedObjectContext *)managedObjectContext {	
-    NSThread *thread = [NSThread currentThread];
+	}];
 	
-    if ([thread isMainThread]) {
-        return [self mainThreadManagedObjectContext];
-    } 
-	
-    // a key to cache the moc for the current thread
-    NSString *threadKey = [NSString stringWithFormat:@"%p", thread];
-	
-    if ( [self.managedObjectContexts objectForKey:threadKey] == nil ) {
-		// create a moc for this thread
-        NSManagedObjectContext *threadContext = [[NSManagedObjectContext alloc] init];
-        [threadContext setPersistentStoreCoordinator:[self persistentStoreCoordinator]];
-		[threadContext setMergePolicy:kMergePolicy];
-		
-        // cache the moc for this thread
-        [self.managedObjectContexts setObject:threadContext forKey:threadKey];
-		
-		// attach a notification thingie
-		[[NSNotificationCenter defaultCenter] addObserver:self 
-												 selector:@selector(mocDidSave:)
-													 name:NSManagedObjectContextDidSaveNotification 
-												   object:threadContext];
-    }
-	
-    return [self.managedObjectContexts objectForKey:threadKey];
-}
-
--(void)discardManagedObjectContext {
-	NSString *threadKey = [NSString stringWithFormat:@"%p", [NSThread currentThread]];
-	NSManagedObjectContext *threadContext = [self.managedObjectContexts objectForKey:threadKey];
-	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:threadContext];
-	[self.managedObjectContexts removeObjectForKey:threadKey];	
+	[self discardManagedObjectContext];
 }
 
 #pragma mark -
 #pragma mark Core Data stack
-// This stuff is more or less what's automatically generated when creating a new project.
 
-/**
- Returns the managed object context for the application.
- If the context doesn't already exist, it is created and bound to the persistent store coordinator for the application.
- */
--(NSManagedObjectContext *)mainThreadManagedObjectContext {	
-	if (managedObjectContext == nil) {
-		NSPersistentStoreCoordinator *coordinator = [self persistentStoreCoordinator];
-		if (coordinator != nil) {
-			self.managedObjectContext = [[NSManagedObjectContext alloc] init];
-			[managedObjectContext setPersistentStoreCoordinator:coordinator];
-			[managedObjectContext setMergePolicy:kMergePolicy];
-			
-			// http://stackoverflow.com/questions/4817416/why-am-i-getting-a-merge-error-when-saving-an-nsmanagedobjectcontext-this-clean
-			// [managedObjectContext setStalenessInterval:0.0];
+-(NSManagedObjectContext *)managedObjectContextBackground {
+	if (managedObjectContextBackground == nil) {
+		self.managedObjectContextBackground = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
+		[managedObjectContextBackground setPersistentStoreCoordinator:[self persistentStoreCoordinator]];
+		[managedObjectContextBackground setMergePolicy:kMergePolicy];
+		
+		[[NSNotificationCenter defaultCenter] addObserver:self
+												 selector:@selector(backgroundMocDidSave:)
+													 name:NSManagedObjectContextDidSaveNotification
+												   object:managedObjectContextBackground];
+		
+	}
+	
+	return managedObjectContextBackground;
+}
+
+-(NSManagedObjectContext *)managedObjectContextForMainThread {
+	if (managedObjectContextForMainThread == nil) {
+		// NSAssert([NSThread isMainThread], @"Construction may only happen on the main thread!");
+		self.managedObjectContextForMainThread = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
+		[managedObjectContextForMainThread setParentContext:[self managedObjectContextBackground]];
+	}
+	
+	return managedObjectContextForMainThread;
+}
+
+-(NSManagedObjectContext *)managedObjectContextForCurrentThread {
+	NSThread *thread = [NSThread currentThread];
+	
+	if ([thread isMainThread]) {
+		return [self managedObjectContextForMainThread];
+	} else if (managedObjectContextForMainThread == nil) {
+		// YES, this is necessary.
+		dispatch_sync(dispatch_get_main_queue(),^{
+			[self managedObjectContextForCurrentThread];
+		});
+	}
+	
+	
+	// a key to cache the moc for the current thread
+	NSString *threadKey = [NSString stringWithFormat:@"%p", thread];
+	
+	@synchronized(self) {
+		if ( [self.managedObjectContexts objectForKey:threadKey] == nil ) {
+			// create a moc for this thread
+			NSManagedObjectContext *threadContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSConfinementConcurrencyType];
+			[threadContext setParentContext:[self managedObjectContextBackground]];
+			[self.managedObjectContexts setObject:threadContext forKey:threadKey];
 		}
 	}
 	
-    return managedObjectContext;
+	return [self.managedObjectContexts objectForKey:threadKey];
 }
 
+-(void)discardManagedObjectContext {
+	NSString *threadKey = [NSString stringWithFormat:@"%p", [NSThread currentThread]];
+	[self.managedObjectContexts removeObjectForKey:threadKey];
+}
 
 /**
- Returns the managed object model for the application.
- If the model doesn't already exist, it is created from the application's model.
+ * Returns the managed object model for the application.
+ * If the model doesn't already exist, it is created from the application's model.
  */
--(NSManagedObjectModel *)managedObjectModel {    	
+-(NSManagedObjectModel *)managedObjectModel {
 	if (managedObjectModel == nil) {
 		NSString *modelPath = [[NSBundle mainBundle] pathForResource:self.modelName ofType:@"momd"];
 		NSURL *modelURL = [NSURL fileURLWithPath:modelPath];
 		
-		self.managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL]; 
+		self.managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
 	}
 	
 	return managedObjectModel;
 }
 
 /**
- Returns the persistent store coordinator for the application.
- If the coordinator doesn't already exist, it is created and the application's store added to it.
+ * Returns the persistent store coordinator for the application.
+ * If the coordinator doesn't already exist, it is created and the application's store added to it.
  */
 -(NSPersistentStoreCoordinator *)persistentStoreCoordinator {
-    
+	
 	if (persistentStoreCoordinator == nil) {
 		
 		// This next block is useful when the store is initialized for the first time.  If the DB doesn't already
@@ -254,16 +263,16 @@
 			}
 		}
 		
-		NSURL *storeURL = [NSURL fileURLWithPath:storePath];		
+		NSURL *storeURL = [self storeURL];
 		NSError *error = nil;
 		
 		self.persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:[self managedObjectModel]];
-
-        // https://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/CoreDataVersioning/Articles/vmLightweightMigration.html#//apple_ref/doc/uid/TP40004399-CH4-SW1
-        NSDictionary *options = [NSDictionary dictionaryWithObjectsAndKeys:
-                                 [NSNumber numberWithBool:YES], NSMigratePersistentStoresAutomaticallyOption,
-                                 [NSNumber numberWithBool:YES], NSInferMappingModelAutomaticallyOption, nil];
-        
+		
+		// https://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/CoreDataVersioning/Articles/vmLightweightMigration.html#//apple_ref/doc/uid/TP40004399-CH4-SW1
+		NSDictionary *options = [NSDictionary dictionaryWithObjectsAndKeys:
+								 [NSNumber numberWithBool:YES], NSMigratePersistentStoresAutomaticallyOption,
+								 [NSNumber numberWithBool:YES], NSInferMappingModelAutomaticallyOption, nil];
+		
 		if (![persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:options error:&error]) {
 			/*
 			 Replace this implementation with code to handle the error appropriately.
@@ -282,7 +291,7 @@
 			 * Simply deleting the existing store:
 			 [[NSFileManager defaultManager] removeItemAtURL:storeURL error:nil]
 			 
-			 * Performing automatic lightweight migration by passing the following dictionary as the options parameter: 
+			 * Performing automatic lightweight migration by passing the following dictionary as the options parameter:
 			 [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:YES],NSMigratePersistentStoresAutomaticallyOption, [NSNumber numberWithBool:YES], NSInferMappingModelAutomaticallyOption, nil];
 			 
 			 Lightweight migration will only work for a limited set of schema changes; consult "Core Data Model Versioning and Data Migration Programming Guide" for details.
@@ -290,13 +299,39 @@
 			 */
 			NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
 			abort();
-		}    
-    }
+		}
+	}
 	
-    return persistentStoreCoordinator;
+	return persistentStoreCoordinator;
 }
 
+-(void)backgroundMocDidSave:(NSNotification *)saveNotification {
+	
+	NSManagedObjectContext *moc = [self managedObjectContextForMainThread];
+	
+	/*
+	 // This ensures no updated object is fault, which would cause the NSFetchedResultsController updates to fail.
+	 // http://www.mlsite.net/blog/?p=518
+	 NSArray* updates = [[saveNotification.userInfo objectForKey:@"updated"] allObjects];
+	 for (NSInteger i = [updates count]-1; i >= 0; i--) {
+	 [[[self managedObjectContextForMainThread] objectWithID:[[updates objectAtIndex:i] objectID]] willAccessValueForKey:nil];
+	 }
+	 */
+	
+	[moc performBlock:^{
+		[moc mergeChangesFromContextDidSaveNotification:saveNotification];
+	}];
+}
 
+-(BOOL)doesRequireMigration {
+	if ([[NSFileManager defaultManager] fileExistsAtPath:[self storePath]]) {
+		NSError *error;
+		NSDictionary *sourceMetadata = [NSPersistentStoreCoordinator metadataForPersistentStoreOfType:NSSQLiteStoreType URL:[self storeURL] error:&error];
+		return ![[self managedObjectModel] isConfiguration:nil compatibleWithStoreMetadata:sourceMetadata];
+	} else {
+		return NO;
+	}
+}
 
 #pragma mark -
 #pragma mark Application's Documents directory
@@ -304,9 +339,14 @@
 	return [[self applicationDocumentsDirectory] stringByAppendingPathComponent:[self databaseName]];
 }
 
-/**
- Returns the URL to the application's Documents directory.
- */
+-(NSURL *)storeURL {
+	return [NSURL fileURLWithPath:[self storePath]];
+}
+
+-(NSString *)databaseName {
+    return [NSString stringWithFormat:@"%@.sqlite", [self.modelName lowercaseString]];
+}
+
 -(NSString *)applicationDocumentsDirectory {
 	return [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
 }

@@ -1,6 +1,6 @@
 //
 //  RHManagedObject.m
-//  Version: 0.8.1
+//  Version: 0.9
 //
 //  Copyright (C) 2012 by Christopher Meyer
 //  http://schwiiz.org/
@@ -228,11 +228,15 @@
 
 // Returns the NSManagedObjectContext for the current thread
 +(NSManagedObjectContext *)managedObjectContextForCurrentThread {
-	return [[self managedObjectContextManager] managedObjectContext];
+	return [[self managedObjectContextManager] managedObjectContextForCurrentThread];
 }
 
 +(RHManagedObjectContextManager *)managedObjectContextManager {
     return [RHManagedObjectContextManager sharedInstanceWithModelName:[self modelName]];
+}
+
++(BOOL)doesRequireMigration {
+	return [[self managedObjectContextManager] doesRequireMigration];
 }
 
 -(void)delete {

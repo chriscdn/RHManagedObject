@@ -1,6 +1,6 @@
 //
 //  RHManagedObject.h
-//  Version: 0.8.1
+//  Version: 0.9
 //
 //  Copyright (C) 2012 by Christopher Meyer
 //  http://schwiiz.org/
@@ -65,6 +65,7 @@ typedef enum {
 +(NSManagedObjectContext *)managedObjectContext __deprecated;
 +(NSManagedObjectContext *)managedObjectContextForCurrentThread;
 +(RHManagedObjectContextManager *)managedObjectContextManager;
++(BOOL)doesRequireMigration;
 
 /* Instance methods */
 -(void)delete;

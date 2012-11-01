@@ -1,6 +1,6 @@
 //
 //  RHCoreDataTableViewController.m
-//  Version: 0.8.1
+//  Version: 0.8.2
 //
 //  Copyright (C) 2012 by Christopher Meyer
 //  http://schwiiz.org/
@@ -41,24 +41,6 @@
 	
 	return self;
 }
-
-
-// We move this fetch code directly into the fetchedResultsController override
-/*
- -(void)viewDidLoad {
- [super viewDidLoad];
- 
- // workaround for nasty apple bug
- // http://stackoverflow.com/questions/5975019/nsfetchedresultscontroller-numberofobjects-returns-additional-duplicate-when-ru
- // http://blog.engledew.com/post/560601132/duplicate-nsmanagedobject-with
- if (self.fetchedResultsController.fetchedObjects == nil) {
- NSError * error = nil;
- if (![self.fetchedResultsController performFetch:&error]) {
- NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
- }
- }
- }
- */
 
 -(void)addSearchBarWithPlaceHolder:(NSString *)placeholder {
 	UISearchBar *searchBar = [[UISearchBar alloc]initWithFrame:CGRectMake(0,0,self.tableView.frame.size.width,44)];
@@ -236,14 +218,10 @@
 	[self.tableView endUpdates];
 }
 
-
-// http://www.raywenderlich.com/999/core-data-tutorial-how-to-use-nsfetchedresultscontroller
 -(void)viewDidUnload {
 	[super viewDidUnload];
     self.fetchedResultsController = nil;
 }
-
-
 
 -(void)dealloc {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];

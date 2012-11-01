@@ -1,6 +1,6 @@
 //
 //  RHManagedObject.m
-//  Version: 0.8.1
+//  Version: 0.8.2
 //
 //  Copyright (C) 2012 by Christopher Meyer
 //  http://schwiiz.org/
@@ -22,7 +22,6 @@
 //  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
-//
 
 #import "RHManagedObject.h"
 #import "RHManagedObjectContextManager.h"
@@ -200,19 +199,7 @@
 }
 
 +(void)deleteAll {
-    
     [self deleteWithPredicate:nil];
-    /*
-    
-	NSFetchRequest *fetch = [[[NSFetchRequest alloc] init] autorelease];
-	[fetch setEntity:[NSEntityDescription entityForName:[self entityName] inManagedObjectContext:[self managedObjectContextForCurrentThread]]];
-	[fetch setIncludesPendingChanges:YES];
-	[fetch setReturnsObjectsAsFaults:YES];
-	
-	for (RHManagedObject *basket in [[self managedObjectContextForCurrentThread] executeFetchRequest:fetch error:nil]) {
-		[(RHManagedObject *)basket delete];
-	}
-     */
 }
 
 +(NSUInteger)deleteWithPredicate:(NSPredicate *)predicate {
@@ -228,11 +215,15 @@
 
 // Returns the NSManagedObjectContext for the current thread
 +(NSManagedObjectContext *)managedObjectContextForCurrentThread {
-	return [[self managedObjectContextManager] managedObjectContext];
+	return [[self managedObjectContextManager] managedObjectContextForCurrentThread];
 }
 
 +(RHManagedObjectContextManager *)managedObjectContextManager {
     return [RHManagedObjectContextManager sharedInstanceWithModelName:[self modelName]];
+}
+
++(BOOL)doesRequireMigration {
+	return [[self managedObjectContextManager] doesRequireMigration];
 }
 
 -(void)delete {
@@ -240,8 +231,7 @@
 }
 
 // perform a shallow copy of a Managed Object and return it - only handle attributes and not relationships
--(id)clone {
-	
+-(id)clone {	
 	NSEntityDescription *entityDescription = [self entity];
 	NSString *entityName = [entityDescription name];
 	NSManagedObject *cloned = [NSEntityDescription insertNewObjectForEntityForName:entityName inManagedObjectContext:[self managedObjectContext]];

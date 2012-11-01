@@ -1,6 +1,6 @@
 //
 //  RHManagedObjectContextManager.h
-//  Version: 0.8.1
+//  Version: 0.8.2
 //
 //  Copyright (C) 2012 by Christopher Meyer
 //  http://schwiiz.org/
@@ -22,37 +22,22 @@
 //  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
-//
 
 #define kMergePolicy NSMergeByPropertyObjectTrumpMergePolicy
-
 #define RHWillMassUpdateNotification @"RHWillMassUpdateNotification"
-// If more than kPostMassUpdateNotificationThreshold updates are commited at once, post a RHWillMassUpdateNotification notification first
-#define kPostMassUpdateNotificationThreshold 10
-
-// #define kMergePolicy NSErrorMergePolicy
+#define kPostMassUpdateNotificationThreshold 10 // If more than kPostMassUpdateNotificationThreshold updates are commited at once, post a RHWillMassUpdateNotification notification first
 
 #import <CoreData/CoreData.h>
 
 @interface RHManagedObjectContextManager : NSObject
 
-@property (nonatomic, strong) NSMutableDictionary *managedObjectContexts;
-@property (nonatomic, strong) NSManagedObjectContext *managedObjectContext;
-@property (nonatomic, strong) NSManagedObjectModel *managedObjectModel;
-@property (nonatomic, strong) NSPersistentStoreCoordinator *persistentStoreCoordinator;
-@property (nonatomic, strong) NSString *modelName;
-
-+(NSMutableDictionary *)sharedInstances;
 +(RHManagedObjectContextManager *)sharedInstanceWithModelName:(NSString *)modelName;
-
 -(id)initWithModelName:(NSString *)_modelName;
--(NSManagedObjectContext *)managedObjectContext;
+-(NSManagedObjectContext *)managedObjectContextForCurrentThread;
 -(void)deleteStore;
 -(void)commit;
--(void)discardManagedObjectContext;
 -(NSUInteger)pendingChangesCount;
--(NSManagedObjectContext *)mainThreadManagedObjectContext;
--(NSString *)storePath;
+-(BOOL)doesRequireMigration;
 -(NSString *)applicationDocumentsDirectory;
 
 @end

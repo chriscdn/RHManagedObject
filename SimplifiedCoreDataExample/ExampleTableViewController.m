@@ -30,7 +30,7 @@
 	NSUInteger randomFirstName = arc4random() % [firstNames count];
 	NSUInteger randomLastName = arc4random() % [lastNames count];
 	
-	Employee *newEmployee = (Employee *)[Employee newEntity];
+	Employee *newEmployee = [Employee newEntity];
 	newEmployee.firstName = [firstNames objectAtIndex:randomFirstName];
 	newEmployee.lastName = [lastNames objectAtIndex:randomLastName];
 	

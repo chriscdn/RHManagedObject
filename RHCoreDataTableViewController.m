@@ -1,6 +1,6 @@
 //
 //  RHCoreDataTableViewController.m
-//  Version: 0.8.2
+//  Version: 0.8.3
 //
 //  Copyright (C) 2012 by Christopher Meyer
 //  http://schwiiz.org/
@@ -74,6 +74,13 @@
 
 -(void)resetMassUpdate {
 	self.massUpdate = NO;
+}
+
+-(void)refreshVisibleCells {
+	for (UITableViewCell *cell in [self.tableView visibleCells]) {
+		NSIndexPath *indexPath = [self.tableView indexPathForCell:cell];
+		[self configureCell:cell atIndexPath:indexPath];
+	}
 }
 
 #pragma mark Abstact classes (implment in sub-class)

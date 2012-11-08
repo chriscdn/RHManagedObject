@@ -1,6 +1,6 @@
 //
 //  RHCoreDataTableViewController.h
-//  Version: 0.8.2
+//  Version: 0.8.3
 //
 //  Copyright (C) 2012 by Christopher Meyer
 //  http://schwiiz.org/
@@ -36,5 +36,6 @@
 
 -(void)addSearchBarWithPlaceHolder:(NSString *)placeholder;
 -(void)resetMassUpdate;
+-(void)refreshVisibleCells;
 
 @end

@@ -1,6 +1,6 @@
 //
 //  RHManagedObjectContextManager.m
-//  Version: 0.8.3
+//  Version: 0.8.4
 //
 //  Copyright (C) 2012 by Christopher Meyer
 //  http://schwiiz.org/
@@ -279,12 +279,10 @@
 		// This ensures no updated object is fault, which would cause the NSFetchedResultsController updates to fail.
 		// http://www.mlsite.net/blog/?p=518
 		
-		/*
-		 NSArray* updates = [[saveNotification.userInfo objectForKey:@"updated"] allObjects];
-		
-		for (NSInteger i = [updates count]-1; i >= 0; i--) {
-			[[[self managedObjectContextForMainThread] objectWithID:[[updates objectAtIndex:i] objectID]] willAccessValueForKey:nil];
-		}*/
+		NSArray* updates = [[saveNotification.userInfo objectForKey:@"updated"] allObjects];
+		for (RHManagedObject *item in updates) {
+			[[item objectInCurrentThreadContext] willAccessValueForKey:nil];
+		}
 		
         [[self managedObjectContextForMainThread] mergeChangesFromContextDidSaveNotification:saveNotification];
     } else {

@@ -1,6 +1,6 @@
 //
 //  RHManagedObjectContextManager.m
-//  Version: 0.8.4
+//  Version: 0.8.5
 //
 //  Copyright (C) 2012 by Christopher Meyer
 //  http://schwiiz.org/
@@ -24,6 +24,7 @@
 //  THE SOFTWARE.
 
 #import "RHManagedObjectContextManager.h"
+#import "RHManagedObject.h"
 
 @interface RHManagedObjectContextManager()
 
@@ -62,7 +63,7 @@
 +(NSMutableDictionary *)sharedInstances {
     static dispatch_once_t once;
     static NSMutableDictionary *sharedInstances;
-    dispatch_once(&once, ^ {
+    dispatch_once(&once, ^{
         sharedInstances = [[NSMutableDictionary alloc] init];
     });
     return sharedInstances;
@@ -142,7 +143,7 @@
 		NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
 		abort();
 	}
-
+	
 	[self discardManagedObjectContext];
 }
 
@@ -168,7 +169,7 @@
 	
 	// a key to cache the moc for the current thread
 	NSString *threadKey = [NSString stringWithFormat:@"%p", thread];
-
+	
     if ( [self.managedObjectContexts objectForKey:threadKey] == nil ) {
 		// create a moc for this thread
         NSManagedObjectContext *threadContext = [[NSManagedObjectContext alloc] init];
@@ -184,7 +185,7 @@
 													 name:NSManagedObjectContextDidSaveNotification
 												   object:threadContext];
     }
-
+	
 	return [self.managedObjectContexts objectForKey:threadKey];
 }
 
@@ -208,70 +209,6 @@
 	}
 	
 	return managedObjectModel;
-}
-
-/**
- * Returns the persistent store coordinator for the application.
- * If the coordinator doesn't already exist, it is created and the application's store added to it.
- */
--(NSPersistentStoreCoordinator *)persistentStoreCoordinator {
-	
-	if (persistentStoreCoordinator == nil) {
-		
-		// This next block is useful when the store is initialized for the first time.  If the DB doesn't already
-		// exist and a copy of the db (with the same name) exists in the bundle, it'll be copied over and used.  This
-		// is useful for the initial seeding of data in the app.
-		NSString *storePath = [self storePath];
-		NSFileManager *fileManager = [NSFileManager defaultManager];
-		
-		if (![fileManager fileExistsAtPath:storePath]) {
-			NSString *defaultStorePath = [[NSBundle mainBundle] pathForResource:[self databaseName] ofType:nil];
-			
-			if ([fileManager fileExistsAtPath:defaultStorePath]) {
-				[fileManager copyItemAtPath:defaultStorePath toPath:storePath error:NULL];
-			}
-		}
-		
-		NSURL *storeURL = [self storeURL];
-		NSError *error = nil;
-		
-		self.persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:[self managedObjectModel]];
-		
-		// https://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/CoreDataVersioning/Articles/vmLightweightMigration.html#//apple_ref/doc/uid/TP40004399-CH4-SW1
-		NSDictionary *options = [NSDictionary dictionaryWithObjectsAndKeys:
-								 [NSNumber numberWithBool:YES], NSMigratePersistentStoresAutomaticallyOption,
-								 [NSNumber numberWithBool:YES], NSInferMappingModelAutomaticallyOption, nil];
-		
-		if (![persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:options error:&error]) {
-			/*
-			 Replace this implementation with code to handle the error appropriately.
-			 
-			 abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development. If it is not possible to recover from the error, display an alert panel that instructs the user to quit the application by pressing the Home button.
-			 
-			 Typical reasons for an error here include:
-			 * The persistent store is not accessible;
-			 * The schema for the persistent store is incompatible with current managed object model.
-			 Check the error message to determine what the actual problem was.
-			 
-			 
-			 If the persistent store is not accessible, there is typically something wrong with the file path. Often, a file URL is pointing into the application's resources directory instead of a writeable directory.
-			 
-			 If you encounter schema incompatibility errors during development, you can reduce their frequency by:
-			 * Simply deleting the existing store:
-			 [[NSFileManager defaultManager] removeItemAtURL:storeURL error:nil]
-			 
-			 * Performing automatic lightweight migration by passing the following dictionary as the options parameter:
-			 [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:YES],NSMigratePersistentStoresAutomaticallyOption, [NSNumber numberWithBool:YES], NSInferMappingModelAutomaticallyOption, nil];
-			 
-			 Lightweight migration will only work for a limited set of schema changes; consult "Core Data Model Versioning and Data Migration Programming Guide" for details.
-			 
-			 */
-			NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-			abort();
-		}
-	}
-	
-	return persistentStoreCoordinator;
 }
 
 -(void)mocDidSave:(NSNotification *)saveNotification {
@@ -298,6 +235,72 @@
 	} else {
 		return NO;
 	}
+}
+
+/**
+ * Returns the persistent store coordinator for the application.
+ * If the coordinator doesn't already exist, it is created and the application's store added to it.
+ */
+-(NSPersistentStoreCoordinator *)persistentStoreCoordinator {
+	
+	@synchronized(self) {
+		if (persistentStoreCoordinator == nil) {
+			
+			// This next block is useful when the store is initialized for the first time.  If the DB doesn't already
+			// exist and a copy of the db (with the same name) exists in the bundle, it'll be copied over and used.  This
+			// is useful for the initial seeding of data in the app.
+			NSString *storePath = [self storePath];
+			NSFileManager *fileManager = [NSFileManager defaultManager];
+			
+			if (![fileManager fileExistsAtPath:storePath]) {
+				NSString *defaultStorePath = [[NSBundle mainBundle] pathForResource:[self databaseName] ofType:nil];
+				
+				if ([fileManager fileExistsAtPath:defaultStorePath]) {
+					[fileManager copyItemAtPath:defaultStorePath toPath:storePath error:NULL];
+				}
+			}
+			
+			NSURL *storeURL = [self storeURL];
+			NSError *error = nil;
+			
+			self.persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:[self managedObjectModel]];
+			
+			// https://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/CoreDataVersioning/Articles/vmLightweightMigration.html#//apple_ref/doc/uid/TP40004399-CH4-SW1
+			NSDictionary *options = [NSDictionary dictionaryWithObjectsAndKeys:
+									 [NSNumber numberWithBool:YES], NSMigratePersistentStoresAutomaticallyOption,
+									 [NSNumber numberWithBool:YES], NSInferMappingModelAutomaticallyOption, nil];
+			
+			if (![persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:options error:&error]) {
+				/*
+				 Replace this implementation with code to handle the error appropriately.
+				 
+				 abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development. If it is not possible to recover from the error, display an alert panel that instructs the user to quit the application by pressing the Home button.
+				 
+				 Typical reasons for an error here include:
+				 * The persistent store is not accessible;
+				 * The schema for the persistent store is incompatible with current managed object model.
+				 Check the error message to determine what the actual problem was.
+				 
+				 
+				 If the persistent store is not accessible, there is typically something wrong with the file path. Often, a file URL is pointing into the application's resources directory instead of a writeable directory.
+				 
+				 If you encounter schema incompatibility errors during development, you can reduce their frequency by:
+				 * Simply deleting the existing store:
+				 [[NSFileManager defaultManager] removeItemAtURL:storeURL error:nil]
+				 
+				 * Performing automatic lightweight migration by passing the following dictionary as the options parameter:
+				 [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:YES],NSMigratePersistentStoresAutomaticallyOption, [NSNumber numberWithBool:YES], NSInferMappingModelAutomaticallyOption, nil];
+				 
+				 Lightweight migration will only work for a limited set of schema changes; consult "Core Data Model Versioning and Data Migration Programming Guide" for details.
+				 
+				 */
+				NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+				abort();
+			}
+		}
+	} // end @synchronized
+	
+	return persistentStoreCoordinator;
 }
 
 #pragma mark -

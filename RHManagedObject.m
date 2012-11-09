@@ -1,6 +1,6 @@
 //
 //  RHManagedObject.m
-//  Version: 0.8.4
+//  Version: 0.8.5
 //
 //  Copyright (C) 2012 by Christopher Meyer
 //  http://schwiiz.org/

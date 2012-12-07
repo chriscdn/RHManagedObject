@@ -59,6 +59,11 @@
 	return [NSEntityDescription insertNewObjectForEntityForName:[self entityName] inManagedObjectContext:[self managedObjectContextForCurrentThread]];
 }
 
++(id)newOrExistingEntityWithPredicate:(NSPredicate *)predicate {
+    id existing = [self getWithPredicate:predicate];
+    return existing ? existing : [self newEntity];
+}
+
 +(id)getWithPredicate:(NSPredicate *)predicate {
 	NSArray *results = [self fetchWithPredicate:predicate];
 	

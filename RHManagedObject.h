@@ -43,6 +43,7 @@ typedef enum {
 +(void)deleteStore;
 +(void)commit;
 +(id)newEntity;
++(id)newOrExistingEntityWithPredicate:(NSPredicate *)predicate;
 +(id)getWithPredicate:(NSPredicate *)predicate;
 +(id)getWithPredicate:(NSPredicate *)predicate sortDescriptor:(NSSortDescriptor *)descriptor;
 

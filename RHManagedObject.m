@@ -31,10 +31,8 @@
 
 @implementation RHManagedObject
 
-// Abstract class.  Implement in your entity subclass to return the name of the entity superclass.
 +(NSString *)entityName {
-	NSLog(@"You must implement an entityName class method in your entity subclass.  Aborting.");
-	abort();
+    return NSStringFromClass([self superclass]);
 }
 
 // Abstract class.  Implement in your entity subclass to return the name of the model without the .xcdatamodeld extension.

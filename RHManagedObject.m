@@ -36,7 +36,12 @@
 }
 
 // Abstract class.  Implement in your entity subclass to return the name of the model without the .xcdatamodeld extension.
+// Optionally, add a RHDefaultModelName key to the app's Info.plist and set a default model there.
 +(NSString *)modelName {
+    NSString *modelName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"RHDefaultModelName"];
+    if (modelName) {
+        return modelName;
+    }
     NSLog(@"You must implement a modelName class method in your entity subclass.  Aborting.");
 	abort();
 }

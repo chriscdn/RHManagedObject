@@ -1,6 +1,6 @@
 //
 //  RHManagedObject.m
-//  Version: 0.8.6
+//  Version: 0.8.7
 //
 //  Copyright (C) 2012 by Christopher Meyer
 //  http://schwiiz.org/
@@ -31,10 +31,12 @@
 
 @implementation RHManagedObject
 
-// Abstract class.  Implement in your entity subclass to return the name of the entity superclass.
 +(NSString *)entityName {
-	NSLog(@"You must implement an entityName class method in your entity subclass.  Aborting.");
-	abort();
+    return NSStringFromClass([self superclass]);
+	/*
+	 NSLog(@"You must implement an entityName class method in your entity subclass.  Aborting.");
+	 abort();
+	 */
 }
 
 // Abstract class.  Implement in your entity subclass to return the name of the model without the .xcdatamodeld extension.
@@ -100,7 +102,7 @@
 	NSFetchRequest *fetch = [[NSFetchRequest alloc] init];
 	
 	[fetch setEntity:[self entityDescription]];
-		
+	
 	if (predicate) {
 		[fetch setPredicate:predicate];
 	}
@@ -236,7 +238,7 @@
 }
 
 // perform a shallow copy of a Managed Object and return it - only handle attributes and not relationships
--(id)clone {	
+-(id)clone {
 	NSEntityDescription *entityDescription = [self entity];
 	NSString *entityName = [entityDescription name];
 	NSManagedObject *cloned = [NSEntityDescription insertNewObjectForEntityForName:entityName inManagedObjectContext:[self managedObjectContext]];

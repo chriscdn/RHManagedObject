@@ -2,7 +2,7 @@
 //  RHManagedObject.m
 //  Version: 0.8.7
 //
-//  Copyright (C) 2012 by Christopher Meyer
+//  Copyright (C) 2013 by Christopher Meyer
 //  http://schwiiz.org/
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -41,6 +41,12 @@
 
 // Abstract class.  Implement in your entity subclass to return the name of the model without the .xcdatamodeld extension.
 +(NSString *)modelName {
+	
+	NSString *modelName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"RHDefaultModelName"];
+	if (modelName) {
+		return modelName;
+	}
+	
     NSLog(@"You must implement a modelName class method in your entity subclass.  Aborting.");
 	abort();
 }

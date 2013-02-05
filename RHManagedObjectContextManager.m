@@ -1,6 +1,6 @@
 //
 //  RHManagedObjectContextManager.m
-//  Version: 0.8.5
+//  Version: 0.8.8
 //
 //  Copyright (C) 2013 by Christopher Meyer
 //  http://schwiiz.org/
@@ -26,16 +26,46 @@
 #import "RHManagedObjectContextManager.h"
 #import "RHManagedObject.h"
 
+
+@interface RHManagedObjectContext : NSManagedObjectContext
+@property (nonatomic, weak) id observer;
+@end
+
+@implementation RHManagedObjectContext
+@synthesize observer;
+
+// This subclass is for managing the NSManagedObjectContextDidSaveNotification.  The ManagedObjectContext is deallocated at an undetermined
+// time when the thread on which it was allocated cleans up the threadDictionary.  By putting the removeObserver in the dealloc we can be
+// certain everything is cleaned up when it's no longer required.
+-(void)setObserver:(id)_observer {
+	if (_observer != self.observer) {
+		[[NSNotificationCenter defaultCenter] removeObserver:self.observer name:NSManagedObjectContextDidSaveNotification object:self];
+		
+		self.observer = observer;
+		
+		[[NSNotificationCenter defaultCenter] addObserver:self.observer
+												 selector:@selector(mocDidSave:)
+													 name:NSManagedObjectContextDidSaveNotification
+												   object:self];
+	}
+}
+
+-(void)dealloc {
+	[[NSNotificationCenter defaultCenter] removeObserver:self.observer name:NSManagedObjectContextDidSaveNotification object:self];
+	// NSLog(@"%@", @"RHManagedObjectContextManager");
+}
+
+@end
+
+
 @interface RHManagedObjectContextManager()
 
 @property (nonatomic, strong) NSManagedObjectContext *managedObjectContextForMainThread;
-@property (nonatomic, strong) NSMutableDictionary *managedObjectContexts;
 @property (nonatomic, strong) NSManagedObjectModel *managedObjectModel;
 @property (nonatomic, strong) NSPersistentStoreCoordinator *persistentStoreCoordinator;
 @property (nonatomic, strong) NSString *modelName;
 
 +(NSMutableDictionary *)sharedInstances;
--(void)discardManagedObjectContext;
 -(NSString *)storePath;
 -(NSURL *)storeURL;
 -(NSString *)databaseName;
@@ -44,7 +74,6 @@
 
 @implementation RHManagedObjectContextManager
 @synthesize managedObjectContextForMainThread;
-@synthesize managedObjectContexts;
 @synthesize managedObjectModel;
 @synthesize persistentStoreCoordinator;
 @synthesize modelName;
@@ -76,13 +105,6 @@
     return self;
 }
 
--(NSMutableDictionary *)managedObjectContexts {
-	if (managedObjectContexts == nil) {
-		self.managedObjectContexts = [NSMutableDictionary dictionary];
-	}
-	return managedObjectContexts;
-}
-
 #pragma mark -
 #pragma mark Other useful stuff
 // Used to flush and reset the database.
@@ -112,7 +134,6 @@
 	}
 	
 	self.managedObjectContextForMainThread = nil;
-	self.managedObjectContexts = nil;
 	self.managedObjectModel = nil;
 	self.persistentStoreCoordinator = nil;
 	
@@ -143,8 +164,6 @@
 		NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
 		abort();
 	}
-	
-	[self discardManagedObjectContext];
 }
 
 #pragma mark -
@@ -168,32 +187,19 @@
 	}
 	
 	// a key to cache the moc for the current thread
-	NSString *threadKey = [NSString stringWithFormat:@"%p", thread];
-	
-    if ( [self.managedObjectContexts objectForKey:threadKey] == nil ) {
+	NSString *threadKey = [NSString stringWithFormat:@"RHManagedObjectContext_%@", self.modelName];
+		
+	if ( [[thread threadDictionary] objectForKey:threadKey] == nil ) {
 		// create a moc for this thread
-        NSManagedObjectContext *threadContext = [[NSManagedObjectContext alloc] init];
+        RHManagedObjectContext *threadContext = [[RHManagedObjectContext alloc] init];
         [threadContext setPersistentStoreCoordinator:[self persistentStoreCoordinator]];
 		[threadContext setMergePolicy:kMergePolicy];
+		[threadContext setObserver:self];
 		
-        // cache the moc for this thread
-        [self.managedObjectContexts setObject:threadContext forKey:threadKey];
-		
-		// attach a notification thingie
-		[[NSNotificationCenter defaultCenter] addObserver:self
-												 selector:@selector(mocDidSave:)
-													 name:NSManagedObjectContextDidSaveNotification
-												   object:threadContext];
+		[[thread threadDictionary] setObject:threadContext forKey:threadKey];
     }
 	
-	return [self.managedObjectContexts objectForKey:threadKey];
-}
-
--(void)discardManagedObjectContext {
-	NSString *threadKey = [NSString stringWithFormat:@"%p", [NSThread currentThread]];
-	NSManagedObjectContext *threadContext = [self.managedObjectContexts objectForKey:threadKey];
-	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:threadContext];
-	[self.managedObjectContexts removeObjectForKey:threadKey];
+	return [[thread threadDictionary] objectForKey:threadKey];
 }
 
 /**

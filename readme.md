@@ -2,7 +2,7 @@
 
 RHManagedObject is a library for iOS to simplify your life with Core Data.  It was motivated by the following:
 
-- Core Data is verbose.  Have a look at [Listing 1](http://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/CoreData/Articles/cdFetching.html) from the Apple Documentation and you'll see it takes ~14 lines of code for a single fetch request. RHManagedObject reduces this to a single line of code.
+- Core Data is verbose.  Have a look at [Listing 1](http://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/CoreData/Articles/cdFetching.html) from the Apple Documentation and you'll see it takes ~14 lines of code for a single fetch request. RHManagedObject reduces this to a single line.
 
 - Each managed object has an object context associated with it, and for some operations you must first fetch the object context in order to operate on the object. For example:
 
@@ -17,7 +17,7 @@ RHManagedObject is a library for iOS to simplify your life with Core Data.  It w
 	[myManagedObject delete];
 	```
 	
-- Core Data is not thread safe. If you wish to mutate your objects off the main thread you need to create a managed object context in that thread, attach a `NSManagedObjectContextDidSaveNotification` notification to it, and merge the context into the main object context on an observer method on the main thread.  Bleh.  RHManagedObject does all of this for you so that you can work with your objects in any thread without having to think about all this.
+- Core Data is not thread safe. If you wish to mutate your objects off the main thread you need to create a managed object context in that thread, attach a `NSManagedObjectContextDidSaveNotification` notification to it, and merge the context into the main object context on an observer method on the main thread.  Bleh.  RHManagedObject does all of this for you so that you can work with your objects in any thread without having to think about this.
 
 - A common Core Data design pattern is to pass the managed object context between each `UIViewController` that requires it.  This gets cumbersome to maintain, so RHManagedObject puts all the Core Data boilerplate code into a singleton, which becomes accessible from anywhere in your code.  Best of all, the singleton encapsulates the entire `NSManagedObjectContext` lifecycle for you: constructing, merging, and saving (even in a multi-threaded app) such that you never need to interact with `NSManagedObjectContext` directly.  RHManagedObject lets you focus on your objects with simple methods to fetch, modify, and save without having to think about `NSManagedObjectContext`.
 
@@ -223,7 +223,7 @@ This is useful to reset your Core Data store after making changes to your model.
 
 ### Get an object instance in another thread
 
-Core Data doesn't allow you to pass managed objects between threads.  However you can generate a new object in a separate thread that's valid for that thread.  Here's an example using the `-objectInCurrentThreadContext` method:
+Core Data doesn't allow managed objects to be passed between threads.  However you can generate a new object in a separate thread that's valid for that thread.  Here's an example using the `-objectInCurrentThreadContext` method:
 
 ``` objective-c
 Employee *employee = [Employee getWithPredicate:[NSPredicate predicateWithFormat:@"employeID=%i", 12345]];
@@ -249,7 +249,7 @@ RHManagedObject is being used with:
 
 - [TrackMyTour.com](http://trackmytour.com/) - Travel Sharing for iPhone and iPad
 - [Warmshowers.org](http://warmshowers.org/) - Hospitality for Touring Cyclists
-- [PubQuest.com](http://pubquest.com/) - Not yet released
+- [PubQuest.com](http://pubquest.com/) - Find Craft Breweries
 
 Contact me if you'd like your app to be listed.
 

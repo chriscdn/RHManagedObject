@@ -1,6 +1,6 @@
 //
 //  RHCoreDataTableViewController.m
-//  Version: 0.8.8
+//  Version: 0.8.9
 //
 //  Copyright (C) 2013 by Christopher Meyer
 //  http://schwiiz.org/

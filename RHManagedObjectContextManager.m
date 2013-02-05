@@ -1,6 +1,6 @@
 //
 //  RHManagedObjectContextManager.m
-//  Version: 0.8.8
+//  Version: 0.8.9
 //
 //  Copyright (C) 2013 by Christopher Meyer
 //  http://schwiiz.org/
@@ -41,7 +41,7 @@
 	if (_observer != self.observer) {
 		[[NSNotificationCenter defaultCenter] removeObserver:self.observer name:NSManagedObjectContextDidSaveNotification object:self];
 		
-		self.observer = observer;
+		observer = _observer;
 		
 		[[NSNotificationCenter defaultCenter] addObserver:self.observer
 												 selector:@selector(mocDidSave:)

@@ -126,7 +126,7 @@ The library contains code to populate the store on first launch. This was motiva
 
 ### ARC
 
-The library is using ARC as of version 0.8.0.
+The library uses ARC as of version 0.8.0.
 
 ### Lightweight Migration
 

@@ -164,6 +164,9 @@ An example of how this works can be found in the `ExampleTableViewController.m` 
 
 <!-- ### Mass Update Notification -->
 
+### Thread Containment
+
+RHManagedObject still uses the older style thread confinement pattern to manage contexts in different threads.  A beta has been developed to work with nested contexts, but deadlocks in iOS 5.1 has put that approach on hold.  You can read about the deadlocking issue [here](http://wbyoung.tumblr.com/post/27851725562/core-data-growing-pains).
 
 ## Example Usage
 

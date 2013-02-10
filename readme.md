@@ -128,7 +128,27 @@ The library contains code to populate the store on first launch. This was motiva
 
 The library is using ARC as of version 0.8.0.
 
+### Lightweight Migration
+
+If possible, RHManagedObject will automatically apply a [Lightweight Migration](http://developer.apple.com/library/ios/#documentation/cocoa/Conceptual/CoreDataVersioning/Articles/vmLightweightMigration.html) to altered models.  If you wish to block the interface or perform other operations during a migration, you can call the RHManagedObject `+doesRequireMigration` method from `-application:didFinishLaunchingWithOptions:` before executing anything else that requires Core Data.  For example:
+
+``` objective-c
+if ([Employee doesRequireMigration]) {
+	// Show a HUD on the main thread using SVProgressHUD or whatever you like
+		
+	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+		// Accessing the context will perform the migration
+		[Employee managedObjectContextForCurrentThread];
+				
+		dispatch_async(dispatch_get_main_queue(), ^{
+			// Dismiss the HUD on the main thread
+		});
+	});
+});
+```
+
 <!-- ### Mass Update Notification -->
+
 
 ## Example Usage
 

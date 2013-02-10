@@ -149,9 +149,9 @@ if ([Employee doesRequireMigration]) {
 
 ### RHCoreDataTableViewController
 
-RHCoreDataTableViewController is a UITableViewController subclass that simplifies the use of NSFetchedResultsController.  It contains most of the boilerplate code required for the different delegates, but it also:
+RHCoreDataTableViewController is a UITableViewController subclass that simplifies the use of NSFetchedResultsController.  It contains most of the boilerplate code required for the different delegates, but also:
 
-* handles updates by calling `[tableView reloadData]` instead of `-controller:didChangeObject:atIndexPath:forChangeType:newIndexPath:newIndexPath` when a large number of changes are pending (currently set to 10 or more); and
+* handles large updates by calling `[tableView reloadData]` instead of `-controller:didChangeObject:atIndexPath:forChangeType:newIndexPath:newIndexPath` for each changed object when a large number of changes are pending (currently set to 10 or more); and
 * provides methods to add and manage a search bar.
 
 You can use the class by subclassing RHCoreDataTableViewController (instead of UITableViewController) and by implementing the following methods:
@@ -160,7 +160,7 @@ You can use the class by subclassing RHCoreDataTableViewController (instead of U
 * `-tableView:cellForRowAtIndexPath:`
 * `configureCell:atIndexPath:`
 
-An example of how this works is found in `ExampleTableViewController.m` in the sample project.
+An example of how this works can be found in the `ExampleTableViewController.m` file in the sample project.
 
 <!-- ### Mass Update Notification -->
 

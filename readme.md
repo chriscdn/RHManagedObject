@@ -130,7 +130,7 @@ The library is using ARC as of version 0.8.0.
 
 ### Lightweight Migration
 
-If possible, RHManagedObject will automatically apply a [Lightweight Migration](http://developer.apple.com/library/ios/#documentation/cocoa/Conceptual/CoreDataVersioning/Articles/vmLightweightMigration.html) to altered models.  If you wish to block the interface or perform other operations during a migration, you can call the RHManagedObject `+doesRequireMigration` method from `-application:didFinishLaunchingWithOptions:` before executing anything else that requires Core Data.  For example:
+If possible, RHManagedObject will automatically apply a [Lightweight Migration](http://developer.apple.com/library/ios/#documentation/cocoa/Conceptual/CoreDataVersioning/Articles/vmLightweightMigration.html) to altered models.  If you wish to block the interface or perform other operations when a migration occurs, you can call the RHManagedObject `+doesRequireMigration` method from the `-application:didFinishLaunchingWithOptions:` method of your AppDelegate to see if a migration is pending.  This must be done before executing anything else that requires Core Data.  For example:
 
 ``` objective-c
 if ([Employee doesRequireMigration]) {

@@ -96,23 +96,18 @@
 	 NSPredicate *predicate = [NSPredicate predicateWithFormat:@"1=1"];
 	 
 	 NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-	 [fetchRequest setEntity:[Waypoint entityDescription]];
+	 [fetchRequest setEntity:[RHManagedObjectSubclass entityDescription]];
 	 [fetchRequest setPredicate:predicate];
 	 [fetchRequest setSortDescriptors:[NSArray arrayWithObjects:sort1, sort2, nil]];
 	 // [fetchRequest setFetchBatchSize:20];
 	 
 	 self.fetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
-	 managedObjectContext:[Waypoint managedObjectContext]
+	 managedObjectContext:[RHManagedObjectSubclass managedObjectContextForCurrentThread]
 	 sectionNameKeyPath:nil
 	 cacheName:nil];
 	 
 	 fetchedResultsController.delegate = self;
-	 
-	 [sort1 release];
-	 [sort2 release];
-	 [fetchRequest release];
-	 [fetchedResultsController release];
-	 
+	
 	 NSError *error = nil;
 	 if (![fetchedResultsController performFetch:&error]) {
 	 NSLog(@"Unresolved error: %@", [error localizedDescription]);
@@ -138,7 +133,7 @@
 	 
 	 UITableViewCell *cell = [_tableView dequeueReusableCellWithIdentifier:CellIdentifier];
 	 if (cell == nil) {
-	 cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier] autorelease];
+	 cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
 	 cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 	 }
 	 

@@ -301,7 +301,7 @@ Contact me if you'd like your app to be listed.
 Are you using RHManagedObject in your project?  I'd love to hear from you!
 
 profile: [Christopher Meyer](https://github.com/chriscdn)  
-e-mail: [chris@schwiiz.org](mailto:chris@schwiiz.org)
+e-mail: [chris@schwiiz.org](mailto:chris@schwiiz.org)  
 twitter: [@chriscdn](http://twitter.com/chriscdn)
 
 ## License

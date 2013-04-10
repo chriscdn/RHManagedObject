@@ -1,6 +1,6 @@
 //
 //  RHManagedObjectContextManager.m
-//  Version: 0.8.9
+//  Version: 0.8.10
 //
 //  Copyright (C) 2013 by Christopher Meyer
 //  http://schwiiz.org/
@@ -64,6 +64,7 @@
 @property (nonatomic, strong) NSManagedObjectModel *managedObjectModel;
 @property (nonatomic, strong) NSPersistentStoreCoordinator *persistentStoreCoordinator;
 @property (nonatomic, strong) NSString *modelName;
+@property (nonatomic, strong) NSString *guid;
 
 +(NSMutableDictionary *)sharedInstances;
 -(NSString *)storePath;
@@ -77,6 +78,7 @@
 @synthesize managedObjectModel;
 @synthesize persistentStoreCoordinator;
 @synthesize modelName;
+@synthesize guid;
 
 #pragma mark -
 #pragma mark Singleton Methods
@@ -136,8 +138,20 @@
 	self.managedObjectContextForMainThread = nil;
 	self.managedObjectModel = nil;
 	self.persistentStoreCoordinator = nil;
+	self.guid = nil;
 	
 	[[RHManagedObjectContextManager sharedInstances] removeObjectForKey:[self modelName]];
+}
+
+-(NSString *)guid {
+	if (guid == nil) {
+		CFUUIDRef uuid = CFUUIDCreate(kCFAllocatorDefault);
+		NSString *uuidStr = (__bridge_transfer NSString *)CFUUIDCreateString(kCFAllocatorDefault, uuid);
+		CFRelease(uuid);
+		
+		self.guid = [uuidStr lowercaseString];
+	}
+	return guid;
 }
 
 -(NSUInteger)pendingChangesCount {
@@ -186,9 +200,11 @@
 		return [self managedObjectContextForMainThread];
 	}
 	
-	// a key to cache the moc for the current thread
-	NSString *threadKey = [NSString stringWithFormat:@"RHManagedObjectContext_%@", self.modelName];
-		
+	// A key to cache the moc for the current thread.
+	// 2013-04-10 - Added a GUID to make sure the key is unique if the store is ever reset.  We don't want to accessed
+	// a cached value from a deleted store!
+	NSString *threadKey = [NSString stringWithFormat:@"RHManagedObjectContext_%@_%@", self.modelName, self.guid];
+	
 	if ( [[thread threadDictionary] objectForKey:threadKey] == nil ) {
 		// create a moc for this thread
         RHManagedObjectContext *threadContext = [[RHManagedObjectContext alloc] init];
@@ -249,14 +265,16 @@
  */
 -(NSPersistentStoreCoordinator *)persistentStoreCoordinator {
 	
-	@synchronized(self) {
-		if (persistentStoreCoordinator == nil) {
-			
+	if (persistentStoreCoordinator == nil) {
+		@synchronized(self) {
 			// This next block is useful when the store is initialized for the first time.  If the DB doesn't already
 			// exist and a copy of the db (with the same name) exists in the bundle, it'll be copied over and used.  This
 			// is useful for the initial seeding of data in the app.
 			NSString *storePath = [self storePath];
 			NSFileManager *fileManager = [NSFileManager defaultManager];
+			
+			
+			NSLog(@"%@", storePath);
 			
 			if (![fileManager fileExistsAtPath:storePath]) {
 				NSString *defaultStorePath = [[NSBundle mainBundle] pathForResource:[self databaseName] ofType:nil];
@@ -303,8 +321,8 @@
 				NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
 				abort();
 			}
-		}
-	} // end @synchronized
+		} // end @synchronized
+	}
 	
 	return persistentStoreCoordinator;
 }

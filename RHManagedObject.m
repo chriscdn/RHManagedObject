@@ -1,6 +1,6 @@
 //
 //  RHManagedObject.m
-//  Version: 0.8.9
+//  Version: 0.8.10
 //
 //  Copyright (C) 2013 by Christopher Meyer
 //  http://schwiiz.org/
@@ -257,7 +257,7 @@
 }
 
 -(id)objectInCurrentThreadContext {
-    NSManagedObjectContext *currentMoc = [[self class] performSelector:@selector(managedObjectContextForCurrentThread)];
+	NSManagedObjectContext *currentMoc = [[self class] performSelector:@selector(managedObjectContextForCurrentThread)];
 	return [currentMoc objectWithID:self.objectID];
 }
 

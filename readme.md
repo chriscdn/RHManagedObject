@@ -295,6 +295,7 @@ Contact me if you'd like your app to be listed.
 ## Contributions
 
 - James Carlson
+- Mathew Leffler
 
 ## Contact
 

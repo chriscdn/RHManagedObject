@@ -1,6 +1,6 @@
 //
 //  RHManagedObjectContextManager.m
-//  Version: 0.8.10
+//  Version: 0.8.11
 //
 //  Copyright (C) 2013 by Christopher Meyer
 //  http://schwiiz.org/
@@ -238,10 +238,25 @@
 		// This ensures no updated object is fault, which would cause the NSFetchedResultsController updates to fail.
 		// http://www.mlsite.net/blog/?p=518
 		
-		NSArray* updates = [[saveNotification.userInfo objectForKey:@"updated"] allObjects];
+		NSDictionary *userInfo = saveNotification.userInfo;
+		
+		NSArray *updates = [[userInfo objectForKey:@"updated"] allObjects];
 		for (RHManagedObject *item in updates) {
 			[[item objectInCurrentThreadContext] willAccessValueForKey:nil];
 		}
+
+		// 2013-04-14 - This hack is also required on the "inserted" key to ensure NSFetchedResultsController works properly
+		NSArray *inserted = [[userInfo objectForKey:@"inserted"] allObjects];
+		for (RHManagedObject *item in inserted) {
+			[[item objectInCurrentThreadContext] willAccessValueForKey:nil];
+		}
+		 
+		/* Deleted items are gone... Can't access properties.
+		NSArray *deleted = [[userInfo objectForKey:@"deleted"] allObjects];
+		for (RHManagedObject *item in deleted) {
+			[[item objectInCurrentThreadContext] willAccessValueForKey:nil];
+		}
+		*/
 		
         [[self managedObjectContextForMainThread] mergeChangesFromContextDidSaveNotification:saveNotification];
     } else {
@@ -273,8 +288,7 @@
 			NSString *storePath = [self storePath];
 			NSFileManager *fileManager = [NSFileManager defaultManager];
 			
-			
-			NSLog(@"%@", storePath);
+			// NSLog(@"%@", storePath);
 			
 			if (![fileManager fileExistsAtPath:storePath]) {
 				NSString *defaultStorePath = [[NSBundle mainBundle] pathForResource:[self databaseName] ofType:nil];

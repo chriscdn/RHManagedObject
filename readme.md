@@ -17,7 +17,7 @@ RHManagedObject is a library for iOS to simplify your life with Core Data.  It w
 	[myManagedObject delete];
 	```
 	
-- Core Data is not thread safe. If you wish to mutate your objects off the main thread you need to create a managed object context in that thread, attach a `NSManagedObjectContextDidSaveNotification` notification to it, and merge the context into the main object context on an observer method on the main thread.  Bleh.  RHManagedObject does all of this for you so that you can work with your objects in any thread without having to think about this.
+- Core Data is not thread safe. If you wish to mutate your objects off the main thread you need to create a managed object context in that thread, attach a `NSManagedObjectContextDidSaveNotification` notification to it, and merge the context into the main object context in an observer method on the main thread.  Bleh.  RHManagedObject does this for you so that you can work with your objects in any thread without having to think about this.
 
 - A common Core Data design pattern is to pass the managed object context between each `UIViewController` that requires it.  This gets cumbersome to maintain, so RHManagedObject puts all the Core Data boilerplate code into a singleton, which becomes accessible from anywhere in your code.  Best of all, the singleton encapsulates the entire `NSManagedObjectContext` lifecycle for you: constructing, merging, and saving (even in a multi-threaded app) such that you never need to interact with `NSManagedObjectContext` directly.  RHManagedObject lets you focus on your objects with simple methods to fetch, modify, and save without having to think about `NSManagedObjectContext`.
 
@@ -130,26 +130,13 @@ The library uses ARC as of version 0.8.0.
 
 ### Lightweight Migration
 
-If possible, RHManagedObject will automatically perform a [Lightweight Migration](http://developer.apple.com/library/ios/#documentation/cocoa/Conceptual/CoreDataVersioning/Articles/vmLightweightMigration.html) to altered models.  If you wish to block the interface or perform other operations when a migration occurs, you can call the RHManagedObject `+doesRequireMigration` method from the `-application:didFinishLaunchingWithOptions:` method of your AppDelegate to see if a migration is pending.  This must be done before executing anything else that requires Core Data.  For example:
+If possible, RHManagedObject will automatically perform a [Lightweight Migration](http://developer.apple.com/library/ios/#documentation/cocoa/Conceptual/CoreDataVersioning/Articles/vmLightweightMigration.html) to altered models.  If you wish to block the interface or perform other operations when a migration occurs, you can call the RHManagedObject `+doesRequireMigration` method from the `-application:didFinishLaunchingWithOptions:` method of your AppDelegate to see if a migration is pending.  This must be done before executing anything else that requires Core Data.
 
-``` objective-c
-if ([Employee doesRequireMigration]) {
-	// Show a HUD on the main thread using SVProgressHUD or whatever you like
-		
-	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-		// Accessing the context will perform the migration
-		[Employee managedObjectContextForCurrentThread];
-				
-		dispatch_async(dispatch_get_main_queue(), ^{
-			// Dismiss the HUD on the main thread
-		});
-	});
-});
-```
+[Click here for a blog post on performing a Core Data Migration.](http://schwiiz.org/?p=1734)
 
 ### RHCoreDataTableViewController
 
-RHCoreDataTableViewController is a UITableViewController subclass that simplifies the use of NSFetchedResultsController.  It contains most of the boilerplate code required for the different delegates, but also:
+RHCoreDataTableViewController is a `UITableViewController` subclass that simplifies the use of `NSFetchedResultsController`.  It contains most of the boilerplate code required for the different delegates, but also:
 
 * handles large updates by calling `[tableView reloadData]` instead of `-controller:didChangeObject:atIndexPath:forChangeType:newIndexPath:newIndexPath` for each changed object when a large number of changes are pending (currently set to 10 or more);
 * provides methods to add and manage a search bar; and
@@ -164,6 +151,15 @@ You can use the class by subclassing RHCoreDataTableViewController (instead of U
 An example of how this works can be found in the `ExampleTableViewController.m` file in the sample project.
 
 <!-- ### Mass Update Notification -->
+
+### RHCoreDataCollectionViewController
+
+RHCoreDataCollectionViewController is the same as RHCoreDataTableViewController but for Collection Views.  It implements the `NSFetchedResultsControllerDelegate` delegate and requires the following methods to be implemented in your subclass:
+
+* `-fetchedResultsController`
+* `-collectionView:cellForItemAtIndexPath:`
+
+The code is based off [Ash Furrow's UICollectionView-NSFetchedResultsController](https://github.com/AshFurrow/UICollectionView-NSFetchedResultsController) but has been adopted to fit this library.
 
 ### Thread Containment
 

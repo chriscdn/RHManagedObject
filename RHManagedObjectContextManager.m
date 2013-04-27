@@ -26,7 +26,6 @@
 #import "RHManagedObjectContextManager.h"
 #import "RHManagedObject.h"
 
-
 @interface RHManagedObjectContext : NSManagedObjectContext
 @property (nonatomic, weak) id observer;
 @end
@@ -52,7 +51,6 @@
 
 -(void)dealloc {
 	[[NSNotificationCenter defaultCenter] removeObserver:self.observer name:NSManagedObjectContextDidSaveNotification object:self];
-	// NSLog(@"%@", @"RHManagedObjectContextManager");
 }
 
 @end
@@ -201,7 +199,7 @@
 	}
 	
 	// A key to cache the moc for the current thread.
-	// 2013-04-10 - Added a GUID to make sure the key is unique if the store is ever reset.  We don't want to accessed
+	// 2013-04-10 - Added a GUID to make sure the key is unique if the store is ever reset.  We don't want to access
 	// a cached value from a deleted store!
 	NSString *threadKey = [NSString stringWithFormat:@"RHManagedObjectContext_%@_%@", self.modelName, self.guid];
 	
@@ -250,13 +248,6 @@
 		for (RHManagedObject *item in inserted) {
 			[[item objectInCurrentThreadContext] willAccessValueForKey:nil];
 		}
-		 
-		/* Deleted items are gone... Can't access properties.
-		NSArray *deleted = [[userInfo objectForKey:@"deleted"] allObjects];
-		for (RHManagedObject *item in deleted) {
-			[[item objectInCurrentThreadContext] willAccessValueForKey:nil];
-		}
-		*/
 		
         [[self managedObjectContextForMainThread] mergeChangesFromContextDidSaveNotification:saveNotification];
     } else {
@@ -287,8 +278,6 @@
 			// is useful for the initial seeding of data in the app.
 			NSString *storePath = [self storePath];
 			NSFileManager *fileManager = [NSFileManager defaultManager];
-			
-			// NSLog(@"%@", storePath);
 			
 			if (![fileManager fileExistsAtPath:storePath]) {
 				NSString *defaultStorePath = [[NSBundle mainBundle] pathForResource:[self databaseName] ofType:nil];

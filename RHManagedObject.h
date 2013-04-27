@@ -57,7 +57,6 @@ typedef enum {
 +(NSUInteger)countWithPredicate:(NSPredicate *)predicate;
 
 +(NSArray *)distinctValuesWithAttribute:(NSString *)attribute predicate:(NSPredicate *)predicate;
-+(NSString*)aggregateToString:(RHAggregate)aggregate;
 +(NSAttributeType)attributeTypeWithKey:(NSString *)key;
 +(id)aggregateWithType:(RHAggregate)aggregate key:(NSString *)key predicate:(NSPredicate *)predicate defaultValue:(id)defaultValue;
 

@@ -27,6 +27,7 @@
 #import "RHManagedObjectContextManager.h"
 
 @interface RHManagedObject()
++(NSString *)aggregateToString:(RHAggregate)aggregate;
 @end
 
 @implementation RHManagedObject
@@ -206,8 +207,7 @@
 	if (returnValue == nil) {
 		returnValue = defaultValue;
 	}
-	
-	
+		
 	return returnValue;
 }
 

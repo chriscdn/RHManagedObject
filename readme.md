@@ -139,7 +139,7 @@ If possible, RHManagedObject will automatically perform a [Lightweight Migration
 RHCoreDataTableViewController is a `UITableViewController` subclass that simplifies the use of `NSFetchedResultsController`.  It contains most of the boilerplate code required for the different delegates, but also:
 
 * handles large updates by calling `[tableView reloadData]` instead of `-controller:didChangeObject:atIndexPath:forChangeType:newIndexPath:newIndexPath` for each changed object when a large number of changes are pending (currently set to 10 or more);
-* provides methods to add and manage a search bar; and
+* provides methods to add and manage a search bar (see sample project for usage); and
 * automatically manages the insertion and deletion of rows and sections.
 
 You can use the class by subclassing RHCoreDataTableViewController (instead of UITableViewController) and by implementing the following methods:
@@ -154,7 +154,7 @@ An example of how this works can be found in the `ExampleTableViewController.m` 
 
 ### RHCoreDataCollectionViewController
 
-RHCoreDataCollectionViewController is the same as RHCoreDataTableViewController but for Collection Views.  It implements the `NSFetchedResultsControllerDelegate` delegate and requires the following methods to be implemented in your subclass:
+RHCoreDataCollectionViewController is a `UICollectionViewController` subclass with a similar motivation as RHCoreDataTableViewController.  It implements the `NSFetchedResultsControllerDelegate` delegate and requires the following methods to be implemented in your subclass:
 
 * `-fetchedResultsController`
 * `-collectionView:cellForItemAtIndexPath:`
@@ -165,7 +165,7 @@ The code is based on [Ash Furrow's UICollectionView-NSFetchedResultsController](
 
 RHManagedObject still uses the older style thread confinement pattern to manage contexts in different threads.  A beta has been developed to work with nested contexts, but deadlocks in iOS 5.1 has put the approach on hold.  You can read about the deadlocking issue [here](http://wbyoung.tumblr.com/post/27851725562/core-data-growing-pains).
 
-## Example Usage
+## Examples
 
 Once you have setup RHManagedObject it becomes easier to do common tasks.  Here are some examples.
 

@@ -159,7 +159,7 @@ RHCoreDataCollectionViewController is the same as RHCoreDataTableViewController 
 * `-fetchedResultsController`
 * `-collectionView:cellForItemAtIndexPath:`
 
-The code is based off [Ash Furrow's UICollectionView-NSFetchedResultsController](https://github.com/AshFurrow/UICollectionView-NSFetchedResultsController) but has been adopted to fit this library.
+The code is based on [Ash Furrow's UICollectionView-NSFetchedResultsController](https://github.com/AshFurrow/UICollectionView-NSFetchedResultsController), but has been modified to fit this library.
 
 ### Thread Containment
 

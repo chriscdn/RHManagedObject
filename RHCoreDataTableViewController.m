@@ -220,11 +220,6 @@
 	[self.tableView endUpdates];
 }
 
--(void)viewDidUnload {
-	[super viewDidUnload];
-    self.fetchedResultsController = nil;
-}
-
 -(void)dealloc {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }

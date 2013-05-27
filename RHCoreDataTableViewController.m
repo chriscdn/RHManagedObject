@@ -1,6 +1,6 @@
 //
 //  RHCoreDataTableViewController.m
-//  Version: 0.8.12
+//  Version: 0.8.13
 //
 //  Copyright (C) 2013 by Christopher Meyer
 //  http://schwiiz.org/
@@ -29,6 +29,7 @@
 @implementation RHCoreDataTableViewController
 @synthesize fetchedResultsController;
 @synthesize massUpdate;
+@synthesize enableSectionIndex;
 
 -(id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
 	if (self=[super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
@@ -37,6 +38,7 @@
 													 name:RHWillMassUpdateNotification
 												   object:nil];
 		[self resetMassUpdate];
+		[self setEnableSectionIndex:NO];
 	}
 	
 	return self;
@@ -218,6 +220,18 @@
 	
 	// The fetch controller has sent all current change notifications, so tell the table view to process all updates.
 	[self.tableView endUpdates];
+}
+
+-(NSArray *)sectionIndexTitlesForTableView:(UITableView *)tableView {
+	if (self.enableSectionIndex) {
+		return [self.fetchedResultsController sectionIndexTitles];
+	}
+	
+	return nil;
+}
+
+-(NSInteger)tableView:(UITableView *)tableView sectionForSectionIndexTitle:(NSString *)title atIndex:(NSInteger)index {
+    return [self.fetchedResultsController sectionForSectionIndexTitle:title atIndex:index];
 }
 
 -(void)dealloc {

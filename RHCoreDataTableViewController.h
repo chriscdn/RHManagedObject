@@ -1,6 +1,6 @@
 //
 //  RHCoreDataTableViewController.h
-//  Version: 0.8.12
+//  Version: 0.8.13
 //
 //  Copyright (C) 2013 by Christopher Meyer
 //  http://schwiiz.org/
@@ -33,6 +33,7 @@
 @property (nonatomic, strong) UISearchDisplayController *searchController;
 @property (nonatomic, strong) NSString *searchString;
 @property (nonatomic, assign) BOOL massUpdate;
+@property (nonatomic, assign) BOOL enableSectionIndex;
 
 -(void)addSearchBarWithPlaceHolder:(NSString *)placeholder;
 -(void)resetMassUpdate;

@@ -9,7 +9,6 @@
 #import "AppDelegate.h"
 #import "Employee.h"
 #import "ExampleTableViewController.h"
-#import "Employee.h"
 
 @implementation AppDelegate
 

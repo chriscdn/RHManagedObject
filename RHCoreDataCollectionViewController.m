@@ -1,6 +1,5 @@
 //
 //  RHCoreDataCollectionViewController.m
-//  Version: 0.8.12
 //
 //  Copyright (C) 2013 by Christopher Meyer
 //  http://schwiiz.org/
@@ -40,7 +39,7 @@
 -(void)viewDidLoad {
     [super viewDidLoad];
     
-    self.objectChanges = [NSMutableArray array];
+    self.objectChanges  = [NSMutableArray array];
     self.sectionChanges = [NSMutableArray array];
 }
 

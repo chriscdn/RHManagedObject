@@ -169,7 +169,8 @@
 }
 
 -(void)controller:(NSFetchedResultsController *)controller didChangeObject:(id)anObject atIndexPath:(NSIndexPath *)indexPath forChangeType:(NSFetchedResultsChangeType)type newIndexPath:(NSIndexPath *)newIndexPath {
-	if (self.massUpdate) {
+	
+    if (self.massUpdate) {
 		return;
 	}
 	

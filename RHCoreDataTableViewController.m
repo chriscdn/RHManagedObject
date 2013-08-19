@@ -39,7 +39,7 @@
 		[self resetMassUpdate];
 		[self setEnableSectionIndex:NO];
 	}
-	
+
 	return self;
 }
 
@@ -58,7 +58,7 @@
 -(BOOL)searchDisplayController:(UISearchDisplayController *)_controller shouldReloadTableForSearchString:(NSString *)_asearchString {
 	self.searchString = _asearchString;
 	self.fetchedResultsController = nil;
-	
+
 	return YES;
 }
 
@@ -88,34 +88,34 @@
 -(NSFetchedResultsController *)fetchedResultsController {
 	NSLog(@"Implement fetchedResultsController in subclass");
 	abort();
-	
+
 	/*
 	 if (fetchedResultsController == nil) {
 	 NSSortDescriptor *sort1 = [[NSSortDescriptor alloc] initWithKey:@"field1" ascending:NO];
 	 NSSortDescriptor *sort2 = [[NSSortDescriptor alloc] initWithKey:@"field2" ascending:NO];
-	 
+
 	 NSPredicate *predicate = [NSPredicate predicateWithFormat:@"1=1"];
-	 
+
 	 NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
 	 [fetchRequest setEntity:[RHManagedObjectSubclass entityDescription]];
 	 [fetchRequest setPredicate:predicate];
 	 [fetchRequest setSortDescriptors:[NSArray arrayWithObjects:sort1, sort2, nil]];
 	 // [fetchRequest setFetchBatchSize:20];
-	 
+
 	 self.fetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
 	 managedObjectContext:[RHManagedObjectSubclass managedObjectContextForCurrentThread]
 	 sectionNameKeyPath:nil
 	 cacheName:nil];
-	 
+
 	 fetchedResultsController.delegate = self;
-	
+
 	 NSError *error = nil;
 	 if (![fetchedResultsController performFetch:&error]) {
 	 NSLog(@"Unresolved error: %@", [error localizedDescription]);
 	 }
-	 
+
 	 }
-	 
+
 	 return fetchedResultsController;
 	 */
 }
@@ -128,18 +128,18 @@
 -(UITableViewCell *)tableView:(UITableView *)_tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
 	NSLog(@"Implement tableView:cellForRowAtIndexPath: in subclass");
 	abort();
-	
+
 	/*
 	 static NSString *CellIdentifier = @"MyCell";
-	 
+
 	 UITableViewCell *cell = [_tableView dequeueReusableCellWithIdentifier:CellIdentifier];
 	 if (cell == nil) {
 	 cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
 	 cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 	 }
-	 
+
 	 [self configureCell:cell atIndexPath:indexPath];
-	 
+
 	 return cell;
 	 */
 }
@@ -164,29 +164,29 @@
 	if (self.massUpdate) {
 		return;
 	}
-	
+
     [self.tableView beginUpdates];
 }
 
 -(void)controller:(NSFetchedResultsController *)controller didChangeObject:(id)anObject atIndexPath:(NSIndexPath *)indexPath forChangeType:(NSFetchedResultsChangeType)type newIndexPath:(NSIndexPath *)newIndexPath {
-	
+
     if (self.massUpdate) {
 		return;
 	}
-	
+
 	switch(type) {
 		case NSFetchedResultsChangeInsert:
 			[self.tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:newIndexPath] withRowAnimation:UITableViewRowAnimationFade];
 			break;
-			
+
 		case NSFetchedResultsChangeDelete:
 			[self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
 			break;
-			
+
 		case NSFetchedResultsChangeUpdate:
 			[self configureCell:[self.tableView cellForRowAtIndexPath:indexPath] atIndexPath:indexPath];
 			break;
-			
+
 		case NSFetchedResultsChangeMove:
 			[self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
             [self.tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:newIndexPath] withRowAnimation:UITableViewRowAnimationFade];
@@ -195,16 +195,16 @@
 }
 
 -(void)controller:(NSFetchedResultsController *)controller didChangeSection:(id <NSFetchedResultsSectionInfo>)sectionInfo atIndex:(NSUInteger)sectionIndex forChangeType:(NSFetchedResultsChangeType)type {
-	
+
     if (self.massUpdate) {
 		return;
 	}
-	
+
 	switch(type) {
 		case NSFetchedResultsChangeInsert:
 			[self.tableView insertSections:[NSIndexSet indexSetWithIndex:sectionIndex] withRowAnimation:UITableViewRowAnimationFade];
 			break;
-			
+
 		case NSFetchedResultsChangeDelete:
 			[self.tableView deleteSections:[NSIndexSet indexSetWithIndex:sectionIndex] withRowAnimation:UITableViewRowAnimationFade];
 			break;
@@ -217,21 +217,36 @@
 		[self resetMassUpdate];
 		return;
 	}
-	
+
 	// The fetch controller has sent all current change notifications, so tell the table view to process all updates.
 	[self.tableView endUpdates];
 }
 
 -(NSArray *)sectionIndexTitlesForTableView:(UITableView *)tableView {
 	if (self.enableSectionIndex) {
-		return [self.fetchedResultsController sectionIndexTitles];
+		return [[UILocalizedIndexedCollation currentCollation] sectionIndexTitles];
+		// [self.fetchedResultsController sectionIndexTitles];
 	}
-	
+
 	return nil;
 }
 
 -(NSInteger)tableView:(UITableView *)tableView sectionForSectionIndexTitle:(NSString *)title atIndex:(NSInteger)index {
-    return [self.fetchedResultsController sectionForSectionIndexTitle:title atIndex:index];
+	// http://stackoverflow.com/questions/14905570/nsfetchedresultscontroller-with-indexed-uitableviewcontroller-and-uilocalizedind
+	NSInteger localizedIndex = [[UILocalizedIndexedCollation currentCollation] sectionForSectionIndexTitleAtIndex:index];
+    NSArray *localizedIndexTitles = [[UILocalizedIndexedCollation currentCollation] sectionIndexTitles];
+    for(int currentLocalizedIndex = localizedIndex; currentLocalizedIndex > 0; currentLocalizedIndex--) {
+        for(int frcIndex = 0; frcIndex < [[self.fetchedResultsController sections] count]; frcIndex++) {
+            id<NSFetchedResultsSectionInfo> sectionInfo = [[self.fetchedResultsController sections] objectAtIndex:frcIndex];
+            NSString *indexTitle = sectionInfo.indexTitle;
+            if([indexTitle isEqualToString:[localizedIndexTitles objectAtIndex:currentLocalizedIndex]]) {
+                return frcIndex;
+            }
+        }
+    }
+    return 0;
+
+	//  return [self.fetchedResultsController sectionForSectionIndexTitle:title atIndex:index];
 }
 
 -(void)dealloc {

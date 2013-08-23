@@ -45,21 +45,30 @@
 	UISearchBar *searchBar = [[UISearchBar alloc]initWithFrame:CGRectMake(0,0,self.tableView.frame.size.width,44)];
 	searchBar.placeholder = placeholder;
 
-	// RHCoreDataTableViewController *delegate = [[[self class] alloc] initWithStyle:UITableViewStylePlain];
-
 	self.searchController = [[UISearchDisplayController alloc] initWithSearchBar:searchBar contentsController:self];
-	self.searchController.delegate = self;  // UISearchDisplayDelegate
+	self.searchController.delegate = self;                 // UISearchDisplayDelegate
 	self.searchController.searchResultsDataSource = self;  // UITableViewDataSource
-	self.searchController.searchResultsDelegate   = self; // UITableViewDelegate
+	self.searchController.searchResultsDelegate   = self;  // UITableViewDelegate
 
 	self.tableView.tableHeaderView = self.searchController.searchBar;
 }
 
 #pragma mark -
 #pragma mark UISearchDisplayDelegate
+// Keep in mind that self.tableView and self.searchController.searchResultsTableView are different and configured to use the same
+// delegate.  This is against the design pattern from Apple, but has a major advantage:  All delegate calls for drawing the table
+// can be kept the same for the two tables.  This means less redundant code.
+//
+// The disadvantage is that modifying the fetchedResultsController can muck up self.tableView.  It's therefore essential to call
+// [self.tableView reloadData] whenever the fetchedResultsController is modified.  Secondly, there seems to be a bug that causes
+// the section titles and cell lines of self.tableView to overlay searchResultsTableView when the table is reloaded.  We therefore
+// hide them with UITableViewCellSeparatorStyleNone & 
+
 -(BOOL)searchDisplayController:(UISearchDisplayController *)controller shouldReloadTableForSearchString:(NSString *)searchString {
 	self.searchString = searchString;
 	self.fetchedResultsController = nil;
+	[self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
+	[self.tableView reloadData];
 	return YES;
 }
 
@@ -67,8 +76,9 @@
 -(void)searchDisplayController:(UISearchDisplayController *)controller willUnloadSearchResultsTableView:(UITableView *)tableView {
 	self.searchString = nil;
 	self.fetchedResultsController = nil;
+	[self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleSingleLine];
+	[self.tableView reloadData];
 }
-
 
 #pragma mark -
 -(void)willMassUpdateNotificationReceived:(id)notification {
@@ -158,8 +168,11 @@
 
 
 -(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-	id <NSFetchedResultsSectionInfo> sectionInfo = [[self.fetchedResultsController sections] objectAtIndex:section];
-	return [sectionInfo name];
+	 if (self.searchString == nil) {
+		id <NSFetchedResultsSectionInfo> sectionInfo = [[self.fetchedResultsController sections] objectAtIndex:section];
+		return [sectionInfo name];
+	}
+	return nil;
 }
 
 
@@ -228,7 +241,7 @@
 
 -(NSArray *)sectionIndexTitlesForTableView:(UITableView *)tableView {
 
-	if ( self.enableSectionIndex && (tableView == self.tableView) ) {
+	if ( self.enableSectionIndex && (self.searchString == nil) ) {
 		return [[UILocalizedIndexedCollation currentCollation] sectionIndexTitles];
 	}
 
@@ -238,25 +251,19 @@
 
 -(NSInteger)tableView:(UITableView *)tableView sectionForSectionIndexTitle:(NSString *)title atIndex:(NSInteger)index {
 	// http://stackoverflow.com/questions/14905570/nsfetchedresultscontroller-with-indexed-uitableviewcontroller-and-uilocalizedind
-	/*
-	 NSInteger localizedIndex = [[UILocalizedIndexedCollation currentCollation] sectionForSectionIndexTitleAtIndex:index];
-	 NSArray *localizedIndexTitles = [[UILocalizedIndexedCollation currentCollation] sectionIndexTitles];
-	 for(int currentLocalizedIndex = localizedIndex; currentLocalizedIndex > 0; currentLocalizedIndex--) {
-	 for(int frcIndex = 0; frcIndex < [[self.fetchedResultsController sections] count]; frcIndex++) {
-	 id<NSFetchedResultsSectionInfo> sectionInfo = [[self.fetchedResultsController sections] objectAtIndex:frcIndex];
-	 NSString *indexTitle = sectionInfo.indexTitle;
-	 if([indexTitle isEqualToString:[localizedIndexTitles objectAtIndex:currentLocalizedIndex]]) {
-	 return frcIndex;
-	 }
-	 }
-	 }
-	 return 0;
-	 */
 
-	// return [self.fetchedResultsController sectionForSectionIndexTitle:title atIndex:index];
-
-	return [self.fetchedResultsController sectionForSectionIndexTitle:title atIndex:index];
-
+	NSInteger localizedIndex = [[UILocalizedIndexedCollation currentCollation] sectionForSectionIndexTitleAtIndex:index];
+	NSArray *localizedIndexTitles = [[UILocalizedIndexedCollation currentCollation] sectionIndexTitles];
+	for(int currentLocalizedIndex = localizedIndex; currentLocalizedIndex > 0; currentLocalizedIndex--) {
+		for(int frcIndex = 0; frcIndex < [[self.fetchedResultsController sections] count]; frcIndex++) {
+			id<NSFetchedResultsSectionInfo> sectionInfo = [[self.fetchedResultsController sections] objectAtIndex:frcIndex];
+			NSString *indexTitle = sectionInfo.indexTitle;
+			if([indexTitle isEqualToString:[localizedIndexTitles objectAtIndex:currentLocalizedIndex]]) {
+				return frcIndex;
+			}
+		}
+	}
+	return 0;
 }
 
 -(void)dealloc {

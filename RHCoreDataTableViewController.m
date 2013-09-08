@@ -42,7 +42,7 @@
 }
 
 -(void)addSearchBarWithPlaceHolder:(NSString *)placeholder {
-	UISearchBar *searchBar = [[UISearchBar alloc]initWithFrame:CGRectMake(0,0,self.tableView.frame.size.width,44)];
+	UISearchBar *searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(0,0,self.tableView.frame.size.width,44)];
 	searchBar.placeholder = placeholder;
 
 	self.searchController = [[UISearchDisplayController alloc] initWithSearchBar:searchBar contentsController:self];

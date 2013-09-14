@@ -70,7 +70,7 @@ Changes can be saved with the `+commit` method, which will handle the merging of
 You'll notice that none of these examples require direct use of an `NSManagedObjectContext` instance. That's handled for you within the library. Of course, a method is available to fetch the object context for the current thread if it's required:
 
 ``` objective-c
-NSManagedObjectContext *moc = [Employee managedObjectContext];
+NSManagedObjectContext *moc = [Employee managedObjectContextForCurrentThread];
 ```
 
 ## How To Get Started

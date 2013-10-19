@@ -107,27 +107,39 @@
 #pragma mark -
 #pragma mark Other useful stuff
 // Used to flush and reset the database.
--(void)deleteStore {
+-(NSError *)deleteStore {
 	NSFileManager *fm = [NSFileManager defaultManager];
-	NSError *error;
+	NSError *error = nil;
 	
 	if (persistentStoreCoordinator == nil) {
 		NSString *storePath = [self storePath];
 		
 		if ([fm fileExistsAtPath:storePath] && [fm isDeletableFileAtPath:storePath]) {
 			[fm removeItemAtPath:storePath error:&error];
+            if (error) {
+                return error;
+            }
 		}
 		
 	} else {
-		NSPersistentStoreCoordinator *storeCoordinator = [self persistentStoreCoordinator];
+		NSPersistentStoreCoordinator *storeCoordinator = [self persistentStoreCoordinatorWithError:&error];
+        if (error) {
+            return error;
+        }
 		
 		for (NSPersistentStore *store in [storeCoordinator persistentStores]) {
 			NSURL *storeURL = store.URL;
 			NSString *storePath = storeURL.path;
 			[storeCoordinator removePersistentStore:store error:&error];
-			
+			if (error) {
+                return error;
+            }
+            
 			if ([fm fileExistsAtPath:storePath] && [fm isDeletableFileAtPath:storePath]) {
 				[fm removeItemAtPath:storePath error:&error];
+                if (error) {
+                    return error;
+                }
 			}
 		}
 	}
@@ -138,6 +150,8 @@
 	self.guid = nil;
 	
 	[[RHManagedObjectContextManager sharedInstances] removeObjectForKey:[self modelName]];
+    
+    return nil;
 }
 
 -(NSString *)guid {
@@ -162,19 +176,21 @@
 }
 
 // http://stackoverflow.com/questions/5236860/app-freeze-on-coredata-save
--(void)commit {
+-(NSError *)commit {
 	
  	NSManagedObjectContext *moc = [self managedObjectContextForCurrentThread];
 	NSError *error = nil;
 	
 	if ([self pendingChangesCount] > kPostMassUpdateNotificationThreshold) {
-		[[NSNotificationCenter defaultCenter] postNotificationName:RHWillMassUpdateNotification object:nil];
+		[[NSNotificationCenter defaultCenter] postNotificationName:RHWillMassUpdateNotification
+                                                            object:nil];
 	}
 	
 	if ([moc hasChanges] && ![moc save:&error]) {
 		NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-		abort();
+		return error;
 	}
+    return nil;
 }
 
 #pragma mark -
@@ -254,11 +270,15 @@
     }
 }
 
--(BOOL)doesRequireMigration {
+-(BOOL)doesRequireMigrationWithError:(NSError **)error {
 	if ([[NSFileManager defaultManager] fileExistsAtPath:[self storePath]]) {
-		NSError *error;
-		NSDictionary *sourceMetadata = [NSPersistentStoreCoordinator metadataForPersistentStoreOfType:NSSQLiteStoreType URL:[self storeURL] error:&error];
-		return ![[self managedObjectModel] isConfiguration:nil compatibleWithStoreMetadata:sourceMetadata];
+//		NSError *error = nil;
+		NSDictionary *sourceMetadata = [NSPersistentStoreCoordinator
+                                        metadataForPersistentStoreOfType:NSSQLiteStoreType
+                                        URL:[self storeURL]
+                                        error:error];
+		return ![[self managedObjectModel] isConfiguration:nil
+                               compatibleWithStoreMetadata:sourceMetadata];
 	} else {
 		return NO;
 	}
@@ -268,7 +288,7 @@
  * Returns the persistent store coordinator for the application.
  * If the coordinator doesn't already exist, it is created and the application's store added to it.
  */
--(NSPersistentStoreCoordinator *)persistentStoreCoordinator {
+-(NSPersistentStoreCoordinator *)persistentStoreCoordinatorWithError:(NSError **)error {
 	
 	if (persistentStoreCoordinator == nil) {
 		@synchronized(self) {
@@ -282,12 +302,12 @@
 				NSString *defaultStorePath = [[NSBundle mainBundle] pathForResource:[self databaseName] ofType:nil];
 				
 				if ([fileManager fileExistsAtPath:defaultStorePath]) {
-					[fileManager copyItemAtPath:defaultStorePath toPath:storePath error:NULL];
+					[fileManager copyItemAtPath:defaultStorePath toPath:storePath error:error];
 				}
 			}
 			
 			NSURL *storeURL = [self storeURL];
-			NSError *error = nil;
+//			NSError *error = nil;
 			
 			self.persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:[self managedObjectModel]];
 			
@@ -296,7 +316,12 @@
 									 [NSNumber numberWithBool:YES], NSMigratePersistentStoresAutomaticallyOption,
 									 [NSNumber numberWithBool:YES], NSInferMappingModelAutomaticallyOption, nil];
 			
-			if (![persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:options error:&error]) {
+			if (![persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType
+                                                          configuration:nil
+                                                                    URL:storeURL
+                                                                options:options
+                                                                  error:error])
+            {
 				/*
 				 Replace this implementation with code to handle the error appropriately.
 				 
@@ -320,7 +345,7 @@
 				 Lightweight migration will only work for a limited set of schema changes; consult "Core Data Model Versioning and Data Migration Programming Guide" for details.
 				 
 				 */
-				NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+				NSLog(@"Unresolved error %@, %@", *error, [*error userInfo]);
 				abort();
 			}
 		} // end @synchronized

@@ -34,10 +34,10 @@
 +(RHManagedObjectContextManager *)sharedInstanceWithModelName:(NSString *)modelName;
 -(id)initWithModelName:(NSString *)_modelName;
 -(NSManagedObjectContext *)managedObjectContextForCurrentThread;
--(void)deleteStore;
--(void)commit;
+-(NSError *)deleteStore;
+-(NSError *)commit;
 -(NSUInteger)pendingChangesCount;
--(BOOL)doesRequireMigration;
+-(BOOL)doesRequireMigrationWithError:(NSError **)error;
 -(NSString *)applicationDocumentsDirectory;
 
 @end

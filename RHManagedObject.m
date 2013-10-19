@@ -51,29 +51,39 @@
 	abort();
 }
 
-+(void)deleteStore {
-	[[self managedObjectContextManager] deleteStore];
-}
-
 +(NSEntityDescription *)entityDescription {
 	return [NSEntityDescription entityForName:[self entityName] inManagedObjectContext:[self managedObjectContextForCurrentThread]];
 }
 
-+(void)commit {
-	[[self managedObjectContextManager] commit];
++(NSError *)deleteStore {
+	NSError *error = [[self managedObjectContextManager] deleteStore];
+    if (error) {
+        return error;
+    }
+    return nil;
+}
+
++(NSError *)commit {
+	NSError *error = [[self managedObjectContextManager] commit];
+    if (error) {
+        return error;
+    }
+    return nil;
 }
 
 +(id)newEntity {
 	return [NSEntityDescription insertNewObjectForEntityForName:[self entityName] inManagedObjectContext:[self managedObjectContextForCurrentThread]];
 }
 
-+(id)newOrExistingEntityWithPredicate:(NSPredicate *)predicate {
-    id existing = [self getWithPredicate:predicate];
++(id)newOrExistingEntityWithPredicate:(NSPredicate *)predicate error:(NSError **)error {
+    id existing = [self getWithPredicate:predicate error:error];
     return existing ? existing : [self newEntity];
 }
 
-+(id)getWithPredicate:(NSPredicate *)predicate {
-	NSArray *results = [self fetchWithPredicate:predicate];
++(id)getWithPredicate:(NSPredicate *)predicate
+                error:(NSError **)error
+{
+	NSArray *results = [self fetchWithPredicate:predicate error:error];
 	
 	if ([results count] > 0) {
 		return [results objectAtIndex:0];
@@ -82,8 +92,11 @@
 	return nil;
 }
 
-+(id)getWithPredicate:(NSPredicate *)predicate sortDescriptor:(NSSortDescriptor *)descriptor {
-	NSArray *results = [self fetchWithPredicate:predicate sortDescriptor:descriptor];
++(id)getWithPredicate:(NSPredicate *)predicate
+       sortDescriptor:(NSSortDescriptor *)descriptor
+                error:(NSError **)error
+{
+	NSArray *results = [self fetchWithPredicate:predicate sortDescriptor:descriptor error:error];
 	
 	if ([results count] > 0) {
 		return [results objectAtIndex:0];
@@ -92,19 +105,28 @@
 	return nil;
 }
 
-+(NSArray *)fetchAll {
-	return [self fetchWithPredicate:nil];
++(NSArray *)fetchAllWithError:(NSError **)error {
+	return [self fetchWithPredicate:nil error:error];
 }
 
-+(NSArray *)fetchWithPredicate:(NSPredicate *)predicate {
-	return [self fetchWithPredicate:predicate sortDescriptor:nil];
++(NSArray *)fetchWithPredicate:(NSPredicate *)predicate
+                         error:(NSError **)error
+{
+	return [self fetchWithPredicate:predicate sortDescriptor:nil error:error];
 }
 
-+(NSArray *)fetchWithPredicate:(NSPredicate *)predicate sortDescriptor:(NSSortDescriptor *)descriptor {
-	return [self fetchWithPredicate:predicate sortDescriptor:descriptor withLimit:0];
++(NSArray *)fetchWithPredicate:(NSPredicate *)predicate
+                sortDescriptor:(NSSortDescriptor *)descriptor
+                         error:(NSError **)error
+{
+	return [self fetchWithPredicate:predicate sortDescriptor:descriptor withLimit:0 error:error];
 }
 
-+(NSArray *)fetchWithPredicate:(NSPredicate *)predicate sortDescriptor:(NSSortDescriptor *)descriptor withLimit:(NSUInteger)limit {
++(NSArray *)fetchWithPredicate:(NSPredicate *)predicate
+                sortDescriptor:(NSSortDescriptor *)descriptor
+                     withLimit:(NSUInteger)limit
+                         error:(NSError **)error
+{
 	NSFetchRequest *fetch = [[NSFetchRequest alloc] init];
 	
 	[fetch setEntity:[self entityDescription]];
@@ -123,14 +145,14 @@
 	
 	[fetch setIncludesPendingChanges:YES];
 	
-	return [[self managedObjectContextForCurrentThread] executeFetchRequest:fetch error:nil];
+	return [[self managedObjectContextForCurrentThread] executeFetchRequest:fetch error:error];
 }
 
-+(NSUInteger)count {
-	return [self countWithPredicate:nil];
++(NSUInteger)countWithError:(NSError **)error {
+	return [self countWithPredicate:nil error:error];
 }
 
-+(NSUInteger)countWithPredicate:(NSPredicate *)predicate {
++(NSUInteger)countWithPredicate:(NSPredicate *)predicate error:(NSError **)error {
 	NSFetchRequest *fetch = [[NSFetchRequest alloc] init];
 	
 	[fetch setEntity:[self entityDescription]];
@@ -139,11 +161,14 @@
 		[fetch setPredicate:predicate];
 	}
 	
-	return [[self managedObjectContextForCurrentThread] countForFetchRequest:fetch error:nil];
+	return [[self managedObjectContextForCurrentThread] countForFetchRequest:fetch error:error];
 }
 
-+(NSArray *)distinctValuesWithAttribute:(NSString *)attribute predicate:(NSPredicate *)predicate {
-	NSArray *items = [self fetchWithPredicate:predicate];
++(NSArray *)distinctValuesWithAttribute:(NSString *)attribute
+                              predicate:(NSPredicate *)predicate
+                                  error:(NSError **)error
+{
+	NSArray *items = [self fetchWithPredicate:predicate error:error];
 	NSString *keyPath = [@"@distinctUnionOfObjects." stringByAppendingString:attribute];
 	return [[items valueForKeyPath:keyPath] sortedArrayUsingSelector:@selector(compare:)];
 }
@@ -170,7 +195,12 @@
 	return [attribute attributeType];
 }
 
-+(id)aggregateWithType:(RHAggregate)aggregate key:(NSString *)key predicate:(NSPredicate *)predicate defaultValue:(id)defaultValue {
++(id)aggregateWithType:(RHAggregate)aggregate
+                   key:(NSString *)key
+             predicate:(NSPredicate *)predicate
+          defaultValue:(id)defaultValue
+                 error:(NSError **)error
+{
 	NSFetchRequest *fetch = [[NSFetchRequest alloc] init];
 	
 	if (predicate) {
@@ -194,8 +224,9 @@
 	
 	[fetch setPropertiesToFetch:[NSArray arrayWithObject:expressionDescription]];
 	
-	NSError *error;
-	NSArray *objects = [[self managedObjectContextForCurrentThread] executeFetchRequest:fetch error:&error];
+//	NSError *error;
+	NSArray *objects = [[self managedObjectContextForCurrentThread] executeFetchRequest:fetch
+                                                                                  error:error];
 	
 	id returnValue = nil;
 	
@@ -210,12 +241,12 @@
 	return returnValue;
 }
 
-+(void)deleteAll {
-    [self deleteWithPredicate:nil];
++(NSUInteger)deleteAllWithError:(NSError **)error {
+    return [self deleteWithPredicate:nil error:error];
 }
 
-+(NSUInteger)deleteWithPredicate:(NSPredicate *)predicate {
-    NSArray *itemsToDelete = [self fetchWithPredicate:predicate];
++(NSUInteger)deleteWithPredicate:(NSPredicate *)predicate error:(NSError **)error {
+    NSArray *itemsToDelete = [self fetchWithPredicate:predicate error:error];
     [itemsToDelete makeObjectsPerformSelector:@selector(delete)];
     return [itemsToDelete count];
 }
@@ -234,8 +265,8 @@
     return [RHManagedObjectContextManager sharedInstanceWithModelName:[self modelName]];
 }
 
-+(BOOL)doesRequireMigration {
-	return [[self managedObjectContextManager] doesRequireMigration];
++(BOOL)doesRequireMigrationWithError:(NSError **)error {
+	return [[self managedObjectContextManager] doesRequireMigrationWithError:error];
 }
 
 -(void)delete {
@@ -246,7 +277,8 @@
 -(id)clone {
 	NSEntityDescription *entityDescription = [self entity];
 	NSString *entityName = [entityDescription name];
-	NSManagedObject *cloned = [NSEntityDescription insertNewObjectForEntityForName:entityName inManagedObjectContext:[self managedObjectContext]];
+	NSManagedObject *cloned = [NSEntityDescription insertNewObjectForEntityForName:entityName
+                                                            inManagedObjectContext:[self managedObjectContext]];
 	
     for (NSString *attr in [entityDescription attributesByName]) {
         [cloned setValue:[self valueForKey:attr] forKey:attr];

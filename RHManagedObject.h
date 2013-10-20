@@ -39,33 +39,49 @@ typedef enum {
 +(NSString *)entityName;
 +(NSString *)modelName;
 
-+(NSEntityDescription *)entityDescription;
-+(void)deleteStore;
-+(void)commit;
-+(id)newEntity;
-+(id)newOrExistingEntityWithPredicate:(NSPredicate *)predicate;
-+(id)getWithPredicate:(NSPredicate *)predicate;
-+(id)getWithPredicate:(NSPredicate *)predicate sortDescriptor:(NSSortDescriptor *)descriptor;
++(NSEntityDescription *)entityDescriptionWithError:(NSError **)error;
++(NSError *)deleteStore;
++(NSError *)commit;
++(id)newEntityWithError:(NSError **)error;
++(id)newOrExistingEntityWithPredicate:(NSPredicate *)predicate
+                                error:(NSError **)error;
++(id)getWithPredicate:(NSPredicate *)predicate
+                error:(NSError **)error;
++(id)getWithPredicate:(NSPredicate *)predicate
+       sortDescriptor:(NSSortDescriptor *)descriptor
+                error:(NSError **)error;
 
 /* Getters */
-+(NSArray *)fetchAll;
-+(NSArray *)fetchWithPredicate:(NSPredicate *)predicate;
-+(NSArray *)fetchWithPredicate:(NSPredicate *)predicate sortDescriptor:(NSSortDescriptor *)descriptor;
-+(NSArray *)fetchWithPredicate:(NSPredicate *)predicate sortDescriptor:(NSSortDescriptor *)descriptor withLimit:(NSUInteger)limit;
++(NSArray *)fetchAllWithError:(NSError **)error;
++(NSArray *)fetchWithPredicate:(NSPredicate *)predicate
+                         error:(NSError **)error;
++(NSArray *)fetchWithPredicate:(NSPredicate *)predicate
+                sortDescriptor:(NSSortDescriptor *)descriptor
+                         error:(NSError **)error;
++(NSArray *)fetchWithPredicate:(NSPredicate *)predicate
+                sortDescriptor:(NSSortDescriptor *)descriptor
+                     withLimit:(NSUInteger)limit
+                         error:(NSError **)error;
 
-+(NSUInteger)count;
-+(NSUInteger)countWithPredicate:(NSPredicate *)predicate;
++(NSUInteger)countWithError:(NSError **)error;
++(NSUInteger)countWithPredicate:(NSPredicate *)predicate error:(NSError **)error;
 
-+(NSArray *)distinctValuesWithAttribute:(NSString *)attribute predicate:(NSPredicate *)predicate;
-+(NSAttributeType)attributeTypeWithKey:(NSString *)key;
-+(id)aggregateWithType:(RHAggregate)aggregate key:(NSString *)key predicate:(NSPredicate *)predicate defaultValue:(id)defaultValue;
++(NSArray *)distinctValuesWithAttribute:(NSString *)attribute
+                              predicate:(NSPredicate *)predicate
+                                  error:(NSError **)error;
++(NSAttributeType)attributeTypeWithKey:(NSString *)key error:(NSError **)error;
++(id)aggregateWithType:(RHAggregate)aggregate
+                   key:(NSString *)key
+             predicate:(NSPredicate *)predicate
+          defaultValue:(id)defaultValue
+                 error:(NSError **)error;
 
-+(void)deleteAll;
-+(NSUInteger)deleteWithPredicate:(NSPredicate *)predicate;
++(NSUInteger)deleteAllWithError:(NSError **)error;
++(NSUInteger)deleteWithPredicate:(NSPredicate *)predicate error:(NSError **)error;
 +(NSManagedObjectContext *)managedObjectContext __deprecated;
-+(NSManagedObjectContext *)managedObjectContextForCurrentThread;
++(NSManagedObjectContext *)managedObjectContextForCurrentThreadWithError:(NSError **)error;
 +(RHManagedObjectContextManager *)managedObjectContextManager;
-+(BOOL)doesRequireMigration;
++(BOOL)doesRequireMigrationWithError:(NSError **)error;
 
 /* Instance methods */
 -(void)delete;

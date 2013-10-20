@@ -51,8 +51,9 @@
 	abort();
 }
 
-+(NSEntityDescription *)entityDescription {
-	return [NSEntityDescription entityForName:[self entityName] inManagedObjectContext:[self managedObjectContextForCurrentThread]];
++(NSEntityDescription *)entityDescriptionWithError:(NSError **)error {
+	return [NSEntityDescription entityForName:[self entityName]
+                       inManagedObjectContext:[self managedObjectContextForCurrentThreadWithError:error]];
 }
 
 +(NSError *)deleteStore {
@@ -71,13 +72,14 @@
     return nil;
 }
 
-+(id)newEntity {
-	return [NSEntityDescription insertNewObjectForEntityForName:[self entityName] inManagedObjectContext:[self managedObjectContextForCurrentThread]];
++(id)newEntityWithError:(NSError **)error {
+	return [NSEntityDescription insertNewObjectForEntityForName:[self entityName]
+                                         inManagedObjectContext:[self managedObjectContextForCurrentThreadWithError:error]];
 }
 
 +(id)newOrExistingEntityWithPredicate:(NSPredicate *)predicate error:(NSError **)error {
     id existing = [self getWithPredicate:predicate error:error];
-    return existing ? existing : [self newEntity];
+    return existing ? existing : [self newEntityWithError:error];
 }
 
 +(id)getWithPredicate:(NSPredicate *)predicate
@@ -129,7 +131,7 @@
 {
 	NSFetchRequest *fetch = [[NSFetchRequest alloc] init];
 	
-	[fetch setEntity:[self entityDescription]];
+	[fetch setEntity:[self entityDescriptionWithError:error]];
 	
 	if (predicate) {
 		[fetch setPredicate:predicate];
@@ -145,7 +147,8 @@
 	
 	[fetch setIncludesPendingChanges:YES];
 	
-	return [[self managedObjectContextForCurrentThread] executeFetchRequest:fetch error:error];
+	return [[self managedObjectContextForCurrentThreadWithError:error] executeFetchRequest:fetch
+                                                                                     error:error];
 }
 
 +(NSUInteger)countWithError:(NSError **)error {
@@ -155,13 +158,14 @@
 +(NSUInteger)countWithPredicate:(NSPredicate *)predicate error:(NSError **)error {
 	NSFetchRequest *fetch = [[NSFetchRequest alloc] init];
 	
-	[fetch setEntity:[self entityDescription]];
+	[fetch setEntity:[self entityDescriptionWithError:error]];
 	
 	if (predicate) {
 		[fetch setPredicate:predicate];
 	}
 	
-	return [[self managedObjectContextForCurrentThread] countForFetchRequest:fetch error:error];
+	return [[self managedObjectContextForCurrentThreadWithError:error] countForFetchRequest:fetch
+                                                                                      error:error];
 }
 
 +(NSArray *)distinctValuesWithAttribute:(NSString *)attribute
@@ -188,8 +192,8 @@
     }
 }
 
-+(NSAttributeType)attributeTypeWithKey:(NSString *)key {
-	NSEntityDescription *entityDescription = [self entityDescription];
++(NSAttributeType)attributeTypeWithKey:(NSString *)key error:(NSError **)error {
+	NSEntityDescription *entityDescription = [self entityDescriptionWithError:error];
 	NSDictionary *properties = [entityDescription propertiesByName];
 	NSAttributeDescription *attribute = [properties objectForKey:key];
 	return [attribute attributeType];
@@ -208,9 +212,9 @@
 	}
 	
 	NSString *aggregateString = [self aggregateToString:aggregate];
-	NSAttributeType attributeType = [self attributeTypeWithKey:key];
+	NSAttributeType attributeType = [self attributeTypeWithKey:key error:error];
 	
-	NSEntityDescription *entity = [self entityDescription]; // [NSEntityDescription entityForName:[self entityName] inManagedObjectContext:[self managedObjectContext]];
+	NSEntityDescription *entity = [self entityDescriptionWithError:error]; // [NSEntityDescription entityForName:[self entityName] inManagedObjectContext:[self managedObjectContext]];
 	[fetch setEntity:entity];
 	[fetch setResultType:NSDictionaryResultType];
 	
@@ -224,9 +228,8 @@
 	
 	[fetch setPropertiesToFetch:[NSArray arrayWithObject:expressionDescription]];
 	
-//	NSError *error;
-	NSArray *objects = [[self managedObjectContextForCurrentThread] executeFetchRequest:fetch
-                                                                                  error:error];
+	NSArray *objects = [[self managedObjectContextForCurrentThreadWithError:error] executeFetchRequest:fetch
+                                                                                                 error:error];
 	
 	id returnValue = nil;
 	
@@ -253,12 +256,12 @@
 
 // deprecated = use managedObjectContextForCurrentThread instead
 +(NSManagedObjectContext *)managedObjectContext {
-    return [self managedObjectContextForCurrentThread];
+    return [self managedObjectContextForCurrentThreadWithError:nil];
 }
 
 // Returns the NSManagedObjectContext for the current thread
-+(NSManagedObjectContext *)managedObjectContextForCurrentThread {
-	return [[self managedObjectContextManager] managedObjectContextForCurrentThread];
++(NSManagedObjectContext *)managedObjectContextForCurrentThreadWithError:(NSError **)error {
+	return [[self managedObjectContextManager] managedObjectContextForCurrentThreadWithError:error];
 }
 
 +(RHManagedObjectContextManager *)managedObjectContextManager {

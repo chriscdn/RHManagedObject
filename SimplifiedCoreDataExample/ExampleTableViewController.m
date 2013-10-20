@@ -30,7 +30,7 @@
 	NSUInteger randomFirstName = arc4random() % [firstNames count];
 	NSUInteger randomLastName = arc4random() % [lastNames count];
 	
-	Employee *newEmployee = [Employee newEntity];
+	Employee *newEmployee = [Employee newEntityWithError:nil];
 	newEmployee.firstName = [firstNames objectAtIndex:randomFirstName];
 	newEmployee.lastName = [lastNames objectAtIndex:randomLastName];
 	
@@ -52,14 +52,14 @@
         }
         
 		NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-		[fetchRequest setEntity:[Employee entityDescription]];
+		[fetchRequest setEntity:[Employee entityDescriptionWithError:nil]];
 		
 		[fetchRequest setPredicate:predicate];
 		[fetchRequest setSortDescriptors:[NSArray arrayWithObjects:sort1, nil]];
 		[fetchRequest setFetchBatchSize:20];
 		
 		self.fetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
-																			managedObjectContext:[Employee managedObjectContextForCurrentThread]
+																			managedObjectContext:[Employee managedObjectContextForCurrentThreadWithError:nil]
 																			  sectionNameKeyPath:nil
 																					   cacheName:nil];
 		

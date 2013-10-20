@@ -165,8 +165,8 @@
 	return guid;
 }
 
--(NSUInteger)pendingChangesCount {
-	NSManagedObjectContext *moc = [self managedObjectContextForCurrentThread];
+-(NSUInteger)pendingChangesCountWithError:(NSError **)error {
+	NSManagedObjectContext *moc = [self managedObjectContextForCurrentThreadWithError:error];
 	
 	NSSet *updated  = [moc updatedObjects];
 	NSSet *deleted  = [moc deletedObjects];
@@ -178,13 +178,21 @@
 // http://stackoverflow.com/questions/5236860/app-freeze-on-coredata-save
 -(NSError *)commit {
 	
- 	NSManagedObjectContext *moc = [self managedObjectContextForCurrentThread];
-	NSError *error = nil;
+    NSError *error = nil;
+ 	NSManagedObjectContext *moc = [self managedObjectContextForCurrentThreadWithError:&error];
 	
-	if ([self pendingChangesCount] > kPostMassUpdateNotificationThreshold) {
+    if (error) {
+        return error;
+    }
+    
+	if ([self pendingChangesCountWithError:&error] > kPostMassUpdateNotificationThreshold) {
 		[[NSNotificationCenter defaultCenter] postNotificationName:RHWillMassUpdateNotification
                                                             object:nil];
 	}
+    
+    if (error) {
+        return error;
+    }
 	
 	if ([moc hasChanges] && ![moc save:&error]) {
 		NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
@@ -195,22 +203,22 @@
 
 #pragma mark -
 #pragma mark Core Data stack
--(NSManagedObjectContext *)managedObjectContextForMainThread {
+-(NSManagedObjectContext *)managedObjectContextForMainThreadWithError:(NSError **)error {
 	if (managedObjectContextForMainThread == nil) {
 		NSAssert([NSThread isMainThread], @"Must be instantiated on main thread.");
 		self.managedObjectContextForMainThread = [[NSManagedObjectContext alloc] init];
-		[managedObjectContextForMainThread setPersistentStoreCoordinator:[self persistentStoreCoordinator]];
+		[managedObjectContextForMainThread setPersistentStoreCoordinator:[self persistentStoreCoordinatorWithError:error]];
 		[managedObjectContextForMainThread setMergePolicy:kMergePolicy];
 	}
 	
 	return managedObjectContextForMainThread;
 }
 
--(NSManagedObjectContext *)managedObjectContextForCurrentThread {
+-(NSManagedObjectContext *)managedObjectContextForCurrentThreadWithError:(NSError **)error {
 	NSThread *thread = [NSThread currentThread];
 	
 	if ([thread isMainThread]) {
-		return [self managedObjectContextForMainThread];
+		return [self managedObjectContextForMainThreadWithError:error];
 	}
 	
 	// A key to cache the moc for the current thread.
@@ -221,7 +229,7 @@
 	if ( [[thread threadDictionary] objectForKey:threadKey] == nil ) {
 		// create a moc for this thread
         RHManagedObjectContext *threadContext = [[RHManagedObjectContext alloc] init];
-        [threadContext setPersistentStoreCoordinator:[self persistentStoreCoordinator]];
+        [threadContext setPersistentStoreCoordinator:[self persistentStoreCoordinatorWithError:error]];
 		[threadContext setMergePolicy:kMergePolicy];
 		[threadContext setObserver:self];
 		
@@ -264,7 +272,8 @@
 			[[item objectInCurrentThreadContext] willAccessValueForKey:nil];
 		}
 		
-        [[self managedObjectContextForMainThread] mergeChangesFromContextDidSaveNotification:saveNotification];
+        NSError *error = nil;
+        [[self managedObjectContextForMainThreadWithError:&error] mergeChangesFromContextDidSaveNotification:saveNotification];
     } else {
         [self performSelectorOnMainThread:@selector(mocDidSave:) withObject:saveNotification waitUntilDone:NO];
     }

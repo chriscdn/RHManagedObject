@@ -39,10 +39,10 @@ typedef enum {
 +(NSString *)entityName;
 +(NSString *)modelName;
 
-+(NSEntityDescription *)entityDescription;
++(NSEntityDescription *)entityDescriptionWithError:(NSError **)error;
 +(NSError *)deleteStore;
 +(NSError *)commit;
-+(id)newEntity;
++(id)newEntityWithError:(NSError **)error;
 +(id)newOrExistingEntityWithPredicate:(NSPredicate *)predicate
                                 error:(NSError **)error;
 +(id)getWithPredicate:(NSPredicate *)predicate
@@ -69,7 +69,7 @@ typedef enum {
 +(NSArray *)distinctValuesWithAttribute:(NSString *)attribute
                               predicate:(NSPredicate *)predicate
                                   error:(NSError **)error;
-+(NSAttributeType)attributeTypeWithKey:(NSString *)key;
++(NSAttributeType)attributeTypeWithKey:(NSString *)key error:(NSError **)error;
 +(id)aggregateWithType:(RHAggregate)aggregate
                    key:(NSString *)key
              predicate:(NSPredicate *)predicate
@@ -79,7 +79,7 @@ typedef enum {
 +(NSUInteger)deleteAllWithError:(NSError **)error;
 +(NSUInteger)deleteWithPredicate:(NSPredicate *)predicate error:(NSError **)error;
 +(NSManagedObjectContext *)managedObjectContext __deprecated;
-+(NSManagedObjectContext *)managedObjectContextForCurrentThread;
++(NSManagedObjectContext *)managedObjectContextForCurrentThreadWithError:(NSError **)error;
 +(RHManagedObjectContextManager *)managedObjectContextManager;
 +(BOOL)doesRequireMigrationWithError:(NSError **)error;
 

@@ -1,6 +1,6 @@
 //
 //  RHCoreDataCollectionViewController.h
-//  Version: 0.8.12
+//  Version: 0.9
 //
 //  Copyright (C) 2013 by Christopher Meyer
 //  http://schwiiz.org/

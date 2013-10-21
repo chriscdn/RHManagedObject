@@ -38,7 +38,7 @@
 
 -(void)viewDidLoad {
     [super viewDidLoad];
-    
+
     self.objectChanges  = [NSMutableArray array];
     self.sectionChanges = [NSMutableArray array];
 }
@@ -64,10 +64,10 @@
 }
 
 -(void)controller:(NSFetchedResultsController *)controller didChangeSection:(id <NSFetchedResultsSectionInfo>)sectionInfo
-           atIndex:(NSUInteger)sectionIndex forChangeType:(NSFetchedResultsChangeType)type {
-    
+		  atIndex:(NSUInteger)sectionIndex forChangeType:(NSFetchedResultsChangeType)type {
+
     NSMutableDictionary *change = [NSMutableDictionary dictionary];
-    
+
     switch(type) {
         case NSFetchedResultsChangeInsert:
             change[@(type)] = @(sectionIndex);
@@ -76,16 +76,16 @@
             change[@(type)] = @(sectionIndex);
             break;
     }
-    
+
     [self.sectionChanges addObject:change];
 }
 
 -(void)controller:(NSFetchedResultsController *)controller didChangeObject:(id)anObject
-       atIndexPath:(NSIndexPath *)indexPath forChangeType:(NSFetchedResultsChangeType)type
-      newIndexPath:(NSIndexPath *)newIndexPath {
-    
+	  atIndexPath:(NSIndexPath *)indexPath forChangeType:(NSFetchedResultsChangeType)type
+	 newIndexPath:(NSIndexPath *)newIndexPath {
+
     NSMutableDictionary *change = [NSMutableDictionary dictionary];
-	
+
     switch(type) {
         case NSFetchedResultsChangeInsert:
             change[@(type)] = newIndexPath;
@@ -100,18 +100,18 @@
             change[@(type)] = @[indexPath, newIndexPath];
             break;
     }
-	
+
     [self.objectChanges addObject:change];
 }
 
 -(void)controllerDidChangeContent:(NSFetchedResultsController *)controller {
-	
+
     if ([self.sectionChanges count] > 0) {
         [self.collectionView performBatchUpdates:^{
-            
+
             for (NSDictionary *change in self.sectionChanges) {
                 [change enumerateKeysAndObjectsUsingBlock:^(NSNumber *key, id obj, BOOL *stop) {
-                    
+
                     NSFetchedResultsChangeType type = [key unsignedIntegerValue];
                     switch (type) {
                         case NSFetchedResultsChangeInsert:
@@ -128,9 +128,9 @@
             }
         } completion:nil];
     }
-    
+
     if ([self.objectChanges count] > 0 && [self.sectionChanges count] == 0) {
-        
+
         if ([self shouldReloadCollectionViewToPreventKnownIssue]) {
             // This is to prevent a bug in UICollectionView from occurring.
             // The bug presents itself when inserting the first object or deleting the last object in a collection view.
@@ -138,14 +138,14 @@
             // This code should be removed once the bug has been fixed, it is tracked in OpenRadar
             // http://openradar.appspot.com/12954582
             [self.collectionView reloadData];
-            
+
         } else {
-            
+
             [self.collectionView performBatchUpdates:^{
-                
+
                 for (NSDictionary *change in self.objectChanges) {
                     [change enumerateKeysAndObjectsUsingBlock:^(NSNumber *key, id obj, BOOL *stop) {
-                        
+
                         NSFetchedResultsChangeType type = [key unsignedIntegerValue];
                         switch (type) {
                             case NSFetchedResultsChangeInsert:
@@ -166,7 +166,7 @@
             } completion:nil];
         }
     }
-    
+
     [self.sectionChanges removeAllObjects];
     [self.objectChanges removeAllObjects];
 }
@@ -201,7 +201,7 @@
             }
         }];
     }
-    
+
     return shouldReload;
 }
 

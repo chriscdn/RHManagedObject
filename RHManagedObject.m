@@ -41,109 +41,186 @@
 
 // Abstract class.  Implement in your entity subclass to return the name of the model without the .xcdatamodeld extension.
 +(NSString *)modelName {
-	
 	NSString *modelName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"RHDefaultModelName"];
 	if (modelName) {
 		return modelName;
 	}
-	
+
     NSLog(@"You must implement a modelName class method in your entity subclass.  Aborting.");
 	abort();
 }
 
-+(void)deleteStore {
-	[[self managedObjectContextManager] deleteStore];
-}
-
 +(NSEntityDescription *)entityDescription {
-	return [NSEntityDescription entityForName:[self entityName] inManagedObjectContext:[self managedObjectContextForCurrentThread]];
+	return [self entityDescriptionWithError:nil];
 }
 
-+(void)commit {
-	[[self managedObjectContextManager] commit];
++(NSEntityDescription *)entityDescriptionWithError:(NSError **)error {
+	return [NSEntityDescription entityForName:[self entityName]
+                       inManagedObjectContext:[self managedObjectContextForCurrentThreadWithError:error]];
+}
+
++(NSError *)deleteStore {
+	NSError *error = [[self managedObjectContextManager] deleteStore];
+    if (error) {
+        return error;
+    }
+    return nil;
+}
+
++(NSError *)commit {
+	NSError *error = [[self managedObjectContextManager] commit];
+    if (error) {
+        return error;
+    }
+    return nil;
 }
 
 +(id)newEntity {
-	return [NSEntityDescription insertNewObjectForEntityForName:[self entityName] inManagedObjectContext:[self managedObjectContextForCurrentThread]];
+	return [self newEntityWithError:nil];
+}
+
++(id)newEntityWithError:(NSError **)error {
+	return [NSEntityDescription insertNewObjectForEntityForName:[self entityName]
+                                         inManagedObjectContext:[self managedObjectContextForCurrentThreadWithError:error]];
 }
 
 +(id)newOrExistingEntityWithPredicate:(NSPredicate *)predicate {
-    id existing = [self getWithPredicate:predicate];
-    return existing ? existing : [self newEntity];
+	return [self newOrExistingEntityWithPredicate:predicate error:nil];
+}
+
++(id)newOrExistingEntityWithPredicate:(NSPredicate *)predicate error:(NSError **)error {
+    id existing = [self getWithPredicate:predicate error:error];
+    return existing ? existing : [self newEntityWithError:error];
 }
 
 +(id)getWithPredicate:(NSPredicate *)predicate {
-	NSArray *results = [self fetchWithPredicate:predicate];
-	
+	return [self getWithPredicate:predicate error:nil];
+}
++(id)getWithPredicate:(NSPredicate *)predicate
+                error:(NSError **)error
+{
+	NSArray *results = [self fetchWithPredicate:predicate error:error];
+
 	if ([results count] > 0) {
 		return [results objectAtIndex:0];
 	}
-	
+
 	return nil;
 }
 
 +(id)getWithPredicate:(NSPredicate *)predicate sortDescriptor:(NSSortDescriptor *)descriptor {
-	NSArray *results = [self fetchWithPredicate:predicate sortDescriptor:descriptor];
-	
+	return [self getWithPredicate:predicate sortDescriptor:descriptor error:nil];
+}
+
++(id)getWithPredicate:(NSPredicate *)predicate
+       sortDescriptor:(NSSortDescriptor *)descriptor
+                error:(NSError **)error
+{
+	NSArray *results = [self fetchWithPredicate:predicate sortDescriptor:descriptor error:error];
+
 	if ([results count] > 0) {
 		return [results objectAtIndex:0];
 	}
-	
+
 	return nil;
 }
 
 +(NSArray *)fetchAll {
-	return [self fetchWithPredicate:nil];
+	return [self fetchAllWithError:nil];
+}
+
++(NSArray *)fetchAllWithError:(NSError **)error {
+	return [self fetchWithPredicate:nil error:error];
 }
 
 +(NSArray *)fetchWithPredicate:(NSPredicate *)predicate {
-	return [self fetchWithPredicate:predicate sortDescriptor:nil];
+	return [self fetchWithPredicate:predicate error:nil];
+}
+
++(NSArray *)fetchWithPredicate:(NSPredicate *)predicate
+                         error:(NSError **)error
+{
+	return [self fetchWithPredicate:predicate sortDescriptor:nil error:error];
 }
 
 +(NSArray *)fetchWithPredicate:(NSPredicate *)predicate sortDescriptor:(NSSortDescriptor *)descriptor {
-	return [self fetchWithPredicate:predicate sortDescriptor:descriptor withLimit:0];
+	return [self fetchWithPredicate:predicate sortDescriptor:descriptor error:nil];
 }
 
-+(NSArray *)fetchWithPredicate:(NSPredicate *)predicate sortDescriptor:(NSSortDescriptor *)descriptor withLimit:(NSUInteger)limit {
++(NSArray *)fetchWithPredicate:(NSPredicate *)predicate
+                sortDescriptor:(NSSortDescriptor *)descriptor
+                         error:(NSError **)error
+{
+	return [self fetchWithPredicate:predicate sortDescriptor:descriptor withLimit:0 error:error];
+}
+
++(NSArray *)fetchWithPredicate:(NSPredicate *)predicate
+                sortDescriptor:(NSSortDescriptor *)descriptor
+                     withLimit:(NSUInteger)limit {
+	return [self fetchWithPredicate:predicate sortDescriptor:descriptor withLimit:limit error:nil];
+}
+
++(NSArray *)fetchWithPredicate:(NSPredicate *)predicate
+                sortDescriptor:(NSSortDescriptor *)descriptor
+                     withLimit:(NSUInteger)limit
+                         error:(NSError **)error
+{
 	NSFetchRequest *fetch = [[NSFetchRequest alloc] init];
-	
-	[fetch setEntity:[self entityDescription]];
-	
+
+	[fetch setEntity:[self entityDescriptionWithError:error]];
+
 	if (predicate) {
 		[fetch setPredicate:predicate];
 	}
-	
+
 	if (descriptor) {
 		[fetch setSortDescriptors:[NSArray arrayWithObject:descriptor]];
 	}
-	
+
 	if (limit > 0) {
 		[fetch setFetchLimit:limit];
 	}
-	
+
 	[fetch setIncludesPendingChanges:YES];
-	
-	return [[self managedObjectContextForCurrentThread] executeFetchRequest:fetch error:nil];
+
+	return [[self managedObjectContextForCurrentThreadWithError:error] executeFetchRequest:fetch
+                                                                                     error:error];
 }
 
 +(NSUInteger)count {
-	return [self countWithPredicate:nil];
+	return [self countWithError:nil];
+}
+
++(NSUInteger)countWithError:(NSError **)error {
+	return [self countWithPredicate:nil error:error];
 }
 
 +(NSUInteger)countWithPredicate:(NSPredicate *)predicate {
+	return [self countWithPredicate:predicate error:nil];
+}
+
++(NSUInteger)countWithPredicate:(NSPredicate *)predicate error:(NSError **)error {
 	NSFetchRequest *fetch = [[NSFetchRequest alloc] init];
-	
-	[fetch setEntity:[self entityDescription]];
-	
+
+	[fetch setEntity:[self entityDescriptionWithError:error]];
+
 	if (predicate) {
 		[fetch setPredicate:predicate];
 	}
-	
-	return [[self managedObjectContextForCurrentThread] countForFetchRequest:fetch error:nil];
+
+	return [[self managedObjectContextForCurrentThreadWithError:error] countForFetchRequest:fetch
+                                                                                      error:error];
 }
 
 +(NSArray *)distinctValuesWithAttribute:(NSString *)attribute predicate:(NSPredicate *)predicate {
-	NSArray *items = [self fetchWithPredicate:predicate];
+	return [self distinctValuesWithAttribute:attribute predicate:predicate error:nil];
+}
+
++(NSArray *)distinctValuesWithAttribute:(NSString *)attribute
+                              predicate:(NSPredicate *)predicate
+                                  error:(NSError **)error
+{
+	NSArray *items = [self fetchWithPredicate:predicate error:error];
 	NSString *keyPath = [@"@distinctUnionOfObjects." stringByAppendingString:attribute];
 	return [[items valueForKeyPath:keyPath] sortedArrayUsingSelector:@selector(compare:)];
 }
@@ -162,72 +239,95 @@
             [NSException raise:NSGenericException format:@"Unexpected FormatType."];
     }
 }
-
 +(NSAttributeType)attributeTypeWithKey:(NSString *)key {
-	NSEntityDescription *entityDescription = [self entityDescription];
+	return [self attributeTypeWithKey:key error:nil];
+}
++(NSAttributeType)attributeTypeWithKey:(NSString *)key error:(NSError **)error {
+	NSEntityDescription *entityDescription = [self entityDescriptionWithError:error];
 	NSDictionary *properties = [entityDescription propertiesByName];
 	NSAttributeDescription *attribute = [properties objectForKey:key];
 	return [attribute attributeType];
 }
 
 +(id)aggregateWithType:(RHAggregate)aggregate key:(NSString *)key predicate:(NSPredicate *)predicate defaultValue:(id)defaultValue {
+	return [self aggregateWithType:aggregate key:key predicate:predicate defaultValue:defaultValue error:nil];
+}
+
++(id)aggregateWithType:(RHAggregate)aggregate
+                   key:(NSString *)key
+             predicate:(NSPredicate *)predicate
+          defaultValue:(id)defaultValue
+                 error:(NSError **)error
+{
 	NSFetchRequest *fetch = [[NSFetchRequest alloc] init];
-	
+
 	if (predicate) {
 		[fetch setPredicate:predicate];
 	}
-	
+
 	NSString *aggregateString = [self aggregateToString:aggregate];
-	NSAttributeType attributeType = [self attributeTypeWithKey:key];
-	
-	NSEntityDescription *entity = [self entityDescription]; // [NSEntityDescription entityForName:[self entityName] inManagedObjectContext:[self managedObjectContext]];
+	NSAttributeType attributeType = [self attributeTypeWithKey:key error:error];
+
+	NSEntityDescription *entity = [self entityDescriptionWithError:error]; // [NSEntityDescription entityForName:[self entityName] inManagedObjectContext:[self managedObjectContext]];
 	[fetch setEntity:entity];
 	[fetch setResultType:NSDictionaryResultType];
-	
+
 	NSExpression *keyPathExpression = [NSExpression expressionForKeyPath:key];
 	NSExpression *expression = [NSExpression expressionForFunction:aggregateString arguments:[NSArray arrayWithObject:keyPathExpression]];
-	
+
 	NSExpressionDescription *expressionDescription = [[NSExpressionDescription alloc] init];
 	[expressionDescription setName:key];
 	[expressionDescription setExpression:expression];
 	[expressionDescription setExpressionResultType:attributeType];
-	
+
 	[fetch setPropertiesToFetch:[NSArray arrayWithObject:expressionDescription]];
-	
-	NSError *error;
-	NSArray *objects = [[self managedObjectContextForCurrentThread] executeFetchRequest:fetch error:&error];
-	
+
+	NSArray *objects = [[self managedObjectContextForCurrentThreadWithError:error] executeFetchRequest:fetch
+                                                                                                 error:error];
+
 	id returnValue = nil;
-	
+
 	if ((objects != nil) && ([objects count] > 0) ) {
 		returnValue = [[objects lastObject] valueForKey:key];
 	}
-	
+
 	if (returnValue == nil) {
 		returnValue = defaultValue;
 	}
-		
+
 	return returnValue;
 }
 
-+(void)deleteAll {
-    [self deleteWithPredicate:nil];
++(NSUInteger)deleteAll {
+	return [self deleteAllWithError:nil];
+}
+
++(NSUInteger)deleteAllWithError:(NSError **)error {
+    return [self deleteWithPredicate:nil error:error];
 }
 
 +(NSUInteger)deleteWithPredicate:(NSPredicate *)predicate {
-    NSArray *itemsToDelete = [self fetchWithPredicate:predicate];
+	return [self deleteWithPredicate:predicate error:nil];
+}
+
++(NSUInteger)deleteWithPredicate:(NSPredicate *)predicate error:(NSError **)error {
+    NSArray *itemsToDelete = [self fetchWithPredicate:predicate error:error];
     [itemsToDelete makeObjectsPerformSelector:@selector(delete)];
     return [itemsToDelete count];
 }
 
 // deprecated = use managedObjectContextForCurrentThread instead
 +(NSManagedObjectContext *)managedObjectContext {
-    return [self managedObjectContextForCurrentThread];
+    return [self managedObjectContextForCurrentThreadWithError:nil];
+}
+
++(NSManagedObjectContext *)managedObjectContextForCurrentThread {
+	return [self managedObjectContextForCurrentThreadWithError:nil];
 }
 
 // Returns the NSManagedObjectContext for the current thread
-+(NSManagedObjectContext *)managedObjectContextForCurrentThread {
-	return [[self managedObjectContextManager] managedObjectContextForCurrentThread];
++(NSManagedObjectContext *)managedObjectContextForCurrentThreadWithError:(NSError **)error {
+	return [[self managedObjectContextManager] managedObjectContextForCurrentThreadWithError:error];
 }
 
 +(RHManagedObjectContextManager *)managedObjectContextManager {
@@ -235,7 +335,11 @@
 }
 
 +(BOOL)doesRequireMigration {
-	return [[self managedObjectContextManager] doesRequireMigration];
+	return [self doesRequireMigrationWithError:nil];
+}
+
++(BOOL)doesRequireMigrationWithError:(NSError **)error {
+	return [[self managedObjectContextManager] doesRequireMigrationWithError:error];
 }
 
 -(void)delete {
@@ -246,12 +350,13 @@
 -(id)clone {
 	NSEntityDescription *entityDescription = [self entity];
 	NSString *entityName = [entityDescription name];
-	NSManagedObject *cloned = [NSEntityDescription insertNewObjectForEntityForName:entityName inManagedObjectContext:[self managedObjectContext]];
-	
+	NSManagedObject *cloned = [NSEntityDescription insertNewObjectForEntityForName:entityName
+                                                            inManagedObjectContext:[self managedObjectContext]];
+
     for (NSString *attr in [entityDescription attributesByName]) {
         [cloned setValue:[self valueForKey:attr] forKey:attr];
     }
-	
+
     return cloned;
 }
 
@@ -263,15 +368,15 @@
 // This function needs work
 -(NSDictionary *)serialize {
 	NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-	
+
 	for (NSString *key in [[self entity] attributesByName]) {
 		id value = [self valueForKey:key];
-		
+
 		if (value != nil) {
 			[dict setObject:value forKey:key];
 		}
 	}
-	
+
 	return dict;
 }
 

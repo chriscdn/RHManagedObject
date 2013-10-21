@@ -168,7 +168,7 @@
 
 
 -(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-	 if (self.searchString == nil) {
+	if (self.searchString == nil) {
 		id <NSFetchedResultsSectionInfo> sectionInfo = [[self.fetchedResultsController sections] objectAtIndex:section];
 		return [sectionInfo name];
 	}

@@ -38,9 +38,9 @@
 -(void)setObserver:(id)_observer {
 	if (_observer != self.observer) {
 		[[NSNotificationCenter defaultCenter] removeObserver:self.observer name:NSManagedObjectContextDidSaveNotification object:self];
-		
+
 		observer = _observer;
-		
+
 		[[NSNotificationCenter defaultCenter] addObserver:self.observer
 												 selector:@selector(mocDidSave:)
 													 name:NSManagedObjectContextDidSaveNotification
@@ -64,10 +64,13 @@
 @property (nonatomic, strong) NSString *guid;
 
 +(NSMutableDictionary *)sharedInstances;
++(void)deleteFile:(NSString *)filePath;
+
 -(NSString *)storePath;
 -(NSURL *)storeURL;
 -(NSString *)databaseName;
 -(void)mocDidSave:(NSNotification *)saveNotification;
+-(void)deleteStoreFiles:(NSString *)storePath;
 @end
 
 @implementation RHManagedObjectContextManager
@@ -84,7 +87,7 @@
         RHManagedObjectContextManager *contextManager = [[RHManagedObjectContextManager alloc] initWithModelName:modelName];
         [[self sharedInstances] setObject:contextManager forKey:modelName];
     }
-	
+
     return [[self sharedInstances] objectForKey:modelName];
 }
 
@@ -95,6 +98,15 @@
         sharedInstances = [[NSMutableDictionary alloc] init];
     });
     return sharedInstances;
+}
+
++(void)deleteFile:(NSString *)filePath {
+	NSFileManager *fm = [NSFileManager defaultManager];
+	NSError *error;
+
+	if ([fm fileExistsAtPath:filePath] && [fm isDeletableFileAtPath:filePath]) {
+		[fm removeItemAtPath:filePath error:&error];
+	}
 }
 
 -(id)initWithModelName:(NSString *)_modelName {
@@ -108,36 +120,37 @@
 #pragma mark Other useful stuff
 // Used to flush and reset the database.
 -(void)deleteStore {
-	NSFileManager *fm = [NSFileManager defaultManager];
-	NSError *error;
-	
+
 	if (persistentStoreCoordinator == nil) {
-		NSString *storePath = [self storePath];
-		
-		if ([fm fileExistsAtPath:storePath] && [fm isDeletableFileAtPath:storePath]) {
-			[fm removeItemAtPath:storePath error:&error];
-		}
-		
+		[self deleteStoreFiles:[self storePath]];
 	} else {
 		NSPersistentStoreCoordinator *storeCoordinator = [self persistentStoreCoordinator];
-		
+
 		for (NSPersistentStore *store in [storeCoordinator persistentStores]) {
 			NSURL *storeURL = store.URL;
 			NSString *storePath = storeURL.path;
+
+			NSError *error;
 			[storeCoordinator removePersistentStore:store error:&error];
-			
-			if ([fm fileExistsAtPath:storePath] && [fm isDeletableFileAtPath:storePath]) {
-				[fm removeItemAtPath:storePath error:&error];
-			}
+
+			[self deleteStoreFiles:storePath];
 		}
 	}
-	
+
 	self.managedObjectContextForMainThread = nil;
 	self.managedObjectModel = nil;
 	self.persistentStoreCoordinator = nil;
 	self.guid = nil;
-	
+
 	[[RHManagedObjectContextManager sharedInstances] removeObjectForKey:[self modelName]];
+}
+
+-(void)deleteStoreFiles:(NSString *)storePath {
+
+	[RHManagedObjectContextManager deleteFile:storePath];
+	[RHManagedObjectContextManager deleteFile:[storePath stringByAppendingString:@"-shm"]];
+	[RHManagedObjectContextManager deleteFile:[storePath stringByAppendingString:@"-wal"]];
+
 }
 
 -(NSString *)guid {
@@ -145,7 +158,7 @@
 		CFUUIDRef uuid = CFUUIDCreate(kCFAllocatorDefault);
 		NSString *uuidStr = (__bridge_transfer NSString *)CFUUIDCreateString(kCFAllocatorDefault, uuid);
 		CFRelease(uuid);
-		
+
 		self.guid = [uuidStr lowercaseString];
 	}
 	return guid;
@@ -153,24 +166,24 @@
 
 -(NSUInteger)pendingChangesCount {
 	NSManagedObjectContext *moc = [self managedObjectContextForCurrentThread];
-	
+
 	NSSet *updated  = [moc updatedObjects];
 	NSSet *deleted  = [moc deletedObjects];
 	NSSet *inserted = [moc insertedObjects];
-	
+
 	return [updated count] + [deleted count] + [inserted count];
 }
 
 // http://stackoverflow.com/questions/5236860/app-freeze-on-coredata-save
 -(void)commit {
-	
+
  	NSManagedObjectContext *moc = [self managedObjectContextForCurrentThread];
 	NSError *error = nil;
-	
+
 	if ([self pendingChangesCount] > kPostMassUpdateNotificationThreshold) {
 		[[NSNotificationCenter defaultCenter] postNotificationName:RHWillMassUpdateNotification object:nil];
 	}
-	
+
 	if ([moc hasChanges] && ![moc save:&error]) {
 		NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
 		abort();
@@ -186,32 +199,32 @@
 		[managedObjectContextForMainThread setPersistentStoreCoordinator:[self persistentStoreCoordinator]];
 		[managedObjectContextForMainThread setMergePolicy:kMergePolicy];
 	}
-	
+
 	return managedObjectContextForMainThread;
 }
 
 -(NSManagedObjectContext *)managedObjectContextForCurrentThread {
 	NSThread *thread = [NSThread currentThread];
-	
+
 	if ([thread isMainThread]) {
 		return [self managedObjectContextForMainThread];
 	}
-	
+
 	// A key to cache the moc for the current thread.
 	// 2013-04-10 - Added a GUID to make sure the key is unique if the store is ever reset.  We don't want to access
 	// a cached value from a deleted store!
 	NSString *threadKey = [NSString stringWithFormat:@"RHManagedObjectContext_%@_%@", self.modelName, self.guid];
-	
+
 	if ( [[thread threadDictionary] objectForKey:threadKey] == nil ) {
 		// create a moc for this thread
         RHManagedObjectContext *threadContext = [[RHManagedObjectContext alloc] init];
         [threadContext setPersistentStoreCoordinator:[self persistentStoreCoordinator]];
 		[threadContext setMergePolicy:kMergePolicy];
 		[threadContext setObserver:self];
-		
+
 		[[thread threadDictionary] setObject:threadContext forKey:threadKey];
     }
-	
+
 	return [[thread threadDictionary] objectForKey:threadKey];
 }
 
@@ -223,10 +236,10 @@
 	if (managedObjectModel == nil) {
 		NSString *modelPath = [[NSBundle mainBundle] pathForResource:self.modelName ofType:@"momd"];
 		NSURL *modelURL = [NSURL fileURLWithPath:modelPath];
-		
+
 		self.managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
 	}
-	
+
 	return managedObjectModel;
 }
 
@@ -234,9 +247,9 @@
     if ([NSThread isMainThread]) {
 		// This ensures no updated object is fault, which would cause the NSFetchedResultsController updates to fail.
 		// http://www.mlsite.net/blog/?p=518
-		
+
 		NSDictionary *userInfo = saveNotification.userInfo;
-		
+
 		NSArray *updates = [[userInfo objectForKey:@"updated"] allObjects];
 		for (RHManagedObject *item in updates) {
 			[[item objectInCurrentThreadContext] willAccessValueForKey:nil];
@@ -247,7 +260,7 @@
 		for (RHManagedObject *item in inserted) {
 			[[item objectInCurrentThreadContext] willAccessValueForKey:nil];
 		}
-		
+
         [[self managedObjectContextForMainThread] mergeChangesFromContextDidSaveNotification:saveNotification];
     } else {
         [self performSelectorOnMainThread:@selector(mocDidSave:) withObject:saveNotification waitUntilDone:NO];
@@ -269,7 +282,7 @@
  * If the coordinator doesn't already exist, it is created and the application's store added to it.
  */
 -(NSPersistentStoreCoordinator *)persistentStoreCoordinator {
-	
+
 	if (persistentStoreCoordinator == nil) {
 		@synchronized(self) {
 			// This next block is useful when the store is initialized for the first time.  If the DB doesn't already
@@ -277,55 +290,55 @@
 			// is useful for the initial seeding of data in the app.
 			NSString *storePath = [self storePath];
 			NSFileManager *fileManager = [NSFileManager defaultManager];
-			
+
 			if (![fileManager fileExistsAtPath:storePath]) {
 				NSString *defaultStorePath = [[NSBundle mainBundle] pathForResource:[self databaseName] ofType:nil];
-				
+
 				if ([fileManager fileExistsAtPath:defaultStorePath]) {
 					[fileManager copyItemAtPath:defaultStorePath toPath:storePath error:NULL];
 				}
 			}
-			
+
 			NSURL *storeURL = [self storeURL];
 			NSError *error = nil;
-			
+
 			self.persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:[self managedObjectModel]];
-			
+
 			// https://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/CoreDataVersioning/Articles/vmLightweightMigration.html#//apple_ref/doc/uid/TP40004399-CH4-SW1
 			NSDictionary *options = [NSDictionary dictionaryWithObjectsAndKeys:
 									 [NSNumber numberWithBool:YES], NSMigratePersistentStoresAutomaticallyOption,
 									 [NSNumber numberWithBool:YES], NSInferMappingModelAutomaticallyOption, nil];
-			
+
 			if (![persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:options error:&error]) {
 				/*
 				 Replace this implementation with code to handle the error appropriately.
-				 
+
 				 abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development. If it is not possible to recover from the error, display an alert panel that instructs the user to quit the application by pressing the Home button.
-				 
+
 				 Typical reasons for an error here include:
 				 * The persistent store is not accessible;
 				 * The schema for the persistent store is incompatible with current managed object model.
 				 Check the error message to determine what the actual problem was.
-				 
-				 
+
+
 				 If the persistent store is not accessible, there is typically something wrong with the file path. Often, a file URL is pointing into the application's resources directory instead of a writeable directory.
-				 
+
 				 If you encounter schema incompatibility errors during development, you can reduce their frequency by:
 				 * Simply deleting the existing store:
 				 [[NSFileManager defaultManager] removeItemAtURL:storeURL error:nil]
-				 
+
 				 * Performing automatic lightweight migration by passing the following dictionary as the options parameter:
 				 [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:YES],NSMigratePersistentStoresAutomaticallyOption, [NSNumber numberWithBool:YES], NSInferMappingModelAutomaticallyOption, nil];
-				 
+
 				 Lightweight migration will only work for a limited set of schema changes; consult "Core Data Model Versioning and Data Migration Programming Guide" for details.
-				 
+
 				 */
 				NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
 				abort();
 			}
 		} // end @synchronized
 	}
-	
+
 	return persistentStoreCoordinator;
 }
 

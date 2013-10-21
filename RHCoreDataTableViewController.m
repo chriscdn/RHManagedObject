@@ -43,14 +43,16 @@
 
 -(void)addSearchBarWithPlaceHolder:(NSString *)placeholder {
 	UISearchBar *searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(0,0,self.tableView.frame.size.width,44)];
-	searchBar.placeholder = placeholder;
+	[searchBar setPlaceholder:placeholder];
+	[searchBar setDelegate:self];
 
 	self.searchController = [[UISearchDisplayController alloc] initWithSearchBar:searchBar contentsController:self];
-	self.searchController.delegate = self;                 // UISearchDisplayDelegate
-	self.searchController.searchResultsDataSource = self;  // UITableViewDataSource
-	self.searchController.searchResultsDelegate   = self;  // UITableViewDelegate
 
-	self.tableView.tableHeaderView = self.searchController.searchBar;
+	[self.searchController setDelegate:self];					// UISearchDisplayDelegate
+	[self.searchController setSearchResultsDataSource:self];  	// UITableViewDataSource
+	[self.searchController setSearchResultsDelegate:self];  	// UITableViewDelegate
+
+	[self.tableView setTableHeaderView:self.searchController.searchBar];
 }
 
 #pragma mark -
@@ -62,7 +64,7 @@
 // The disadvantage is that modifying the fetchedResultsController can muck up self.tableView.  It's therefore essential to call
 // [self.tableView reloadData] whenever the fetchedResultsController is modified.  Secondly, there seems to be a bug that causes
 // the section titles and cell lines of self.tableView to overlay searchResultsTableView when the table is reloaded.  We therefore
-// hide them with UITableViewCellSeparatorStyleNone & 
+// hide them with UITableViewCellSeparatorStyleNone.
 
 -(BOOL)searchDisplayController:(UISearchDisplayController *)controller shouldReloadTableForSearchString:(NSString *)searchString {
 	self.searchString = searchString;
@@ -72,11 +74,9 @@
 	return YES;
 }
 
-// Will be called when "Cancel" button is called to dismiss search input.
--(void)searchDisplayController:(UISearchDisplayController *)controller willUnloadSearchResultsTableView:(UITableView *)tableView {
+-(void)searchBarCancelButtonClicked:(UISearchBar *)searchBar {
 	self.searchString = nil;
 	self.fetchedResultsController = nil;
-	[self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleSingleLine];
 	[self.tableView reloadData];
 }
 

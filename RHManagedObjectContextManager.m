@@ -37,7 +37,9 @@
 // certain everything is cleaned up when it's no longer required.
 -(void)setObserver:(id)_observer {
 	if (_observer != self.observer) {
-		[[NSNotificationCenter defaultCenter] removeObserver:self.observer name:NSManagedObjectContextDidSaveNotification object:self];
+		[[NSNotificationCenter defaultCenter] removeObserver:self.observer
+														name:NSManagedObjectContextDidSaveNotification
+													  object:self];
 
 		observer = _observer;
 
@@ -49,7 +51,9 @@
 }
 
 -(void)dealloc {
-	[[NSNotificationCenter defaultCenter] removeObserver:self.observer name:NSManagedObjectContextDidSaveNotification object:self];
+	[[NSNotificationCenter defaultCenter] removeObserver:self.observer
+													name:NSManagedObjectContextDidSaveNotification
+												  object:self];
 }
 
 @end

@@ -39,7 +39,7 @@ typedef enum {
 +(NSString *)entityName;
 +(NSString *)modelName;
 
-+(NSEntityDescription *)entityDescription;
++(NSEntityDescription *)entityDescription __deprecated;
 +(NSEntityDescription *)entityDescriptionWithError:(NSError **)error;
 
 +(NSError *)deleteStore;
@@ -48,74 +48,86 @@ typedef enum {
 +(id)newEntity;
 +(id)newEntityWithError:(NSError **)error;
 
-+(id)newOrExistingEntityWithPredicate:(NSPredicate *)predicate;
++(id)newOrExistingEntityWithPredicate:(NSPredicate *)predicate __deprecated;
 +(id)newOrExistingEntityWithPredicate:(NSPredicate *)predicate
                                 error:(NSError **)error;
 
-+(id)getWithPredicate:(NSPredicate *)predicate;
++(id)getWithPredicate:(NSPredicate *)predicate __deprecated;
 +(id)getWithPredicate:(NSPredicate *)predicate
                 error:(NSError **)error;
 
-+(id)getWithPredicate:(NSPredicate *)predicate sortDescriptor:(NSSortDescriptor *)descriptor;
++(id)getWithPredicate:(NSPredicate *)predicate
+	   sortDescriptor:(NSSortDescriptor *)descriptor __deprecated;
 +(id)getWithPredicate:(NSPredicate *)predicate
        sortDescriptor:(NSSortDescriptor *)descriptor
                 error:(NSError **)error;
 
-+(NSArray *)fetchAll;
++(NSArray *)fetchAll __deprecated;
 +(NSArray *)fetchAllWithError:(NSError **)error;
 
-+(NSArray *)fetchWithPredicate:(NSPredicate *)predicate;
++(NSArray *)fetchWithPredicate:(NSPredicate *)predicate __deprecated;
+
 +(NSArray *)fetchWithPredicate:(NSPredicate *)predicate
                          error:(NSError **)error;
 
-+(NSArray *)fetchWithPredicate:(NSPredicate *)predicate sortDescriptor:(NSSortDescriptor *)descriptor;
-+(NSArray *)fetchWithPredicate:(NSPredicate *)predicate sortDescriptor:(NSSortDescriptor *)descriptor
++(NSArray *)fetchWithPredicate:(NSPredicate *)predicate
+				sortDescriptor:(NSSortDescriptor *)descriptor __deprecated;
+
++(NSArray *)fetchWithPredicate:(NSPredicate *)predicate
+				sortDescriptor:(NSSortDescriptor *)descriptor
                          error:(NSError **)error;
 
 +(NSArray *)fetchWithPredicate:(NSPredicate *)predicate
                 sortDescriptor:(NSSortDescriptor *)descriptor
-                     withLimit:(NSUInteger)limit;
+                     withLimit:(NSUInteger)limit __deprecated;
 
 +(NSArray *)fetchWithPredicate:(NSPredicate *)predicate
                 sortDescriptor:(NSSortDescriptor *)descriptor
                      withLimit:(NSUInteger)limit
                          error:(NSError **)error;
 
-+(NSUInteger)count;
++(NSUInteger)count __deprecated;
 +(NSUInteger)countWithError:(NSError **)error;
 
-+(NSUInteger)countWithPredicate:(NSPredicate *)predicate;
++(NSUInteger)countWithPredicate:(NSPredicate *)predicate __deprecated;
 +(NSUInteger)countWithPredicate:(NSPredicate *)predicate error:(NSError **)error;
 
-+(NSArray *)distinctValuesWithAttribute:(NSString *)attribute predicate:(NSPredicate *)predicate;
++(NSArray *)distinctValuesWithAttribute:(NSString *)attribute
+							  predicate:(NSPredicate *)predicate __deprecated;
+
 +(NSArray *)distinctValuesWithAttribute:(NSString *)attribute
                               predicate:(NSPredicate *)predicate
                                   error:(NSError **)error;
 
-+(NSAttributeType)attributeTypeWithKey:(NSString *)key;
-+(NSAttributeType)attributeTypeWithKey:(NSString *)key error:(NSError **)error;
++(NSAttributeType)attributeTypeWithKey:(NSString *)key __deprecated;
++(NSAttributeType)attributeTypeWithKey:(NSString *)key
+								 error:(NSError **)error;
 
-+(id)aggregateWithType:(RHAggregate)aggregate key:(NSString *)key predicate:(NSPredicate *)predicate defaultValue:(id)defaultValue;
++(id)aggregateWithType:(RHAggregate)aggregate
+				   key:(NSString *)key
+			 predicate:(NSPredicate *)predicate
+		  defaultValue:(id)defaultValue __deprecated;
+
 +(id)aggregateWithType:(RHAggregate)aggregate
                    key:(NSString *)key
              predicate:(NSPredicate *)predicate
           defaultValue:(id)defaultValue
                  error:(NSError **)error;
 
-+(NSUInteger)deleteAll;
++(NSUInteger)deleteAll __deprecated;
 +(NSUInteger)deleteAllWithError:(NSError **)error;
 
-+(NSUInteger)deleteWithPredicate:(NSPredicate *)predicate;
++(NSUInteger)deleteWithPredicate:(NSPredicate *)predicate __deprecated;
 +(NSUInteger)deleteWithPredicate:(NSPredicate *)predicate error:(NSError **)error;
 
 +(NSManagedObjectContext *)managedObjectContext __deprecated;
++(NSManagedObjectContext *)managedObjectContextForCurrentThread __deprecated;
 
-+(NSManagedObjectContext *)managedObjectContextForCurrentThread;
 +(NSManagedObjectContext *)managedObjectContextForCurrentThreadWithError:(NSError **)error;
 
 +(RHManagedObjectContextManager *)managedObjectContextManager;
 
-+(BOOL)doesRequireMigration;
++(BOOL)doesRequireMigration __deprecated;
 +(BOOL)doesRequireMigrationWithError:(NSError **)error;
 
 /* Instance methods */

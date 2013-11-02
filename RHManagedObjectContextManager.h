@@ -1,6 +1,6 @@
 //
 //  RHManagedObjectContextManager.h
-//  Version: 0.9
+//  Version: 0.10
 //
 //  Copyright (C) 2013 by Christopher Meyer
 //  http://schwiiz.org/
@@ -32,9 +32,11 @@
 @interface RHManagedObjectContextManager : NSObject
 
 +(RHManagedObjectContextManager *)sharedInstanceWithModelName:(NSString *)modelName;
++(NSError *)deleteFile:(NSString *)filePath;
 -(id)initWithModelName:(NSString *)_modelName;
 -(NSManagedObjectContext *)managedObjectContextForCurrentThreadWithError:(NSError **)error;
 -(NSError *)deleteStore;
+-(NSError *)deleteStoreFiles:(NSString *)storePath;
 -(NSError *)commit;
 -(NSUInteger)pendingChangesCountWithError:(NSError **)error;
 -(BOOL)doesRequireMigrationWithError:(NSError **)error;

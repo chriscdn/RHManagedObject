@@ -1,5 +1,5 @@
 //
-//  RHCoreDataCollectionViewController.h
+//  RHFetchedResultsManager.h
 //  Version: 0.10
 //
 //  Copyright (C) 2013 by Christopher Meyer
@@ -22,15 +22,31 @@
 //  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
-//
-//  Motivated by https://github.com/AshFurrow/UICollectionView-NSFetchedResultsController
 
 #import <CoreData/CoreData.h>
 
-@interface RHCoreDataCollectionViewController : UICollectionViewController<NSFetchedResultsControllerDelegate> {
-    NSFetchedResultsController *fetchedResultsController;
-}
+typedef UITableViewCell *(^RHCellBlock)(UITableView *tableView, NSIndexPath *indexPath);
+typedef void (^RHCellConfigureBlock)(UITableViewCell *cell, NSFetchedResultsController *fetchedResultsController, NSIndexPath *indexPath);
+typedef void (^RHDidSelectRowBlock)(NSFetchedResultsController *fetchedResultsController, NSIndexPath *indexPath);
 
-@property (nonatomic, strong) NSFetchedResultsController *fetchedResultsController;
+@interface RHFetchedResultsManager : NSObject<NSFetchedResultsControllerDelegate,UITableViewDataSource,UITableViewDelegate>
+
+@property (nonatomic, retain) NSFetchedResultsController *fetchedResultsController;
+@property (nonatomic, weak) UITableView *tableView;
+@property (nonatomic, retain) NSString *entityClass;
+@property (nonatomic, retain) NSPredicate *predicate;
+@property (nonatomic, retain) NSSortDescriptor *sortDescriptor;
+
+-(id)initWithTableView:(UITableView *)tableView
+		   entityClass:(NSString *)entityClass
+			 predicate:(NSPredicate *)predicate
+		sortDescriptor:(NSSortDescriptor *)sortDescriptor
+			 cellBlock:(RHCellBlock)cellBlock
+		configureBlock:(RHCellConfigureBlock)configureBlock
+	 didSelectRowBlock:(RHDidSelectRowBlock)didSelectRowBlock;
+
+-(void)reload;
+
+-(id)objectAtIndexPath:(NSIndexPath *)indexPath;
 
 @end

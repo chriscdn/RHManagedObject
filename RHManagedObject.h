@@ -1,6 +1,6 @@
 //
 //  RHManagedObject.h
-//  Version: 0.9
+//  Version: 0.10
 //
 //  Copyright (C) 2013 by Christopher Meyer
 //  http://schwiiz.org/
@@ -23,6 +23,9 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 
+
+typedef void (^RHDidUpdateBlock)();
+
 typedef enum {
     RHAggregateMax,
 	RHAggregateMin,
@@ -35,11 +38,12 @@ typedef enum {
 
 @interface RHManagedObject : NSManagedObject
 
+@property (nonatomic, copy) RHDidUpdateBlock didUpdateBlock;
+
 /* Abstract Classes */
 +(NSString *)entityName;
 +(NSString *)modelName;
 
-+(NSEntityDescription *)entityDescription __deprecated;
 +(NSEntityDescription *)entityDescriptionWithError:(NSError **)error;
 
 +(NSError *)deleteStore;
@@ -48,30 +52,20 @@ typedef enum {
 +(id)newEntity;
 +(id)newEntityWithError:(NSError **)error;
 
-+(id)newOrExistingEntityWithPredicate:(NSPredicate *)predicate __deprecated;
 +(id)newOrExistingEntityWithPredicate:(NSPredicate *)predicate
                                 error:(NSError **)error;
 
-+(id)getWithPredicate:(NSPredicate *)predicate __deprecated;
 +(id)getWithPredicate:(NSPredicate *)predicate
                 error:(NSError **)error;
 
-+(id)getWithPredicate:(NSPredicate *)predicate
-	   sortDescriptor:(NSSortDescriptor *)descriptor __deprecated;
 +(id)getWithPredicate:(NSPredicate *)predicate
        sortDescriptor:(NSSortDescriptor *)descriptor
                 error:(NSError **)error;
 
-+(NSArray *)fetchAll __deprecated;
 +(NSArray *)fetchAllWithError:(NSError **)error;
-
-+(NSArray *)fetchWithPredicate:(NSPredicate *)predicate __deprecated;
 
 +(NSArray *)fetchWithPredicate:(NSPredicate *)predicate
                          error:(NSError **)error;
-
-+(NSArray *)fetchWithPredicate:(NSPredicate *)predicate
-				sortDescriptor:(NSSortDescriptor *)descriptor __deprecated;
 
 +(NSArray *)fetchWithPredicate:(NSPredicate *)predicate
 				sortDescriptor:(NSSortDescriptor *)descriptor
@@ -79,34 +73,19 @@ typedef enum {
 
 +(NSArray *)fetchWithPredicate:(NSPredicate *)predicate
                 sortDescriptor:(NSSortDescriptor *)descriptor
-                     withLimit:(NSUInteger)limit __deprecated;
-
-+(NSArray *)fetchWithPredicate:(NSPredicate *)predicate
-                sortDescriptor:(NSSortDescriptor *)descriptor
                      withLimit:(NSUInteger)limit
                          error:(NSError **)error;
 
-+(NSUInteger)count __deprecated;
 +(NSUInteger)countWithError:(NSError **)error;
 
-+(NSUInteger)countWithPredicate:(NSPredicate *)predicate __deprecated;
 +(NSUInteger)countWithPredicate:(NSPredicate *)predicate error:(NSError **)error;
-
-+(NSArray *)distinctValuesWithAttribute:(NSString *)attribute
-							  predicate:(NSPredicate *)predicate __deprecated;
 
 +(NSArray *)distinctValuesWithAttribute:(NSString *)attribute
                               predicate:(NSPredicate *)predicate
                                   error:(NSError **)error;
 
-+(NSAttributeType)attributeTypeWithKey:(NSString *)key __deprecated;
 +(NSAttributeType)attributeTypeWithKey:(NSString *)key
 								 error:(NSError **)error;
-
-+(id)aggregateWithType:(RHAggregate)aggregate
-				   key:(NSString *)key
-			 predicate:(NSPredicate *)predicate
-		  defaultValue:(id)defaultValue __deprecated;
 
 +(id)aggregateWithType:(RHAggregate)aggregate
                    key:(NSString *)key
@@ -114,20 +93,14 @@ typedef enum {
           defaultValue:(id)defaultValue
                  error:(NSError **)error;
 
-+(NSUInteger)deleteAll __deprecated;
 +(NSUInteger)deleteAllWithError:(NSError **)error;
 
-+(NSUInteger)deleteWithPredicate:(NSPredicate *)predicate __deprecated;
 +(NSUInteger)deleteWithPredicate:(NSPredicate *)predicate error:(NSError **)error;
-
-+(NSManagedObjectContext *)managedObjectContext __deprecated;
-+(NSManagedObjectContext *)managedObjectContextForCurrentThread __deprecated;
 
 +(NSManagedObjectContext *)managedObjectContextForCurrentThreadWithError:(NSError **)error;
 
 +(RHManagedObjectContextManager *)managedObjectContextManager;
 
-+(BOOL)doesRequireMigration __deprecated;
 +(BOOL)doesRequireMigrationWithError:(NSError **)error;
 
 /* Instance methods */
@@ -135,6 +108,7 @@ typedef enum {
 -(id)clone;
 -(id)objectInCurrentThreadContext;
 -(NSDictionary *)serialize;
+-(void)didUpdate;
 
 @end
 

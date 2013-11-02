@@ -72,6 +72,7 @@
 -(NSURL *)storeURL;
 -(NSString *)databaseName;
 -(void)mocDidSave:(NSNotification *)saveNotification;
+@property (nonatomic, strong) id localChangeObserver;
 @end
 
 @implementation RHManagedObjectContextManager
@@ -101,31 +102,42 @@
     return sharedInstances;
 }
 
++(NSError *)deleteFile:(NSString *)filePath {
+	NSFileManager *fm = [NSFileManager defaultManager];
+	NSError *error;
+
+	if ([fm fileExistsAtPath:filePath] && [fm isDeletableFileAtPath:filePath]) {
+		[fm removeItemAtPath:filePath error:&error];
+	}
+
+	return error;
+}
+
 -(id)initWithModelName:(NSString *)_modelName {
     if (self=[super init]) {
         self.modelName = _modelName;
+
+
+
     }
     return self;
 }
+
+
 
 #pragma mark -
 #pragma mark Other useful stuff
 // Used to flush and reset the database.
 -(NSError *)deleteStore {
-	NSFileManager *fm = [NSFileManager defaultManager];
 	NSError *error = nil;
 
 	if (persistentStoreCoordinator == nil) {
 		NSString *storePath = [self storePath];
 
-		if ([fm fileExistsAtPath:storePath] && [fm isDeletableFileAtPath:storePath]) {
-			[fm removeItemAtPath:storePath error:&error];
-            if (error) {
-                return error;
-            }
-		}
+		[self deleteStoreFiles:storePath];
 
 	} else {
+
 		NSPersistentStoreCoordinator *storeCoordinator = [self persistentStoreCoordinatorWithError:&error];
         if (error) {
             return error;
@@ -135,16 +147,12 @@
 			NSURL *storeURL = store.URL;
 			NSString *storePath = storeURL.path;
 			[storeCoordinator removePersistentStore:store error:&error];
+
 			if (error) {
                 return error;
             }
 
-			if ([fm fileExistsAtPath:storePath] && [fm isDeletableFileAtPath:storePath]) {
-				[fm removeItemAtPath:storePath error:&error];
-                if (error) {
-                    return error;
-                }
-			}
+			[self deleteStoreFiles:storePath];
 		}
 	}
 
@@ -156,6 +164,16 @@
 	[[RHManagedObjectContextManager sharedInstances] removeObjectForKey:[self modelName]];
 
     return nil;
+}
+
+
+-(NSError *)deleteStoreFiles:(NSString *)storePath {
+	NSError *error = [RHManagedObjectContextManager deleteFile:storePath];
+	[RHManagedObjectContextManager deleteFile:[storePath stringByAppendingString:@"-shm"]];
+	[RHManagedObjectContextManager deleteFile:[storePath stringByAppendingString:@"-wal"]];
+
+	return error;
+
 }
 
 -(NSString *)guid {
@@ -213,6 +231,15 @@
 		self.managedObjectContextForMainThread = [[NSManagedObjectContext alloc] init];
 		[managedObjectContextForMainThread setPersistentStoreCoordinator:[self persistentStoreCoordinatorWithError:error]];
 		[managedObjectContextForMainThread setMergePolicy:kMergePolicy];
+
+		self.localChangeObserver = [[NSNotificationCenter defaultCenter]
+									addObserverForName:NSManagedObjectContextObjectsDidChangeNotification
+									object:managedObjectContextForMainThread
+									queue:[NSOperationQueue mainQueue]
+									usingBlock:^(NSNotification *notification) {
+										NSSet *updatedObjects = [[notification userInfo] objectForKey:NSUpdatedObjectsKey];
+										[updatedObjects makeObjectsPerformSelector:@selector(didUpdate)];
+									}];
 	}
 
 	return managedObjectContextForMainThread;
@@ -278,6 +305,7 @@
 
         NSError *error = nil;
         [[self managedObjectContextForMainThreadWithError:&error] mergeChangesFromContextDidSaveNotification:saveNotification];
+
     } else {
         [self performSelectorOnMainThread:@selector(mocDidSave:) withObject:saveNotification waitUntilDone:NO];
     }
@@ -333,8 +361,7 @@
                                                           configuration:nil
                                                                     URL:storeURL
                                                                 options:options
-                                                                  error:error])
-            {
+                                                                  error:error]) {
 				/*
 				 Replace this implementation with code to handle the error appropriately.
 

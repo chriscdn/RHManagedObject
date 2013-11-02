@@ -30,6 +30,8 @@
 @end
 
 @implementation RHManagedObject
+// http://stackoverflow.com/questions/12510849/ios6-automatic-property-synthesize-not-working
+@synthesize didUpdateBlock;
 
 +(NSString *)entityName {
     return NSStringFromClass([self superclass]);
@@ -50,9 +52,6 @@
 	abort();
 }
 
-+(NSEntityDescription *)entityDescription {
-	return [self entityDescriptionWithError:nil];
-}
 
 +(NSEntityDescription *)entityDescriptionWithError:(NSError **)error {
 	return [NSEntityDescription entityForName:[self entityName]
@@ -84,21 +83,14 @@
                                          inManagedObjectContext:[self managedObjectContextForCurrentThreadWithError:error]];
 }
 
-+(id)newOrExistingEntityWithPredicate:(NSPredicate *)predicate {
-	return [self newOrExistingEntityWithPredicate:predicate error:nil];
-}
-
 +(id)newOrExistingEntityWithPredicate:(NSPredicate *)predicate error:(NSError **)error {
     id existing = [self getWithPredicate:predicate error:error];
     return existing ? existing : [self newEntityWithError:error];
 }
 
-+(id)getWithPredicate:(NSPredicate *)predicate {
-	return [self getWithPredicate:predicate error:nil];
-}
 +(id)getWithPredicate:(NSPredicate *)predicate
-                error:(NSError **)error
-{
+                error:(NSError **)error {
+
 	NSArray *results = [self fetchWithPredicate:predicate error:error];
 
 	if ([results count] > 0) {
@@ -108,14 +100,9 @@
 	return nil;
 }
 
-+(id)getWithPredicate:(NSPredicate *)predicate sortDescriptor:(NSSortDescriptor *)descriptor {
-	return [self getWithPredicate:predicate sortDescriptor:descriptor error:nil];
-}
-
 +(id)getWithPredicate:(NSPredicate *)predicate
        sortDescriptor:(NSSortDescriptor *)descriptor
-                error:(NSError **)error
-{
+                error:(NSError **)error {
 	NSArray *results = [self fetchWithPredicate:predicate sortDescriptor:descriptor error:error];
 
 	if ([results count] > 0) {
@@ -125,46 +112,26 @@
 	return nil;
 }
 
-+(NSArray *)fetchAll {
-	return [self fetchAllWithError:nil];
-}
 
 +(NSArray *)fetchAllWithError:(NSError **)error {
 	return [self fetchWithPredicate:nil error:error];
 }
 
-+(NSArray *)fetchWithPredicate:(NSPredicate *)predicate {
-	return [self fetchWithPredicate:predicate error:nil];
-}
-
 +(NSArray *)fetchWithPredicate:(NSPredicate *)predicate
-                         error:(NSError **)error
-{
+                         error:(NSError **)error {
 	return [self fetchWithPredicate:predicate sortDescriptor:nil error:error];
-}
-
-+(NSArray *)fetchWithPredicate:(NSPredicate *)predicate sortDescriptor:(NSSortDescriptor *)descriptor {
-	return [self fetchWithPredicate:predicate sortDescriptor:descriptor error:nil];
 }
 
 +(NSArray *)fetchWithPredicate:(NSPredicate *)predicate
                 sortDescriptor:(NSSortDescriptor *)descriptor
-                         error:(NSError **)error
-{
+                         error:(NSError **)error {
 	return [self fetchWithPredicate:predicate sortDescriptor:descriptor withLimit:0 error:error];
 }
 
 +(NSArray *)fetchWithPredicate:(NSPredicate *)predicate
                 sortDescriptor:(NSSortDescriptor *)descriptor
-                     withLimit:(NSUInteger)limit {
-	return [self fetchWithPredicate:predicate sortDescriptor:descriptor withLimit:limit error:nil];
-}
-
-+(NSArray *)fetchWithPredicate:(NSPredicate *)predicate
-                sortDescriptor:(NSSortDescriptor *)descriptor
                      withLimit:(NSUInteger)limit
-                         error:(NSError **)error
-{
+                         error:(NSError **)error {
 	NSFetchRequest *fetch = [[NSFetchRequest alloc] init];
 
 	[fetch setEntity:[self entityDescriptionWithError:error]];
@@ -187,16 +154,8 @@
                                                                                      error:error];
 }
 
-+(NSUInteger)count {
-	return [self countWithError:nil];
-}
-
 +(NSUInteger)countWithError:(NSError **)error {
 	return [self countWithPredicate:nil error:error];
-}
-
-+(NSUInteger)countWithPredicate:(NSPredicate *)predicate {
-	return [self countWithPredicate:predicate error:nil];
 }
 
 +(NSUInteger)countWithPredicate:(NSPredicate *)predicate error:(NSError **)error {
@@ -212,14 +171,9 @@
                                                                                       error:error];
 }
 
-+(NSArray *)distinctValuesWithAttribute:(NSString *)attribute predicate:(NSPredicate *)predicate {
-	return [self distinctValuesWithAttribute:attribute predicate:predicate error:nil];
-}
-
 +(NSArray *)distinctValuesWithAttribute:(NSString *)attribute
                               predicate:(NSPredicate *)predicate
-                                  error:(NSError **)error
-{
+                                  error:(NSError **)error {
 	NSArray *items = [self fetchWithPredicate:predicate error:error];
 	NSString *keyPath = [@"@distinctUnionOfObjects." stringByAppendingString:attribute];
 	return [[items valueForKeyPath:keyPath] sortedArrayUsingSelector:@selector(compare:)];
@@ -239,9 +193,7 @@
             [NSException raise:NSGenericException format:@"Unexpected FormatType."];
     }
 }
-+(NSAttributeType)attributeTypeWithKey:(NSString *)key {
-	return [self attributeTypeWithKey:key error:nil];
-}
+
 +(NSAttributeType)attributeTypeWithKey:(NSString *)key error:(NSError **)error {
 	NSEntityDescription *entityDescription = [self entityDescriptionWithError:error];
 	NSDictionary *properties = [entityDescription propertiesByName];
@@ -249,16 +201,11 @@
 	return [attribute attributeType];
 }
 
-+(id)aggregateWithType:(RHAggregate)aggregate key:(NSString *)key predicate:(NSPredicate *)predicate defaultValue:(id)defaultValue {
-	return [self aggregateWithType:aggregate key:key predicate:predicate defaultValue:defaultValue error:nil];
-}
-
 +(id)aggregateWithType:(RHAggregate)aggregate
                    key:(NSString *)key
              predicate:(NSPredicate *)predicate
           defaultValue:(id)defaultValue
-                 error:(NSError **)error
-{
+                 error:(NSError **)error {
 	NSFetchRequest *fetch = [[NSFetchRequest alloc] init];
 
 	if (predicate) {
@@ -298,31 +245,14 @@
 	return returnValue;
 }
 
-+(NSUInteger)deleteAll {
-	return [self deleteAllWithError:nil];
-}
-
 +(NSUInteger)deleteAllWithError:(NSError **)error {
     return [self deleteWithPredicate:nil error:error];
-}
-
-+(NSUInteger)deleteWithPredicate:(NSPredicate *)predicate {
-	return [self deleteWithPredicate:predicate error:nil];
 }
 
 +(NSUInteger)deleteWithPredicate:(NSPredicate *)predicate error:(NSError **)error {
     NSArray *itemsToDelete = [self fetchWithPredicate:predicate error:error];
     [itemsToDelete makeObjectsPerformSelector:@selector(delete)];
     return [itemsToDelete count];
-}
-
-// deprecated = use managedObjectContextForCurrentThread instead
-+(NSManagedObjectContext *)managedObjectContext {
-    return [self managedObjectContextForCurrentThreadWithError:nil];
-}
-
-+(NSManagedObjectContext *)managedObjectContextForCurrentThread {
-	return [self managedObjectContextForCurrentThreadWithError:nil];
 }
 
 // Returns the NSManagedObjectContext for the current thread
@@ -332,10 +262,6 @@
 
 +(RHManagedObjectContextManager *)managedObjectContextManager {
     return [RHManagedObjectContextManager sharedInstanceWithModelName:[self modelName]];
-}
-
-+(BOOL)doesRequireMigration {
-	return [self doesRequireMigrationWithError:nil];
 }
 
 +(BOOL)doesRequireMigrationWithError:(NSError **)error {
@@ -378,6 +304,12 @@
 	}
 
 	return dict;
+}
+
+-(void)didUpdate {
+	if (self.didUpdateBlock) {
+		self.didUpdateBlock();
+	}
 }
 
 @end

@@ -25,9 +25,7 @@
 #import "RHFetchedResultsManager.h"
 
 @interface RHFetchedResultsManager()
-@property (nonatomic, copy) RHCellBlock cellBlock;
-@property (nonatomic, copy) RHCellConfigureBlock configureBlock;
-@property (nonatomic, copy) RHDidSelectRowBlock didSelectRowBlock;
+
 @end
 
 
@@ -39,7 +37,7 @@
 		sortDescriptor:(NSSortDescriptor *)sortDescriptor
 			 cellBlock:(RHCellBlock)cellBlock
 		configureBlock:(RHCellConfigureBlock)configureBlock
-	 didSelectRowBlock:(RHDidSelectRowBlock)didSelectRowBlock {
+	didSelectCellBlock:(RHDidSelectCellBlock)didSelectCellBlock {
 
 	if (self=[super init]) {
 		self.tableView = tableView;
@@ -48,7 +46,7 @@
 		self.sortDescriptor = sortDescriptor;
 		self.cellBlock = cellBlock;
 		self.configureBlock = configureBlock;
-		self.didSelectRowBlock = didSelectRowBlock;
+		self.didSelectCellBlock = didSelectCellBlock;
 		self.tableView.dataSource = self;
 		self.tableView.delegate = self;
 	}
@@ -78,7 +76,7 @@
 
 		self.fetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
 																			managedObjectContext:[classFromString managedObjectContextForCurrentThread]
-																			  sectionNameKeyPath:nil
+																			  sectionNameKeyPath:self.sectionNameKeyPath
 																					   cacheName:nil];
 		// _fetchedResultsController.delegate = self;
 
@@ -94,7 +92,7 @@
 
 -(void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath {
 
-	if (self.didSelectRowBlock == nil) {
+	if (self.didSelectCellBlock == nil) {
 		[cell setSelectionStyle:UITableViewCellSelectionStyleNone];
 	}
 
@@ -102,14 +100,20 @@
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-		UITableViewCell *cell = self.cellBlock(self.tableView, indexPath);
-		[self configureCell:cell atIndexPath:indexPath];
-		return cell;
+	UITableViewCell *cell = self.cellBlock(self.tableView, indexPath);
+	[self configureCell:cell atIndexPath:indexPath];
+	return cell;
 }
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-	if (self.didSelectRowBlock) {
-		self.didSelectRowBlock(self.fetchedResultsController, indexPath);
+	if (self.didSelectCellBlock) {
+		self.didSelectCellBlock(self.fetchedResultsController, indexPath);
+	}
+}
+
+-(void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
+	if (self.willDisplayCellBlock) {
+		self.willDisplayCellBlock(tableView, cell, indexPath);
 	}
 }
 
@@ -125,8 +129,22 @@
 
 
 -(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-	id <NSFetchedResultsSectionInfo> sectionInfo = [[self.fetchedResultsController sections] objectAtIndex:section];
-	return [sectionInfo name];
+
+	if (self.titleForHeaderInSectionBlock) {
+		return self.titleForHeaderInSectionBlock(section);
+	} else {
+		id <NSFetchedResultsSectionInfo> sectionInfo = [[self.fetchedResultsController sections] objectAtIndex:section];
+		return [sectionInfo name];
+	}
+
+}
+
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+	if (self.heightForCellBlock) {
+		return self.heightForCellBlock(tableView, self.fetchedResultsController, indexPath);
+	}
+
+	return 44;
 }
 
 #pragma mark -

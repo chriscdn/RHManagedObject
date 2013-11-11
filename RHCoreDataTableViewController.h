@@ -39,5 +39,6 @@
 -(void)addSearchBarWithPlaceHolder:(NSString *)placeholder;
 -(void)resetMassUpdate;
 -(void)refreshVisibleCells;
+-(UITableView *)currentTableView;
 
 @end

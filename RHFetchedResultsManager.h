@@ -27,15 +27,26 @@
 
 typedef UITableViewCell *(^RHCellBlock)(UITableView *tableView, NSIndexPath *indexPath);
 typedef void (^RHCellConfigureBlock)(UITableViewCell *cell, NSFetchedResultsController *fetchedResultsController, NSIndexPath *indexPath);
-typedef void (^RHDidSelectRowBlock)(NSFetchedResultsController *fetchedResultsController, NSIndexPath *indexPath);
+typedef void (^RHDidSelectCellBlock)(NSFetchedResultsController *fetchedResultsController, NSIndexPath *indexPath);
+typedef void (^RHWillDisplayCellBlock)(UITableView *tableView, UITableViewCell *cell, NSIndexPath *indexPath);
+typedef CGFloat (^RHHeightForCellBlock)(UITableView *tableView, NSFetchedResultsController *fetchedResultsController, NSIndexPath *indexPath);
+typedef NSString *(^RHTitleForHeaderInSectionBlock)(NSInteger section);
 
 @interface RHFetchedResultsManager : NSObject<NSFetchedResultsControllerDelegate,UITableViewDataSource,UITableViewDelegate>
 
-@property (nonatomic, retain) NSFetchedResultsController *fetchedResultsController;
 @property (nonatomic, weak) UITableView *tableView;
-@property (nonatomic, retain) NSString *entityClass;
-@property (nonatomic, retain) NSPredicate *predicate;
-@property (nonatomic, retain) NSSortDescriptor *sortDescriptor;
+@property (nonatomic, strong) NSFetchedResultsController *fetchedResultsController;
+@property (nonatomic, strong) NSString *entityClass;
+@property (nonatomic, strong) NSPredicate *predicate;
+@property (nonatomic, strong) NSSortDescriptor *sortDescriptor;
+@property (nonatomic, strong) NSString *sectionNameKeyPath;
+
+@property (nonatomic, copy) RHCellBlock cellBlock;
+@property (nonatomic, copy) RHCellConfigureBlock configureBlock;
+@property (nonatomic, copy) RHDidSelectCellBlock didSelectCellBlock;
+@property (nonatomic, copy) RHWillDisplayCellBlock willDisplayCellBlock;
+@property (nonatomic, copy) RHHeightForCellBlock heightForCellBlock;
+@property (nonatomic, copy) RHTitleForHeaderInSectionBlock titleForHeaderInSectionBlock;
 
 -(id)initWithTableView:(UITableView *)tableView
 		   entityClass:(NSString *)entityClass
@@ -43,7 +54,7 @@ typedef void (^RHDidSelectRowBlock)(NSFetchedResultsController *fetchedResultsCo
 		sortDescriptor:(NSSortDescriptor *)sortDescriptor
 			 cellBlock:(RHCellBlock)cellBlock
 		configureBlock:(RHCellConfigureBlock)configureBlock
-	 didSelectRowBlock:(RHDidSelectRowBlock)didSelectRowBlock;
+	 didSelectCellBlock:(RHDidSelectCellBlock)didSelectCellBlock;
 
 -(void)reload;
 

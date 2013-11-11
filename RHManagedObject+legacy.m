@@ -96,7 +96,6 @@
 	return [self managedObjectContextForCurrentThreadWithError:nil];
 }
 
-
 +(BOOL)doesRequireMigration {
 	return [self doesRequireMigrationWithError:nil];
 }

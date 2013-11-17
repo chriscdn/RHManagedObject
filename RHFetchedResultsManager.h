@@ -31,6 +31,7 @@ typedef void (^RHDidSelectCellBlock)(NSFetchedResultsController *fetchedResultsC
 typedef void (^RHWillDisplayCellBlock)(UITableView *tableView, UITableViewCell *cell, NSIndexPath *indexPath);
 typedef CGFloat (^RHHeightForCellBlock)(UITableView *tableView, NSFetchedResultsController *fetchedResultsController, NSIndexPath *indexPath);
 typedef NSString *(^RHTitleForHeaderInSectionBlock)(NSInteger section);
+typedef void (^RHDeleteActionCellBlock)(NSFetchedResultsController *fetchedResultsController, NSIndexPath *indexPath);
 
 @interface RHFetchedResultsManager : NSObject<NSFetchedResultsControllerDelegate,UITableViewDataSource,UITableViewDelegate>
 
@@ -40,6 +41,7 @@ typedef NSString *(^RHTitleForHeaderInSectionBlock)(NSInteger section);
 @property (nonatomic, strong) NSPredicate *predicate;
 @property (nonatomic, strong) NSSortDescriptor *sortDescriptor;
 @property (nonatomic, strong) NSString *sectionNameKeyPath;
+@property (nonatomic, strong) NSString *deleteButtonText;
 
 @property (nonatomic, copy) RHCellBlock cellBlock;
 @property (nonatomic, copy) RHCellConfigureBlock configureBlock;
@@ -47,6 +49,8 @@ typedef NSString *(^RHTitleForHeaderInSectionBlock)(NSInteger section);
 @property (nonatomic, copy) RHWillDisplayCellBlock willDisplayCellBlock;
 @property (nonatomic, copy) RHHeightForCellBlock heightForCellBlock;
 @property (nonatomic, copy) RHTitleForHeaderInSectionBlock titleForHeaderInSectionBlock;
+@property (nonatomic, copy) RHDeleteActionCellBlock deleteActionCellBlock;
+
 
 -(id)initWithTableView:(UITableView *)tableView
 		   entityClass:(NSString *)entityClass

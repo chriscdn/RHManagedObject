@@ -62,6 +62,13 @@
 	[self.tableView setTableHeaderView:self.searchController.searchBar];
 }
 
+/*
+-(void)removeSearchBar {
+	self.searchController = nil;
+	[self.tableView setTableHeaderView:nil];
+}
+ */
+
 #pragma mark -
 #pragma mark UISearchDisplayDelegate
 // Keep in mind that self.tableView and self.searchController.searchResultsTableView are different and configured to use the same
@@ -85,7 +92,7 @@
 -(void)searchBarCancelButtonClicked:(UISearchBar *)searchBar {
 	[self setSearching:NO];
 	[self setSearchString:nil];
-	self.fetchedResultsController = nil;
+	[self setFetchedResultsController:nil];
 
 	[self.tableView reloadData];
 }
@@ -193,8 +200,8 @@
 	return nil;
 }
 
-
 #pragma mark -
+#pragma mark Core Data
 -(void)controllerWillChangeContent:(NSFetchedResultsController *)controller {
 	if (self.massUpdate) {
 		return;

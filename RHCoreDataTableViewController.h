@@ -37,6 +37,7 @@
 
 -(void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
 -(void)addSearchBarWithPlaceHolder:(NSString *)placeholder;
+// -(void)removeSearchBar;
 -(void)resetMassUpdate;
 -(void)refreshVisibleCells;
 -(UITableView *)currentTableView;

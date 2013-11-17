@@ -23,9 +23,6 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 
-
-typedef void (^RHDidUpdateBlock)();
-
 typedef enum {
     RHAggregateMax,
 	RHAggregateMin,
@@ -33,12 +30,16 @@ typedef enum {
 	RHAggregateSum
 } RHAggregate;
 
+typedef void (^RHDidUpdateBlock)();
+typedef void (^RHDidDeleteBlock)();
+
 #import <CoreData/CoreData.h>
 @class RHManagedObjectContextManager;
 
 @interface RHManagedObject : NSManagedObject
 
 @property (nonatomic, copy) RHDidUpdateBlock didUpdateBlock;
+@property (nonatomic, copy) RHDidDeleteBlock didDeleteBlock;
 
 /* Abstract Classes */
 +(NSString *)entityName;
@@ -109,6 +110,7 @@ typedef enum {
 -(id)objectInCurrentThreadContext;
 -(NSDictionary *)serialize;
 -(void)didUpdate;
+-(void)didDelete;
 
 @end
 

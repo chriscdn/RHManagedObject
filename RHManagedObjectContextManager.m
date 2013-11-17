@@ -116,14 +116,9 @@
 -(id)initWithModelName:(NSString *)_modelName {
     if (self=[super init]) {
         self.modelName = _modelName;
-
-
-
     }
     return self;
 }
-
-
 
 #pragma mark -
 #pragma mark Other useful stuff
@@ -173,7 +168,6 @@
 	[RHManagedObjectContextManager deleteFile:[storePath stringByAppendingString:@"-wal"]];
 
 	return error;
-
 }
 
 -(NSString *)guid {
@@ -237,8 +231,13 @@
 									object:managedObjectContextForMainThread
 									queue:[NSOperationQueue mainQueue]
 									usingBlock:^(NSNotification *notification) {
+
 										NSSet *updatedObjects = [[notification userInfo] objectForKey:NSUpdatedObjectsKey];
 										[updatedObjects makeObjectsPerformSelector:@selector(didUpdate)];
+
+										NSSet *deletedObjects = [[notification userInfo] objectForKey:NSDeletedObjectsKey];
+										[deletedObjects makeObjectsPerformSelector:@selector(didDelete)];
+
 									}];
 	}
 

@@ -49,6 +49,7 @@
 		self.didSelectCellBlock = didSelectCellBlock;
 		self.tableView.dataSource = self;
 		self.tableView.delegate = self;
+		self.deleteButtonText = NSLocalizedString(@"Delete", nil);
 	}
 
 	return self;
@@ -117,6 +118,22 @@
 	}
 }
 
+
+#pragma mark -
+-(NSString *)tableView:(UITableView *)tableView titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath {
+	return self.deleteButtonText;
+}
+
+-(BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
+	return (self.deleteActionCellBlock != nil);
+}
+
+-(void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+	if (editingStyle == UITableViewCellEditingStyleDelete) {
+		self.deleteActionCellBlock(self.fetchedResultsController, indexPath);
+	}
+}
+
 #pragma mark -
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
 	return [[self.fetchedResultsController sections] count];
@@ -127,16 +144,13 @@
 	return [sectionInfo numberOfObjects];
 }
 
-
 -(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-
 	if (self.titleForHeaderInSectionBlock) {
 		return self.titleForHeaderInSectionBlock(section);
 	} else {
 		id <NSFetchedResultsSectionInfo> sectionInfo = [[self.fetchedResultsController sections] objectAtIndex:section];
 		return [sectionInfo name];
 	}
-
 }
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {

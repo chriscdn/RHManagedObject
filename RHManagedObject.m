@@ -32,6 +32,7 @@
 @implementation RHManagedObject
 // http://stackoverflow.com/questions/12510849/ios6-automatic-property-synthesize-not-working
 @synthesize didUpdateBlock;
+@synthesize didDeleteBlock;
 
 +(NSString *)entityName {
     return NSStringFromClass([self superclass]);
@@ -51,7 +52,6 @@
     NSLog(@"You must implement a modelName class method in your entity subclass.  Aborting.");
 	abort();
 }
-
 
 +(NSEntityDescription *)entityDescriptionWithError:(NSError **)error {
 	return [NSEntityDescription entityForName:[self entityName]
@@ -112,7 +112,6 @@
 	return nil;
 }
 
-
 +(NSArray *)fetchAllWithError:(NSError **)error {
 	return [self fetchWithPredicate:nil error:error];
 }
@@ -150,8 +149,7 @@
 
 	[fetch setIncludesPendingChanges:YES];
 
-	return [[self managedObjectContextForCurrentThreadWithError:error] executeFetchRequest:fetch
-                                                                                     error:error];
+	return [[self managedObjectContextForCurrentThreadWithError:error] executeFetchRequest:fetch error:error];
 }
 
 +(NSUInteger)countWithError:(NSError **)error {
@@ -167,8 +165,7 @@
 		[fetch setPredicate:predicate];
 	}
 
-	return [[self managedObjectContextForCurrentThreadWithError:error] countForFetchRequest:fetch
-                                                                                      error:error];
+	return [[self managedObjectContextForCurrentThreadWithError:error] countForFetchRequest:fetch error:error];
 }
 
 +(NSArray *)distinctValuesWithAttribute:(NSString *)attribute
@@ -309,6 +306,12 @@
 -(void)didUpdate {
 	if (self.didUpdateBlock) {
 		self.didUpdateBlock();
+	}
+}
+
+-(void)didDelete {
+	if (self.didDeleteBlock ) {
+		self.didDeleteBlock();
 	}
 }
 

@@ -284,7 +284,7 @@
 }
 
 -(id)objectInCurrentThreadContext {
-	NSManagedObjectContext *currentMoc = [[self class] performSelector:@selector(managedObjectContextForCurrentThread)];
+	NSManagedObjectContext *currentMoc = [[self class] performSelector:@selector(managedObjectContextForCurrentThreadWithError:)];
 	return [currentMoc objectWithID:self.objectID];
 }
 

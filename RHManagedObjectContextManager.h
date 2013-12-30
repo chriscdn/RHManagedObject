@@ -41,5 +41,6 @@
 -(NSUInteger)pendingChangesCountWithError:(NSError **)error;
 -(BOOL)doesRequireMigrationWithError:(NSError **)error;
 -(NSString *)applicationDocumentsDirectory;
+-(NSString *)applicationCachesDirectory;
 
 @end

@@ -77,6 +77,40 @@ typedef void (^RHDidDeleteBlock)();
                      withLimit:(NSUInteger)limit
                          error:(NSError **)error;
 
++(NSArray *)fetchWithPredicate:(NSPredicate *)predicate
+               sortDescriptors:(NSArray *)descriptors
+                     withLimit:(NSUInteger)limit
+                         error:(NSError **)error;
+
++(void)fetchInBackgroundWithPredicate:(NSPredicate *)predicate
+                      sortDescriptors:(NSArray *)descriptors
+                            withLimit:(NSUInteger)limit
+                           completion:(void (^)(NSArray* fetchedObjects, NSError* error))completion;
+
++(NSDictionary*)fetchAllAsDictionaryWithKeyProperty:(NSString*)keyProperty
+                                              error:(NSError **)error;
+
++(NSDictionary*)fetchAsDictionaryWithKeyProperty:(NSString*)keyProperty
+                                   withPredicate:(NSPredicate*)predicate
+                                           error:(NSError **)error;
+
++(NSDictionary*)fetchAsDictionaryWithKeyProperty:(NSString*)keyProperty
+                                   withPredicate:(NSPredicate*)predicate
+                              withSortDescriptor:(NSSortDescriptor*)descriptor
+                                           error:(NSError **)error;
+
++(NSDictionary*)fetchAsDictionaryWithKeyProperty:(NSString*)keyProperty
+                                   withPredicate:(NSPredicate*)predicate
+                             withSortDescriptors:(NSArray*)descriptors
+                                       withLimit:(NSUInteger)limit
+                                           error:(NSError **)error;
+
++(void)fetchInBackgroundAsDictionaryWithKeyProperty:(NSString*)keyProperty
+                                      withPredicate:(NSPredicate*)predicate
+                                withSortDescriptors:(NSArray*)descriptors
+                                          withLimit:(NSUInteger)limit
+                                         completion:(void (^)(NSDictionary* fetchedObjects, NSError* error))completion;
+
 +(NSUInteger)countWithError:(NSError **)error;
 
 +(NSUInteger)countWithPredicate:(NSPredicate *)predicate error:(NSError **)error;
@@ -111,6 +145,11 @@ typedef void (^RHDidDeleteBlock)();
 -(NSDictionary *)serialize;
 -(void)didUpdate;
 -(void)didDelete;
+
+
++(NSArray*)arrayInCurrentThreadContext:(NSArray*)array;
++(NSDictionary*)dictionaryInCurrentThreadContext:(NSDictionary*)dictionary;
++(NSSet*)setInCurrentThreadContext:(NSSet*)set;
 
 @end
 

@@ -74,10 +74,6 @@
     return nil;
 }
 
-+(id)newEntity {
-	return [self newEntityWithError:nil];
-}
-
 +(id)newEntityWithError:(NSError **)error {
 	return [NSEntityDescription insertNewObjectForEntityForName:[self entityName]
                                          inManagedObjectContext:[self managedObjectContextForCurrentThreadWithError:error]];

@@ -50,7 +50,6 @@ typedef void (^RHDidDeleteBlock)();
 +(NSError *)deleteStore;
 +(NSError *)commit;
 
-+(id)newEntity;
 +(id)newEntityWithError:(NSError **)error;
 
 +(id)newOrExistingEntityWithPredicate:(NSPredicate *)predicate

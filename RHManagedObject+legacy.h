@@ -28,6 +28,7 @@
 @interface RHManagedObject (legacy)
 
 +(NSEntityDescription *)entityDescription;
++(id)newEntity;
 
 +(id)newOrExistingEntityWithPredicate:(NSPredicate *)predicate;
 

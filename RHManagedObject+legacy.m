@@ -30,6 +30,10 @@
 	return [self entityDescriptionWithError:nil];
 }
 
++(id)newEntity {
+	return [self newEntityWithError:nil];
+}
+
 +(id)newOrExistingEntityWithPredicate:(NSPredicate *)predicate {
 	return [self newOrExistingEntityWithPredicate:predicate error:nil];
 }

@@ -71,12 +71,12 @@
 		Class classFromString = NSClassFromString(self.entityClass);
 
 		NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-		[fetchRequest setEntity:[classFromString entityDescription]];
+		[fetchRequest setEntity:[classFromString entityDescriptionWithError:nil]];
 		[fetchRequest setPredicate:self.predicate];
 		[fetchRequest setSortDescriptors:[NSArray arrayWithObjects:self.sortDescriptor, nil]];
 
 		self.fetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
-																			managedObjectContext:[classFromString managedObjectContextForCurrentThread]
+																			managedObjectContext:[classFromString managedObjectContextForCurrentThreadWithError:nil]
 																			  sectionNameKeyPath:self.sectionNameKeyPath
 																					   cacheName:nil];
 		// _fetchedResultsController.delegate = self;

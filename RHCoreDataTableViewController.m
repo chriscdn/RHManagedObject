@@ -84,8 +84,12 @@
 	[self setSearching:YES];
 	[self setSearchString:searchString];
 	[self setFetchedResultsController:nil];
-	[self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
+
+	// [self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
 	[self.tableView reloadData];
+
+	// [self.searchController.searchResultsTableView reloadData];
+
 	return YES;
 }
 

@@ -8,7 +8,6 @@
 
 #import "EmployeeEntity.h"
 
-
 @implementation EmployeeEntity
 
 @dynamic firstName;

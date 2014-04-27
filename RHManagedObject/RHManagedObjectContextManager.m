@@ -30,18 +30,17 @@
 @end
 
 @implementation RHManagedObjectContext
-@synthesize observer;
 
 // This subclass is for managing the NSManagedObjectContextDidSaveNotification.  The ManagedObjectContext is deallocated at an undetermined
 // time when the thread on which it was allocated cleans up the threadDictionary.  By putting the removeObserver in the dealloc we can be
 // certain everything is cleaned up when it's no longer required.
--(void)setObserver:(id)_observer {
-	if (_observer != self.observer) {
+-(void)setObserver:(id)observer {
+	if (observer != self.observer) {
 		[[NSNotificationCenter defaultCenter] removeObserver:self.observer
 														name:NSManagedObjectContextDidSaveNotification
 													  object:self];
 
-		observer = _observer;
+		_observer = observer;
 
 		[[NSNotificationCenter defaultCenter] addObserver:self.observer
 												 selector:@selector(mocDidSave:)

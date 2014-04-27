@@ -1,45 +1,17 @@
 # RHManagedObject
 
-[![Version](http://cocoapod-badges.herokuapp.com/v/RHManagedObject/badge.png)](http://cocoadocs.org/docsets/RHManagedObject)
-[![Platform](http://cocoapod-badges.herokuapp.com/p/RHManagedObject/badge.png)](http://cocoadocs.org/docsets/RHManagedObject)
-
-## Usage
-
-To run the example project; clone the repo, and run `pod install` from the Example directory first.
-
-## Requirements
-
-## Installation
-
-RHManagedObject is available through [CocoaPods](http://cocoapods.org), to install
-it simply add the following line to your Podfile:
-
-    pod "RHManagedObject"
-
-## Author
-
-Christopher Meyer, chris@rhouse.ch
-
-## License
-
-RHManagedObject is available under the MIT license. See the LICENSE file for more info.
-
----
-
-# RHManagedObject
-
 RHManagedObject is a library for iOS to simplify your life with Core Data.  It was motivated by the following:
 
 - Core Data is verbose.  Have a look at [Listing 1](http://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/CoreData/Articles/cdFetching.html) from the Apple Documentation and you'll see it takes ~14 lines of code for a single fetch request. RHManagedObject reduces this to a single line.
 
 - Each managed object has an object context associated with it, and for some operations you must first fetch the object context in order to operate on the object. For example:
 	
-	NSManagedObjectContext *moc = [myManagedObject managedObjectContext];
-	[moc deleteObject:myManagedObject];
+		NSManagedObjectContext *moc = [myManagedObject managedObjectContext];
+		[moc deleteObject:myManagedObject];
 	
 	This is more verbose than necessary since it introduces the object context when its existence is implied by the managed object. RHManagedObject simplifies the above code to:
 
-	[myManagedObject delete];
+		[myManagedObject delete];
 		
 - Core Data is not thread safe. If you wish to mutate your objects off the main thread you need to create a managed object context in that thread, attach a `NSManagedObjectContextDidSaveNotification` notification to it, and merge the context into the main object context in an observer method on the main thread.  Bleh.  RHManagedObject does this for you so that you can work with your objects in any thread without having to think about this.
 

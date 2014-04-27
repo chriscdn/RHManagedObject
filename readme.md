@@ -69,6 +69,11 @@ You'll notice that none of these examples require direct use of an `NSManagedObj
 - Copy `RHManagedObject.h`, `RHManagedObject.m`, `RHManagedObjectContextManager.h`, and `RHManagedObjectContextManager.m` into your project.
 - Include the CoreData framework in your project.
 
+If you're using [Cocoapods](http://cocoapods.org/) you can just include RHManagedObject in your Podfile:
+
+	pod 'RHManagedObject'
+
+
 ## Setup
 
 Recall the new object hierarchy from the overview:
@@ -142,7 +147,7 @@ An example of how this works can be found in the `ExampleTableViewController.m` 
 
 This class is useful for quickly applying an `NSFetchedResultsController` to a `UITableView` when your view isn't a subclass of `UITableViewController` (although it can also be used with `UITableViewController`).
 
-(document required)
+(documentation required)
 
 ### RHDidUpdateBlock
 

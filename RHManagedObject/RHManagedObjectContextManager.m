@@ -71,7 +71,7 @@
 -(NSString *)storePath;
 -(NSURL *)storeURL;
 -(NSString *)databaseName;
--(void)mocDidSave:(NSNotification *)saveNotification;
+
 @property (nonatomic, strong) id localChangeObserver;
 @end
 

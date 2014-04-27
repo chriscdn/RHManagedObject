@@ -23,6 +23,7 @@
 //  THE SOFTWARE.
 
 #import "RHFetchedResultsManager.h"
+#import "RHManagedObject.h"
 
 @interface RHFetchedResultsManager()
 

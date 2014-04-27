@@ -1,6 +1,5 @@
 //
-//  RHCoreDataTableViewController.h
-//  Version: 0.10
+//  RHCoreDataCollectionViewController.h
 //
 //  Copyright (C) 2013 by Christopher Meyer
 //  http://schwiiz.org/
@@ -22,24 +21,15 @@
 //  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
+//
+//  Motivated by https://github.com/AshFurrow/UICollectionView-NSFetchedResultsController
 
 #import <CoreData/CoreData.h>
 
-@interface RHCoreDataTableViewController : UITableViewController<NSFetchedResultsControllerDelegate, UISearchDisplayDelegate, UISearchBarDelegate> {
-	NSFetchedResultsController *fetchedResultsController;
+@interface RHCoreDataCollectionViewController : UICollectionViewController<NSFetchedResultsControllerDelegate> {
+    NSFetchedResultsController *fetchedResultsController;
 }
 
 @property (nonatomic, strong) NSFetchedResultsController *fetchedResultsController;
-@property (nonatomic, strong) UISearchDisplayController *searchController;
-@property (nonatomic, strong) NSString *searchString;
-@property (nonatomic, assign) BOOL massUpdate;
-@property (nonatomic, assign) BOOL enableSectionIndex;
-
--(void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
--(void)addSearchBarWithPlaceHolder:(NSString *)placeholder;
-// -(void)removeSearchBar;
--(void)resetMassUpdate;
--(void)refreshVisibleCells;
--(UITableView *)currentTableView;
 
 @end

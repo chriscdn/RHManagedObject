@@ -1,6 +1,5 @@
 //
-//  RHCoreDataCollectionViewController.h
-//  Version: 0.10
+//  AppDelegate.h
 //
 //  Copyright (C) 2013 by Christopher Meyer
 //  http://schwiiz.org/
@@ -22,15 +21,11 @@
 //  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
-//
-//  Motivated by https://github.com/AshFurrow/UICollectionView-NSFetchedResultsController
 
-#import <CoreData/CoreData.h>
+@class MainViewController;
 
-@interface RHCoreDataCollectionViewController : UICollectionViewController<NSFetchedResultsControllerDelegate> {
-    NSFetchedResultsController *fetchedResultsController;
-}
+@interface AppDelegate : UIResponder <UIApplicationDelegate>
 
-@property (nonatomic, strong) NSFetchedResultsController *fetchedResultsController;
+@property (strong, nonatomic) UIWindow *window;
 
 @end

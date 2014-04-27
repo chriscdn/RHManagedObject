@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		8303F6BF15D8FA8100A16D5B /* ExampleTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8303F6BE15D8FA8100A16D5B /* ExampleTableViewController.m */; };
-		8303F6C015D8FAAD00A16D5B /* RHCoreDataTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8303F6BC15D8F94500A16D5B /* RHCoreDataTableViewController.m */; };
 		8305CA9A148565290066AB52 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8305CA99148565290066AB52 /* UIKit.framework */; };
 		8305CA9C148565290066AB52 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8305CA9B148565290066AB52 /* Foundation.framework */; };
 		8305CA9E148565290066AB52 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8305CA9D148565290066AB52 /* CoreGraphics.framework */; };
@@ -19,13 +18,16 @@
 		8305CAAF148565290066AB52 /* SimplifiedCoreDataExample.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 8305CAAD148565290066AB52 /* SimplifiedCoreDataExample.xcdatamodeld */; };
 		8305CAD2148565F80066AB52 /* EmployeeEntity.m in Sources */ = {isa = PBXBuildFile; fileRef = 8305CAD1148565F80066AB52 /* EmployeeEntity.m */; };
 		8305CAD5148566420066AB52 /* Employee.m in Sources */ = {isa = PBXBuildFile; fileRef = 8305CAD4148566420066AB52 /* Employee.m */; };
-		834C307614FE23290056EAF3 /* RHManagedObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 834C307314FE23290056EAF3 /* RHManagedObject.m */; };
-		834C307714FE23290056EAF3 /* RHManagedObjectContextManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 834C307514FE23290056EAF3 /* RHManagedObjectContextManager.m */; };
+		831517C7190CE7080019F7A6 /* RHCoreDataCollectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 831517BC190CE7080019F7A6 /* RHCoreDataCollectionViewController.m */; };
+		831517C8190CE7080019F7A6 /* RHCoreDataTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 831517BE190CE7080019F7A6 /* RHCoreDataTableViewController.m */; };
+		831517C9190CE7080019F7A6 /* RHFetchedResultsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 831517C0190CE7080019F7A6 /* RHFetchedResultsManager.m */; };
+		831517CA190CE7080019F7A6 /* RHManagedObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 831517C2190CE7080019F7A6 /* RHManagedObject.m */; };
+		831517CB190CE7080019F7A6 /* RHManagedObject+legacy.m in Sources */ = {isa = PBXBuildFile; fileRef = 831517C4190CE7080019F7A6 /* RHManagedObject+legacy.m */; };
+		831517CC190CE7080019F7A6 /* RHManagedObjectContextManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 831517C6190CE7080019F7A6 /* RHManagedObjectContextManager.m */; };
+		831517D0190CE9B70019F7A6 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 831517CF190CE9B70019F7A6 /* Images.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		8303F6BB15D8F94500A16D5B /* RHCoreDataTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RHCoreDataTableViewController.h; sourceTree = "<group>"; };
-		8303F6BC15D8F94500A16D5B /* RHCoreDataTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RHCoreDataTableViewController.m; sourceTree = "<group>"; };
 		8303F6BD15D8FA8100A16D5B /* ExampleTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExampleTableViewController.h; sourceTree = "<group>"; };
 		8303F6BE15D8FA8100A16D5B /* ExampleTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExampleTableViewController.m; sourceTree = "<group>"; };
 		8305CA95148565290066AB52 /* SimplifiedCoreDataExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SimplifiedCoreDataExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -44,10 +46,19 @@
 		8305CAD1148565F80066AB52 /* EmployeeEntity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = EmployeeEntity.m; path = SimplifiedCoreDataExample/EmployeeEntity.m; sourceTree = "<group>"; };
 		8305CAD3148566420066AB52 /* Employee.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Employee.h; path = SimplifiedCoreDataExample/Employee.h; sourceTree = "<group>"; };
 		8305CAD4148566420066AB52 /* Employee.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Employee.m; path = SimplifiedCoreDataExample/Employee.m; sourceTree = "<group>"; };
-		834C307214FE23290056EAF3 /* RHManagedObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RHManagedObject.h; sourceTree = "<group>"; };
-		834C307314FE23290056EAF3 /* RHManagedObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RHManagedObject.m; sourceTree = "<group>"; };
-		834C307414FE23290056EAF3 /* RHManagedObjectContextManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RHManagedObjectContextManager.h; sourceTree = "<group>"; };
-		834C307514FE23290056EAF3 /* RHManagedObjectContextManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RHManagedObjectContextManager.m; sourceTree = "<group>"; };
+		831517BB190CE7080019F7A6 /* RHCoreDataCollectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RHCoreDataCollectionViewController.h; path = ../RHManagedObject/RHCoreDataCollectionViewController.h; sourceTree = "<group>"; };
+		831517BC190CE7080019F7A6 /* RHCoreDataCollectionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RHCoreDataCollectionViewController.m; path = ../RHManagedObject/RHCoreDataCollectionViewController.m; sourceTree = "<group>"; };
+		831517BD190CE7080019F7A6 /* RHCoreDataTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RHCoreDataTableViewController.h; path = ../RHManagedObject/RHCoreDataTableViewController.h; sourceTree = "<group>"; };
+		831517BE190CE7080019F7A6 /* RHCoreDataTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RHCoreDataTableViewController.m; path = ../RHManagedObject/RHCoreDataTableViewController.m; sourceTree = "<group>"; };
+		831517BF190CE7080019F7A6 /* RHFetchedResultsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RHFetchedResultsManager.h; path = ../RHManagedObject/RHFetchedResultsManager.h; sourceTree = "<group>"; };
+		831517C0190CE7080019F7A6 /* RHFetchedResultsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RHFetchedResultsManager.m; path = ../RHManagedObject/RHFetchedResultsManager.m; sourceTree = "<group>"; };
+		831517C1190CE7080019F7A6 /* RHManagedObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RHManagedObject.h; path = ../RHManagedObject/RHManagedObject.h; sourceTree = "<group>"; };
+		831517C2190CE7080019F7A6 /* RHManagedObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RHManagedObject.m; path = ../RHManagedObject/RHManagedObject.m; sourceTree = "<group>"; };
+		831517C3190CE7080019F7A6 /* RHManagedObject+legacy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "RHManagedObject+legacy.h"; path = "../RHManagedObject/RHManagedObject+legacy.h"; sourceTree = "<group>"; };
+		831517C4190CE7080019F7A6 /* RHManagedObject+legacy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "RHManagedObject+legacy.m"; path = "../RHManagedObject/RHManagedObject+legacy.m"; sourceTree = "<group>"; };
+		831517C5190CE7080019F7A6 /* RHManagedObjectContextManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RHManagedObjectContextManager.h; path = ../RHManagedObject/RHManagedObjectContextManager.h; sourceTree = "<group>"; };
+		831517C6190CE7080019F7A6 /* RHManagedObjectContextManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RHManagedObjectContextManager.m; path = ../RHManagedObject/RHManagedObjectContextManager.m; sourceTree = "<group>"; };
+		831517CF190CE9B70019F7A6 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,7 +92,7 @@
 			isa = PBXGroup;
 			children = (
 				8303F6B315D8F8DF00A16D5B /* Model */,
-				8305CAC11485653F0066AB52 /* RHMangedObject Group */,
+				8305CAC11485653F0066AB52 /* RHMangedObject */,
 				8305CAA1148565290066AB52 /* SimplifiedCoreDataExample */,
 				8305CA98148565290066AB52 /* Frameworks */,
 				8305CA96148565290066AB52 /* Products */,
@@ -114,6 +125,7 @@
 				8305CAAB148565290066AB52 /* AppDelegate.m */,
 				8303F6BD15D8FA8100A16D5B /* ExampleTableViewController.h */,
 				8303F6BE15D8FA8100A16D5B /* ExampleTableViewController.m */,
+				831517CF190CE9B70019F7A6 /* Images.xcassets */,
 				8305CAA2148565290066AB52 /* Supporting Files */,
 			);
 			path = SimplifiedCoreDataExample;
@@ -130,17 +142,23 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		8305CAC11485653F0066AB52 /* RHMangedObject Group */ = {
+		8305CAC11485653F0066AB52 /* RHMangedObject */ = {
 			isa = PBXGroup;
 			children = (
-				834C307214FE23290056EAF3 /* RHManagedObject.h */,
-				834C307314FE23290056EAF3 /* RHManagedObject.m */,
-				834C307414FE23290056EAF3 /* RHManagedObjectContextManager.h */,
-				834C307514FE23290056EAF3 /* RHManagedObjectContextManager.m */,
-				8303F6BB15D8F94500A16D5B /* RHCoreDataTableViewController.h */,
-				8303F6BC15D8F94500A16D5B /* RHCoreDataTableViewController.m */,
+				831517BB190CE7080019F7A6 /* RHCoreDataCollectionViewController.h */,
+				831517BC190CE7080019F7A6 /* RHCoreDataCollectionViewController.m */,
+				831517BD190CE7080019F7A6 /* RHCoreDataTableViewController.h */,
+				831517BE190CE7080019F7A6 /* RHCoreDataTableViewController.m */,
+				831517BF190CE7080019F7A6 /* RHFetchedResultsManager.h */,
+				831517C0190CE7080019F7A6 /* RHFetchedResultsManager.m */,
+				831517C1190CE7080019F7A6 /* RHManagedObject.h */,
+				831517C2190CE7080019F7A6 /* RHManagedObject.m */,
+				831517C3190CE7080019F7A6 /* RHManagedObject+legacy.h */,
+				831517C4190CE7080019F7A6 /* RHManagedObject+legacy.m */,
+				831517C5190CE7080019F7A6 /* RHManagedObjectContextManager.h */,
+				831517C6190CE7080019F7A6 /* RHManagedObjectContextManager.m */,
 			);
-			name = "RHMangedObject Group";
+			name = RHMangedObject;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -169,7 +187,7 @@
 		8305CA8C148565280066AB52 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0460;
+				LastUpgradeCheck = 0510;
 			};
 			buildConfigurationList = 8305CA8F148565280066AB52 /* Build configuration list for PBXProject "SimplifiedCoreDataExample" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -193,6 +211,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				831517D0190CE9B70019F7A6 /* Images.xcassets in Resources */,
 				8305CAA6148565290066AB52 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -204,14 +223,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8303F6C015D8FAAD00A16D5B /* RHCoreDataTableViewController.m in Sources */,
 				8305CAA8148565290066AB52 /* main.m in Sources */,
 				8305CAAC148565290066AB52 /* AppDelegate.m in Sources */,
+				831517C7190CE7080019F7A6 /* RHCoreDataCollectionViewController.m in Sources */,
 				8305CAAF148565290066AB52 /* SimplifiedCoreDataExample.xcdatamodeld in Sources */,
 				8305CAD2148565F80066AB52 /* EmployeeEntity.m in Sources */,
 				8305CAD5148566420066AB52 /* Employee.m in Sources */,
-				834C307614FE23290056EAF3 /* RHManagedObject.m in Sources */,
-				834C307714FE23290056EAF3 /* RHManagedObjectContextManager.m in Sources */,
+				831517CA190CE7080019F7A6 /* RHManagedObject.m in Sources */,
+				831517CB190CE7080019F7A6 /* RHManagedObject+legacy.m in Sources */,
+				831517CC190CE7080019F7A6 /* RHManagedObjectContextManager.m in Sources */,
+				831517C9190CE7080019F7A6 /* RHFetchedResultsManager.m in Sources */,
+				831517C8190CE7080019F7A6 /* RHCoreDataTableViewController.m in Sources */,
 				8303F6BF15D8FA8100A16D5B /* ExampleTableViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -234,8 +256,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -250,11 +273,15 @@
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 			};
 			name = Debug;
@@ -263,8 +290,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -272,9 +300,12 @@
 				COPY_PHASE_STRIP = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
@@ -286,6 +317,8 @@
 		8305CABF148565290066AB52 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "SimplifiedCoreDataExample/SimplifiedCoreDataExample-Prefix.pch";
@@ -298,6 +331,8 @@
 		8305CAC0148565290066AB52 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "SimplifiedCoreDataExample/SimplifiedCoreDataExample-Prefix.pch";

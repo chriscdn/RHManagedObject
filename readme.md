@@ -1,5 +1,33 @@
 # RHManagedObject
 
+[![Version](http://cocoapod-badges.herokuapp.com/v/RHManagedObject/badge.png)](http://cocoadocs.org/docsets/RHManagedObject)
+[![Platform](http://cocoapod-badges.herokuapp.com/p/RHManagedObject/badge.png)](http://cocoadocs.org/docsets/RHManagedObject)
+
+## Usage
+
+To run the example project; clone the repo, and run `pod install` from the Example directory first.
+
+## Requirements
+
+## Installation
+
+RHManagedObject is available through [CocoaPods](http://cocoapods.org), to install
+it simply add the following line to your Podfile:
+
+    pod "RHManagedObject"
+
+## Author
+
+Christopher Meyer, chris@rhouse.ch
+
+## License
+
+RHManagedObject is available under the MIT license. See the LICENSE file for more info.
+
+---
+
+# RHManagedObject
+
 RHManagedObject is a library for iOS to simplify your life with Core Data.  It was motivated by the following:
 
 - Core Data is verbose.  Have a look at [Listing 1](http://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/CoreData/Articles/cdFetching.html) from the Apple Documentation and you'll see it takes ~14 lines of code for a single fetch request. RHManagedObject reduces this to a single line.

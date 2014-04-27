@@ -10,10 +10,6 @@
 
 @implementation Employee
 
-+(NSString *)entityName {
-	return @"EmployeeEntity";
-}
-
 +(NSString *)modelName {
 	return @"SimplifiedCoreDataExample";
 }

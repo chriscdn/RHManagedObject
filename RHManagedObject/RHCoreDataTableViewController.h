@@ -1,6 +1,5 @@
 //
-//  RHManagedObjectContextManager.h
-//  Version: 0.10
+//  RHCoreDataTableViewController.h
 //
 //  Copyright (C) 2013 by Christopher Meyer
 //  http://schwiiz.org/
@@ -23,24 +22,23 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 
-#define kMergePolicy NSMergeByPropertyObjectTrumpMergePolicy
-#define RHWillMassUpdateNotification @"RHWillMassUpdateNotification"
-#define kPostMassUpdateNotificationThreshold 10 // If more than kPostMassUpdateNotificationThreshold updates are commited at once, post a RHWillMassUpdateNotification notification first
-
 #import <CoreData/CoreData.h>
 
-@interface RHManagedObjectContextManager : NSObject
+@interface RHCoreDataTableViewController : UITableViewController<NSFetchedResultsControllerDelegate, UISearchDisplayDelegate, UISearchBarDelegate> {
+	NSFetchedResultsController *fetchedResultsController;
+}
 
-+(RHManagedObjectContextManager *)sharedInstanceWithModelName:(NSString *)modelName;
-+(NSError *)deleteFile:(NSString *)filePath;
--(id)initWithModelName:(NSString *)_modelName;
--(NSManagedObjectContext *)managedObjectContextForCurrentThreadWithError:(NSError **)error;
--(NSError *)deleteStore;
--(NSError *)deleteStoreFiles:(NSString *)storePath;
--(NSError *)commit;
--(NSUInteger)pendingChangesCountWithError:(NSError **)error;
--(BOOL)doesRequireMigrationWithError:(NSError **)error;
--(NSString *)applicationDocumentsDirectory;
--(NSString *)applicationCachesDirectory;
+@property (nonatomic, strong) NSFetchedResultsController *fetchedResultsController;
+@property (nonatomic, strong) UISearchDisplayController *searchController;
+@property (nonatomic, strong) NSString *searchString;
+@property (nonatomic, assign) BOOL massUpdate;
+@property (nonatomic, assign) BOOL enableSectionIndex;
+
+-(void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
+-(void)addSearchBarWithPlaceHolder:(NSString *)placeholder;
+// -(void)removeSearchBar;
+-(void)resetMassUpdate;
+-(void)refreshVisibleCells;
+-(UITableView *)currentTableView;
 
 @end

@@ -14,11 +14,15 @@
 
 -(void)viewDidLoad {
 	[super viewDidLoad];
+
+	[self setTitle:@"Example"];
     
 	UIBarButtonItem *button = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addRandomEmployee:)];
 	self.navigationItem.rightBarButtonItem = button;
     
     [self addSearchBarWithPlaceHolder:@"Filter"];
+
+	[self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"EmployeeCell"];
 	
 }
 
@@ -35,7 +39,7 @@
 	newEmployee.lastName = [lastNames objectAtIndex:randomLastName];
 	
 	[Employee commit];
-	
+
 }
 
 
@@ -48,7 +52,8 @@
         if (self.searchString) {
             predicate = [NSPredicate predicateWithFormat:@"firstName CONTAINS[cd] %@ OR lastName CONTAINS[cd] %@", self.searchString, self.searchString];
         } else {
-            predicate = [NSPredicate predicateWithFormat:@"1==1"];
+			// i.e., show all
+            predicate = [NSPredicate predicateWithFormat:@"1=1"];
         }
         
 		NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
@@ -83,23 +88,17 @@
     
 }
 
--(UITableViewCell *)tableView:(UITableView *)_tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-	
-	static NSString *CellIdentifier = @"EmployeeCell";
-	
-	UITableViewCell *cell = [_tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-	
-	if (cell == nil) {
-		cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
-	}
-    
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+
+	UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"EmployeeCell"];
+
 	[self configureCell:cell atIndexPath:indexPath];
 
 	return cell;
 }
 
--(NSString *)tableView:(UITableView *)_tableView titleForFooterInSection:(NSInteger)section {
-	if (_tableView == self.tableView) {
+-(NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
+	if (tableView == self.tableView) {
         return @"Press the plus button to create a random employee.  See\n\n-(void)addRandomEmployee:(id)sender\n\nin\n\nExampleTableViewController.m";
     } else {
         return @""; // search tableview

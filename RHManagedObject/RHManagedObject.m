@@ -36,10 +36,6 @@
 
 +(NSString *)entityName {
     return NSStringFromClass([self superclass]);
-	/*
-	 NSLog(@"You must implement an entityName class method in your entity subclass.  Aborting.");
-	 abort();
-	 */
 }
 
 // Abstract class.  Implement in your entity subclass to return the name of the model without the .xcdatamodeld extension.
@@ -99,6 +95,7 @@
 +(id)getWithPredicate:(NSPredicate *)predicate
        sortDescriptor:(NSSortDescriptor *)descriptor
                 error:(NSError **)error {
+	
 	NSArray *results = [self fetchWithPredicate:predicate sortDescriptor:descriptor error:error];
 
 	if ([results count] > 0) {
@@ -127,6 +124,22 @@
                 sortDescriptor:(NSSortDescriptor *)descriptor
                      withLimit:(NSUInteger)limit
                          error:(NSError **)error {
+
+	NSArray *desciptors = descriptor ? [NSArray arrayWithObject:descriptor] : nil;
+
+	return [self fetchWithPredicate:predicate
+					sortDescriptors:desciptors
+						  withLimit:limit
+							  error:error];
+
+}
+
+
++(NSArray *)fetchWithPredicate:(NSPredicate *)predicate
+               sortDescriptors:(NSArray *)descriptors
+                     withLimit:(NSUInteger)limit
+                         error:(NSError **)error {
+
 	NSFetchRequest *fetch = [[NSFetchRequest alloc] init];
 
 	[fetch setEntity:[self entityDescriptionWithError:error]];
@@ -135,8 +148,8 @@
 		[fetch setPredicate:predicate];
 	}
 
-	if (descriptor) {
-		[fetch setSortDescriptors:[NSArray arrayWithObject:descriptor]];
+	if (descriptors) {
+		[fetch setSortDescriptors:descriptors];
 	}
 
 	if (limit > 0) {
@@ -147,6 +160,115 @@
 
 	return [[self managedObjectContextForCurrentThreadWithError:error] executeFetchRequest:fetch error:error];
 }
+
++(void)fetchInBackgroundWithPredicate:(NSPredicate *)predicate
+                      sortDescriptors:(NSArray *)descriptors
+                            withLimit:(NSUInteger)limit
+                           completion:(void (^)(NSArray* fetchedObjects, NSError* error))completion {
+
+    if ([NSThread isMainThread]) {
+		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+
+            NSError* error = nil;
+            NSArray* fetchedObjects = [self fetchWithPredicate:predicate sortDescriptors:descriptors withLimit:limit error:&error];
+
+            dispatch_async(dispatch_get_main_queue(), ^{
+
+                NSArray* convertedFetchedObjects = [self arrayInCurrentThreadContext:fetchedObjects];
+                completion(convertedFetchedObjects, error);
+            });
+        });
+	} else {
+        NSError* error = nil;
+        NSArray* fetchedObjects = [self fetchWithPredicate:predicate sortDescriptors:descriptors withLimit:limit error:&error];
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            NSArray* convertedFetchedObjects = [self arrayInCurrentThreadContext:fetchedObjects];
+            completion(convertedFetchedObjects, error);
+        });
+    }
+}
+
++(NSDictionary*)fetchAllAsDictionaryWithKeyProperty:(NSString*)keyProperty
+                                              error:(NSError **)error {
+
+    return [self fetchAsDictionaryWithKeyProperty:keyProperty withPredicate:nil withSortDescriptors:nil withLimit:0 error:error];
+}
+
++(NSDictionary*)fetchAsDictionaryWithKeyProperty:(NSString*)keyProperty
+                                   withPredicate:(NSPredicate*)predicate
+                                           error:(NSError **)error {
+
+    return [self fetchAsDictionaryWithKeyProperty:keyProperty withPredicate:predicate withSortDescriptors:nil withLimit:0 error:error];
+}
+
++(NSDictionary*)fetchAsDictionaryWithKeyProperty:(NSString*)keyProperty
+                                   withPredicate:(NSPredicate*)predicate
+                              withSortDescriptor:(NSSortDescriptor*)descriptor
+                                           error:(NSError **)error {
+
+    NSArray* descriptors = nil;
+    if (descriptor) {
+        descriptors = [NSArray arrayWithObject:descriptor];
+	}
+	
+    return [self fetchAsDictionaryWithKeyProperty:keyProperty withPredicate:predicate withSortDescriptors:descriptors withLimit:0 error:error];
+}
+
++(NSDictionary*)fetchAsDictionaryWithKeyProperty:(NSString*)keyProperty
+                                   withPredicate:(NSPredicate*)predicate
+                             withSortDescriptors:(NSArray*)descriptors
+                                       withLimit:(NSUInteger)limit
+                                           error:(NSError **)error {
+
+    NSArray *fetchedObjects = [self fetchWithPredicate:predicate sortDescriptors:descriptors withLimit:limit error:error];
+
+    NSMutableDictionary* dictionary = [NSMutableDictionary new];
+
+    for (RHManagedObject* managedObject in fetchedObjects) {
+        if ([managedObject valueForKey:keyProperty]) {
+            [dictionary setObject:managedObject forKey:[managedObject valueForKey:keyProperty]];
+        }
+    }
+
+    return [dictionary copy];
+}
+
++(void)fetchInBackgroundAsDictionaryWithKeyProperty:(NSString*)keyProperty
+                                      withPredicate:(NSPredicate*)predicate
+                                withSortDescriptors:(NSArray*)descriptors
+                                          withLimit:(NSUInteger)limit
+                                         completion:(void (^)(NSDictionary* fetchedObjects, NSError* error))completion {
+
+    if ([NSThread isMainThread]) {
+		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+
+            NSError* error = nil;
+            NSDictionary* fetchedObjects = [self fetchAsDictionaryWithKeyProperty:keyProperty withPredicate:predicate withSortDescriptors:descriptors withLimit:limit error:&error];
+
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSDictionary* convertedFetchedObjects = [self dictionaryInCurrentThreadContext:fetchedObjects];
+                completion(convertedFetchedObjects, error);
+            });
+        });
+	} else {
+        NSError* error = nil;
+        NSDictionary* fetchedObjects = [self fetchAsDictionaryWithKeyProperty:keyProperty withPredicate:predicate withSortDescriptors:descriptors withLimit:limit error:&error];
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            NSDictionary* convertedFetchedObjects = [self dictionaryInCurrentThreadContext:fetchedObjects];
+            completion(convertedFetchedObjects, error);
+        });
+    }
+}
+
+
+
+
+
+
+
+
 
 +(NSUInteger)countWithError:(NSError **)error {
 	return [self countWithPredicate:nil error:error];
@@ -283,6 +405,79 @@
 	NSManagedObjectContext *currentMoc = [[self class] performSelector:@selector(managedObjectContextForCurrentThreadWithError:)];
 	return [currentMoc objectWithID:self.objectID];
 }
+
+
+
+
+
+
+
+
++(NSArray*)arrayInCurrentThreadContext:(NSArray *)array {
+    if (!array) {
+        return nil;
+	}
+
+    NSMutableArray* tempArray = [NSMutableArray new];
+
+    for (RHManagedObject *managedObject in array) {
+        if ([managedObject isKindOfClass:[RHManagedObject class]]) {
+
+			RHManagedObject *convertedManagedObject = [managedObject objectInCurrentThreadContext];
+
+			if (convertedManagedObject) {
+                [tempArray addObject:convertedManagedObject];
+			}
+
+        } else {
+            // Some other object, don't do anything with it
+            [tempArray addObject:managedObject];
+        }
+    }
+
+    return [tempArray copy];
+}
+
++(NSDictionary *)dictionaryInCurrentThreadContext:(NSDictionary *)dictionary {
+    if (!dictionary) {
+        return nil;
+	}
+
+    NSMutableDictionary* tempDictionary = [NSMutableDictionary new];
+    for (NSString* key in [dictionary allKeys]) {
+        RHManagedObject* managedObject = [dictionary objectForKey:key];
+        if ([managedObject isKindOfClass:[RHManagedObject class]]) {
+            RHManagedObject* convertedManagedObject = [managedObject objectInCurrentThreadContext];
+            if (convertedManagedObject) {
+                [tempDictionary setObject:convertedManagedObject forKey:key];
+			}
+        } else {
+            // Some other object, don't do anything with it
+            [tempDictionary setObject:managedObject forKey:key];
+        }
+    }
+
+    return [NSDictionary dictionaryWithDictionary:tempDictionary];
+}
+
++(NSSet *)setInCurrentThreadContext:(NSSet*)set {
+    if (!set) {
+        return nil;
+	}
+
+    NSArray* array = [self arrayInCurrentThreadContext:[set allObjects]];
+    return [NSSet setWithArray:array];
+}
+
+
+
+
+
+
+
+
+
+
 
 // This function needs work
 -(NSDictionary *)serialize {

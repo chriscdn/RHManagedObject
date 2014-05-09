@@ -50,7 +50,6 @@ typedef void (^RHDeleteActionCellBlock)(NSFetchedResultsController *fetchedResul
 @property (nonatomic, copy) RHTitleForHeaderInSectionBlock titleForHeaderInSectionBlock;
 @property (nonatomic, copy) RHDeleteActionCellBlock deleteActionCellBlock;
 
-
 -(id)initWithTableView:(UITableView *)tableView
 		   entityClass:(NSString *)entityClass
 			 predicate:(NSPredicate *)predicate

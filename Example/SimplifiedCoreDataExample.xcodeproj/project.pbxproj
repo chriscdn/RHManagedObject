@@ -18,7 +18,6 @@
 		8305CAAF148565290066AB52 /* SimplifiedCoreDataExample.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 8305CAAD148565290066AB52 /* SimplifiedCoreDataExample.xcdatamodeld */; };
 		8305CAD2148565F80066AB52 /* EmployeeEntity.m in Sources */ = {isa = PBXBuildFile; fileRef = 8305CAD1148565F80066AB52 /* EmployeeEntity.m */; };
 		8305CAD5148566420066AB52 /* Employee.m in Sources */ = {isa = PBXBuildFile; fileRef = 8305CAD4148566420066AB52 /* Employee.m */; };
-		831517C7190CE7080019F7A6 /* RHCoreDataCollectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 831517BC190CE7080019F7A6 /* RHCoreDataCollectionViewController.m */; };
 		831517C8190CE7080019F7A6 /* RHCoreDataTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 831517BE190CE7080019F7A6 /* RHCoreDataTableViewController.m */; };
 		831517CA190CE7080019F7A6 /* RHManagedObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 831517C2190CE7080019F7A6 /* RHManagedObject.m */; };
 		831517CC190CE7080019F7A6 /* RHManagedObjectContextManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 831517C6190CE7080019F7A6 /* RHManagedObjectContextManager.m */; };
@@ -44,8 +43,6 @@
 		8305CAD1148565F80066AB52 /* EmployeeEntity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = EmployeeEntity.m; path = SimplifiedCoreDataExample/EmployeeEntity.m; sourceTree = "<group>"; };
 		8305CAD3148566420066AB52 /* Employee.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Employee.h; path = SimplifiedCoreDataExample/Employee.h; sourceTree = "<group>"; };
 		8305CAD4148566420066AB52 /* Employee.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Employee.m; path = SimplifiedCoreDataExample/Employee.m; sourceTree = "<group>"; };
-		831517BB190CE7080019F7A6 /* RHCoreDataCollectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RHCoreDataCollectionViewController.h; path = ../RHManagedObject/RHCoreDataCollectionViewController.h; sourceTree = "<group>"; };
-		831517BC190CE7080019F7A6 /* RHCoreDataCollectionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RHCoreDataCollectionViewController.m; path = ../RHManagedObject/RHCoreDataCollectionViewController.m; sourceTree = "<group>"; };
 		831517BD190CE7080019F7A6 /* RHCoreDataTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RHCoreDataTableViewController.h; path = ../RHManagedObject/RHCoreDataTableViewController.h; sourceTree = "<group>"; };
 		831517BE190CE7080019F7A6 /* RHCoreDataTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RHCoreDataTableViewController.m; path = ../RHManagedObject/RHCoreDataTableViewController.m; sourceTree = "<group>"; };
 		831517C1190CE7080019F7A6 /* RHManagedObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RHManagedObject.h; path = ../RHManagedObject/RHManagedObject.h; sourceTree = "<group>"; };
@@ -139,8 +136,6 @@
 		8305CAC11485653F0066AB52 /* RHMangedObject */ = {
 			isa = PBXGroup;
 			children = (
-				831517BB190CE7080019F7A6 /* RHCoreDataCollectionViewController.h */,
-				831517BC190CE7080019F7A6 /* RHCoreDataCollectionViewController.m */,
 				831517BD190CE7080019F7A6 /* RHCoreDataTableViewController.h */,
 				831517BE190CE7080019F7A6 /* RHCoreDataTableViewController.m */,
 				831517C1190CE7080019F7A6 /* RHManagedObject.h */,
@@ -215,7 +210,6 @@
 			files = (
 				8305CAA8148565290066AB52 /* main.m in Sources */,
 				8305CAAC148565290066AB52 /* AppDelegate.m in Sources */,
-				831517C7190CE7080019F7A6 /* RHCoreDataCollectionViewController.m in Sources */,
 				8305CAAF148565290066AB52 /* SimplifiedCoreDataExample.xcdatamodeld in Sources */,
 				8305CAD2148565F80066AB52 /* EmployeeEntity.m in Sources */,
 				8305CAD5148566420066AB52 /* Employee.m in Sources */,

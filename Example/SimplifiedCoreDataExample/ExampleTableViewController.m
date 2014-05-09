@@ -44,6 +44,7 @@
 
 -(NSFetchedResultsController *)fetchedResultsController {
 	if (fetchedResultsController == nil) {
+
 		NSSortDescriptor *sort1 = [[NSSortDescriptor alloc] initWithKey:@"lastName" ascending:YES];
 
 		NSPredicate *predicate;
@@ -60,7 +61,6 @@
 
 		[fetchRequest setPredicate:predicate];
 		[fetchRequest setSortDescriptors:[NSArray arrayWithObjects:sort1, nil]];
-		[fetchRequest setFetchBatchSize:20];
 
 		self.fetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
 																			managedObjectContext:[Employee managedObjectContextForCurrentThreadWithError:nil]
@@ -84,7 +84,8 @@
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-	UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:kCellIdentifier];
+	// We must dequeue from self.tableView and not tableView since this method is also used by the search controller
+	UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:kCellIdentifier];
 	[self configureCell:cell atIndexPath:indexPath];
 	return cell;
 }

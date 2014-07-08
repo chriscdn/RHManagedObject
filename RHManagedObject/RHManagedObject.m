@@ -111,13 +111,20 @@
 
 +(NSArray *)fetchWithPredicate:(NSPredicate *)predicate
                          error:(NSError **)error {
-	return [self fetchWithPredicate:predicate sortDescriptor:nil error:error];
+
+	return [self fetchWithPredicate:predicate
+					 sortDescriptor:nil
+							  error:error];
 }
 
 +(NSArray *)fetchWithPredicate:(NSPredicate *)predicate
                 sortDescriptor:(NSSortDescriptor *)descriptor
                          error:(NSError **)error {
-	return [self fetchWithPredicate:predicate sortDescriptor:descriptor withLimit:0 error:error];
+
+	return [self fetchWithPredicate:predicate
+					 sortDescriptor:descriptor
+						  withLimit:0
+							  error:error];
 }
 
 +(NSArray *)fetchWithPredicate:(NSPredicate *)predicate
@@ -140,7 +147,20 @@
                      withLimit:(NSUInteger)limit
                          error:(NSError **)error {
 
-	NSFetchRequest *fetch = [[NSFetchRequest alloc] init];
+	return [self fetchWithPredicate:predicate
+					sortDescriptors:descriptors
+						  withLimit:limit
+				 includeSubentities:[self shouldFetchRequestsReturnSubentities]
+							  error:error];
+}
+
++(NSArray *)fetchWithPredicate:(NSPredicate *)predicate
+               sortDescriptors:(NSArray *)descriptors
+                     withLimit:(NSUInteger)limit
+			includeSubentities:(BOOL)includeSubentities
+                         error:(NSError **)error {
+
+	NSFetchRequest *fetch = [NSFetchRequest new];
 
 	[fetch setEntity:[self entityDescriptionWithError:error]];
 
@@ -156,9 +176,17 @@
 		[fetch setFetchLimit:limit];
 	}
 
-	[fetch setIncludesPendingChanges:YES];
+	[fetch setIncludesSubentities:includeSubentities];
+
+	// system defaults to YES already
+	// [fetch setIncludesPendingChanges:YES];
 
 	return [[self managedObjectContextForCurrentThreadWithError:error] executeFetchRequest:fetch error:error];
+}
+
+// This can be overridden per subclass
++(BOOL)shouldFetchRequestsReturnSubentities {
+    return YES;
 }
 
 +(void)fetchInBackgroundWithPredicate:(NSPredicate *)predicate

@@ -80,6 +80,13 @@ typedef void (^RHDidDeleteBlock)();
                      withLimit:(NSUInteger)limit
                          error:(NSError **)error;
 
++(NSArray *)fetchWithPredicate:(NSPredicate *)predicate
+               sortDescriptors:(NSArray *)descriptors
+                     withLimit:(NSUInteger)limit
+			includeSubentities:(BOOL)includeSubentities
+                         error:(NSError **)error;
+
++(BOOL)shouldFetchRequestsReturnSubentities;
 
 +(void)fetchInBackgroundWithPredicate:(NSPredicate *)predicate
                       sortDescriptors:(NSArray *)descriptors

@@ -6,6 +6,20 @@
 	objectVersion = 46;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		41A008C8199B840A0097FAA9 /* Documentation */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 41A008CB199B840A0097FAA9 /* Build configuration list for PBXAggregateTarget "Documentation" */;
+			buildPhases = (
+				41A008CC199B84100097FAA9 /* ShellScript */,
+			);
+			dependencies = (
+			);
+			name = Documentation;
+			productName = Documentation;
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		8303F6BF15D8FA8100A16D5B /* ExampleTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8303F6BE15D8FA8100A16D5B /* ExampleTableViewController.m */; };
 		8305CA9A148565290066AB52 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8305CA99148565290066AB52 /* UIKit.framework */; };
@@ -187,6 +201,7 @@
 			projectRoot = "";
 			targets = (
 				8305CA94148565290066AB52 /* SimplifiedCoreDataExample */,
+				41A008C8199B840A0097FAA9 /* Documentation */,
 			);
 		};
 /* End PBXProject section */
@@ -202,6 +217,22 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		41A008CC199B84100097FAA9 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "/usr/local/bin/appledoc \\\n--project-name \"RHManagedObject\" \\\n--project-company \"chriscdn\" \\\n--company-id \"com.chriscdn\" \\\n--output \"${PROJECT_DIR}/../Documentation/RHManagedObject\" \\\n--install-docset \\\n--logformat xcode \\\n--keep-undocumented-objects \\\n--keep-undocumented-members \\\n--keep-intermediate-files \\\n--no-repeat-first-par \\\n--no-warn-invalid-crossref \\\n--merge-categories \\\n--exit-threshold 2 \\\n--docset-platform-family iphoneos \\\n--ignore \"*.m\" \\\n--index-desc \"${PROJECT_DIR}/../readme.md\" \\\n\"${PROJECT_DIR}/../RHManagedObject\"";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		8305CA91148565290066AB52 /* Sources */ = {
@@ -234,6 +265,20 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		41A008C9199B840A0097FAA9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		41A008CA199B840A0097FAA9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		8305CABC148565290066AB52 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -327,6 +372,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		41A008CB199B840A0097FAA9 /* Build configuration list for PBXAggregateTarget "Documentation" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				41A008C9199B840A0097FAA9 /* Debug */,
+				41A008CA199B840A0097FAA9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		8305CA8F148565280066AB52 /* Build configuration list for PBXProject "SimplifiedCoreDataExample" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

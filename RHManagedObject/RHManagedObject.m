@@ -249,16 +249,26 @@
                                        withLimit:(NSUInteger)limit
                                            error:(NSError **)error {
 
-    NSArray *fetchedObjects = [self fetchWithPredicate:predicate sortDescriptors:descriptors withLimit:limit error:error];
+    return [self fetchAsDictionaryWithKeyProperty:keyProperty withPredicate:predicate withSortDescriptors:descriptors withLimit:limit includeSubentities:[self shouldFetchRequestsReturnSubentities] error:error];
+}
 
++(NSDictionary*)fetchAsDictionaryWithKeyProperty:(NSString *)keyProperty
+                                   withPredicate:(NSPredicate *)predicate
+                             withSortDescriptors:(NSArray *)descriptors
+                                       withLimit:(NSUInteger)limit
+                              includeSubentities:(BOOL)includeSubentities
+                                           error:(NSError **)error {
+    
+    NSArray *fetchedObjects = [self fetchWithPredicate:predicate sortDescriptors:descriptors withLimit:limit includeSubentities:includeSubentities error:error];
+    
     NSMutableDictionary* dictionary = [NSMutableDictionary new];
-
+    
     for (RHManagedObject* managedObject in fetchedObjects) {
         if ([managedObject valueForKey:keyProperty]) {
             [dictionary setObject:managedObject forKey:[managedObject valueForKey:keyProperty]];
         }
     }
-
+    
     return [dictionary copy];
 }
 

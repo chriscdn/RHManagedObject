@@ -577,9 +577,11 @@ typedef void (^RHDidDeleteBlock)();
 /**
  *  Returns an instance for the Managed Object for the current thread. Core Data is not thread safe, use this to access a Managed Object that was created or fetched in a different thread.
  *
+ *  @param error     If an error occurs, upon return contains an NSError object that describes the problem.
+ *
  *  @return An instance of the Managed Object for the current thread.
  */
--(id)objectInCurrentThreadContext;
+-(id)objectInCurrentThreadContextWithError:(NSError **)error;
 
 /**
  *  Takes an array containing Managed Objects and returns an array containing instances for the Managed Objects for the current thread.

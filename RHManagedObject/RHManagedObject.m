@@ -439,9 +439,9 @@
     return cloned;
 }
 
--(id)objectInCurrentThreadContext {
+-(id)objectInCurrentThreadContextWithError:(NSError **)error {
 	NSManagedObjectContext *currentMoc = [[self class] performSelector:@selector(managedObjectContextForCurrentThreadWithError:)];
-	return [currentMoc objectWithID:self.objectID];
+	return [currentMoc existingObjectWithID:self.objectID error:error];
 }
 
 

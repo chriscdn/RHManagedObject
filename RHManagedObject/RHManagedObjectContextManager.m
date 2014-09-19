@@ -292,13 +292,13 @@
 
 		NSArray *updates = [[userInfo objectForKey:@"updated"] allObjects];
 		for (RHManagedObject *item in updates) {
-			[[item objectInCurrentThreadContext] willAccessValueForKey:nil];
+			[[item objectInCurrentThreadContextWithError:nil] willAccessValueForKey:nil];
 		}
 
 		// 2013-04-14 - This hack is also required on the "inserted" key to ensure NSFetchedResultsController works properly
 		NSArray *inserted = [[userInfo objectForKey:@"inserted"] allObjects];
 		for (RHManagedObject *item in inserted) {
-			[[item objectInCurrentThreadContext] willAccessValueForKey:nil];
+			[[item objectInCurrentThreadContextWithError:nil] willAccessValueForKey:nil];
 		}
 
         NSError *error = nil;

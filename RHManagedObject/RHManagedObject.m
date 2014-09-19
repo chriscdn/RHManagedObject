@@ -461,7 +461,7 @@
     for (RHManagedObject *managedObject in array) {
         if ([managedObject isKindOfClass:[RHManagedObject class]]) {
 
-			RHManagedObject *convertedManagedObject = [managedObject objectInCurrentThreadContext];
+			RHManagedObject *convertedManagedObject = [managedObject objectInCurrentThreadContextWithError:nil];
 
 			if (convertedManagedObject) {
                 [tempArray addObject:convertedManagedObject];
@@ -485,7 +485,7 @@
     for (NSString* key in [dictionary allKeys]) {
         RHManagedObject* managedObject = [dictionary objectForKey:key];
         if ([managedObject isKindOfClass:[RHManagedObject class]]) {
-            RHManagedObject* convertedManagedObject = [managedObject objectInCurrentThreadContext];
+            RHManagedObject* convertedManagedObject = [managedObject objectInCurrentThreadContextWithError:nil];
             if (convertedManagedObject) {
                 [tempDictionary setObject:convertedManagedObject forKey:key];
 			}

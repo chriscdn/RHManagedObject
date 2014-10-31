@@ -35,7 +35,7 @@
 @synthesize didDeleteBlock;
 
 +(NSString *)entityName {
-    return NSStringFromClass([self superclass]);
+    return NSStringFromClass([self class]);
 }
 
 // Abstract class.  Implement in your entity subclass to return the name of the model without the .xcdatamodeld extension.

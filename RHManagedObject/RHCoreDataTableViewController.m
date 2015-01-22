@@ -49,12 +49,12 @@
 }
 
 -(void)addSearchBarWithPlaceHolder:(NSString *)placeholder {
-	UISearchBar *searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(0,0,self.tableView.frame.size.width,44)];
+	UISearchBar *searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width, 44)];
 	[searchBar setPlaceholder:placeholder];
 	[searchBar setDelegate:self];
 
 	self.searchController = [[UISearchDisplayController alloc] initWithSearchBar:searchBar contentsController:self];
-
+    
 	[self.searchController setDelegate:self];					// UISearchDisplayDelegate
 	[self.searchController setSearchResultsDataSource:self];  	// UITableViewDataSource
 	[self.searchController setSearchResultsDelegate:self];  	// UITableViewDelegate
@@ -247,6 +247,10 @@
 	}
 
 	switch(type) {
+        case NSFetchedResultsChangeMove:
+            break;
+        case NSFetchedResultsChangeUpdate:
+            break;
 		case NSFetchedResultsChangeInsert:
 			[[self currentTableView] insertSections:[NSIndexSet indexSetWithIndex:sectionIndex] withRowAnimation:UITableViewRowAnimationFade];
 			break;
@@ -277,7 +281,7 @@
 	return nil;
 }
 
-
+/*
 -(NSInteger)tableView:(UITableView *)tableView sectionForSectionIndexTitle:(NSString *)title atIndex:(NSInteger)index {
 	// http://stackoverflow.com/questions/14905570/nsfetchedresultscontroller-with-indexed-uitableviewcontroller-and-uilocalizedind
 
@@ -294,6 +298,7 @@
 	}
 	return 0;
 }
+ */
 
 -(void)dealloc {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];

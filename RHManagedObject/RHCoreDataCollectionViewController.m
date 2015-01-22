@@ -69,6 +69,10 @@
     NSMutableDictionary *change = [NSMutableDictionary dictionary];
 
     switch(type) {
+        case NSFetchedResultsChangeMove:
+            break;
+        case NSFetchedResultsChangeUpdate:
+            break;
         case NSFetchedResultsChangeInsert:
             change[@(type)] = @(sectionIndex);
             break;
@@ -114,6 +118,8 @@
 
                     NSFetchedResultsChangeType type = [key unsignedIntegerValue];
                     switch (type) {
+                        case NSFetchedResultsChangeMove:
+                            break;
                         case NSFetchedResultsChangeInsert:
                             [self.collectionView insertSections:[NSIndexSet indexSetWithIndex:[obj unsignedIntegerValue]]];
                             break;

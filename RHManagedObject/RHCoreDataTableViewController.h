@@ -24,21 +24,21 @@
 
 #import <CoreData/CoreData.h>
 
-@interface RHCoreDataTableViewController : UITableViewController<NSFetchedResultsControllerDelegate, UISearchDisplayDelegate, UISearchBarDelegate> {
+@interface RHCoreDataTableViewController : UITableViewController<NSFetchedResultsControllerDelegate, UISearchResultsUpdating, UISearchBarDelegate, UISearchControllerDelegate> {
 	NSFetchedResultsController *fetchedResultsController;
 }
 
 @property (nonatomic, strong) NSFetchedResultsController *fetchedResultsController;
-@property (nonatomic, strong) UISearchDisplayController *searchController;
+@property (nonatomic, strong) UISearchController *searchController;
 @property (nonatomic, strong) NSString *searchString;
 @property (nonatomic, assign) BOOL massUpdate;
 @property (nonatomic, assign) BOOL enableSectionIndex;
 
 -(void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
 -(void)addSearchBarWithPlaceHolder:(NSString *)placeholder;
-// -(void)removeSearchBar;
 -(void)resetMassUpdate;
 -(void)refreshVisibleCells;
--(UITableView *)currentTableView;
+-(NSPredicate *)predicate;
+-(void)reload;
 
 @end

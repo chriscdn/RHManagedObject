@@ -196,7 +196,7 @@
     abort();
 }
 
--(UITableViewCell *)tableView:(UITableView *)_tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     NSLog(@"Implement tableView:cellForRowAtIndexPath: in subclass.");
     abort();
     

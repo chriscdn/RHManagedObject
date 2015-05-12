@@ -414,4 +414,8 @@
 	return [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject];
 }
 
+-(NSArray *)entities {
+    return [self.managedObjectModel entities];
+}
+
 @end

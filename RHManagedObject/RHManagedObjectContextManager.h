@@ -191,4 +191,18 @@
  */
 -(NSString *)applicationCachesDirectory;
 
+
+#pragma mark - Other Methods
+/**---------------------------------------------------------------------------------------
+ * @name Other Methods
+ *  ---------------------------------------------------------------------------------------
+ */
+
+/**
+ *  Returns all entities.
+ *
+ *  @return The entities.
+ */
+-(NSArray *)entities;
+
 @end

@@ -78,7 +78,7 @@
 																			managedObjectContext:[classFromString managedObjectContextForCurrentThreadWithError:nil]
 																			  sectionNameKeyPath:self.sectionNameKeyPath
 																					   cacheName:nil];
-		// _fetchedResultsController.delegate = self;
+		_fetchedResultsController.delegate = self;
 
 		NSError *error = nil;
 
@@ -157,7 +157,7 @@
 		return self.heightForCellBlock(tableView, self.fetchedResultsController, indexPath);
 	}
 
-	return 44;
+	return self.tableView.rowHeight;
 }
 
 #pragma mark -

@@ -34,11 +34,15 @@
 @property (nonatomic, assign) BOOL massUpdate;
 @property (nonatomic, assign) BOOL enableSectionIndex;
 
++(void)setInsertRowAnimation:(UITableViewRowAnimation)rowAnimation;
++(void)setDeleteRowAnimation:(UITableViewRowAnimation)rowAnimation;
+
 -(void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
 -(void)addSearchBarWithPlaceHolder:(NSString *)placeholder;
 -(void)resetMassUpdate;
 -(void)refreshVisibleCells;
 -(NSPredicate *)predicate;
+-(NSArray *)sortDescriptors;
 -(void)reload;
 
 @end

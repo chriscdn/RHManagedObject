@@ -25,6 +25,9 @@
 #import "RHCoreDataTableViewController.h"
 #import "RHManagedObjectContextManager.h"
 
+static UITableViewRowAnimation insertRowAnimation = UITableViewRowAnimationAutomatic;
+static UITableViewRowAnimation deleteRowAnimation = UITableViewRowAnimationAutomatic;
+
 @interface RHCoreDataTableViewController()
 
 @property (nonatomic, assign, getter = isSearching) BOOL searching;
@@ -33,6 +36,15 @@
 
 @implementation RHCoreDataTableViewController
 @synthesize fetchedResultsController;
+
+
++(void)setInsertRowAnimation:(UITableViewRowAnimation)rowAnimation {
+    insertRowAnimation = rowAnimation;
+}
+
++(void)setDeleteRowAnimation:(UITableViewRowAnimation)rowAnimation {
+    deleteRowAnimation = rowAnimation;
+}
 
 -(id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     if (self=[super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
@@ -156,6 +168,11 @@
     abort();
 }
 
+-(NSArray *)sortDescriptors {
+    NSLog(@"Implement fetchedResultsController in subclass.");
+    abort();
+}
+
 -(NSFetchedResultsController *)fetchedResultsController {
     NSLog(@"Implement fetchedResultsController in subclass.");
     abort();
@@ -258,11 +275,11 @@
     
     switch(type) {
         case NSFetchedResultsChangeInsert:
-            [self.tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:newIndexPath] withRowAnimation:UITableViewRowAnimationFade];
+            [self.tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:newIndexPath] withRowAnimation:insertRowAnimation];
             break;
             
         case NSFetchedResultsChangeDelete:
-            [self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
+            [self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:deleteRowAnimation];
             break;
             
         case NSFetchedResultsChangeUpdate:
@@ -270,8 +287,8 @@
             break;
             
         case NSFetchedResultsChangeMove:
-            [self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
-            [self.tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:newIndexPath] withRowAnimation:UITableViewRowAnimationFade];
+            [self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:deleteRowAnimation];
+            [self.tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:newIndexPath] withRowAnimation:insertRowAnimation];
             break;
     }
 }
@@ -288,11 +305,11 @@
         case NSFetchedResultsChangeUpdate:
             break;
         case NSFetchedResultsChangeInsert:
-            [self.tableView insertSections:[NSIndexSet indexSetWithIndex:sectionIndex] withRowAnimation:UITableViewRowAnimationFade];
+            [self.tableView insertSections:[NSIndexSet indexSetWithIndex:sectionIndex] withRowAnimation:insertRowAnimation];
             break;
             
         case NSFetchedResultsChangeDelete:
-            [self.tableView deleteSections:[NSIndexSet indexSetWithIndex:sectionIndex] withRowAnimation:UITableViewRowAnimationFade];
+            [self.tableView deleteSections:[NSIndexSet indexSetWithIndex:sectionIndex] withRowAnimation:deleteRowAnimation];
             break;
     }
 }

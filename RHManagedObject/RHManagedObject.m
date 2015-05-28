@@ -141,7 +141,6 @@
 
 }
 
-
 +(NSArray *)fetchWithPredicate:(NSPredicate *)predicate
                sortDescriptors:(NSArray *)descriptors
                      withLimit:(NSUInteger)limit
@@ -299,12 +298,6 @@
         });
     }
 }
-
-
-
-
-
-
 
 
 

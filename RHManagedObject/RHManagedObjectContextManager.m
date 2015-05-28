@@ -233,7 +233,13 @@
 
 										NSSet *updatedObjects = [[notification userInfo] objectForKey:NSUpdatedObjectsKey];
 										[updatedObjects makeObjectsPerformSelector:@selector(didUpdate)];
-
+                                        
+                                        // As far as I can tell, the difference between NSUpdatedObjectsKey & NSRefreshedObjectsKey
+                                        // depends on where the object was updated. NSUpdatedObjectsKey for the main thread,
+                                        // NSRefreshedObjectsKey for a secondary thread.  For our purposes we call the same block.
+                                        NSSet *refreshedObjects = [[notification userInfo] objectForKey:NSRefreshedObjectsKey];
+                                        [refreshedObjects makeObjectsPerformSelector:@selector(didUpdate)];
+                                        
 										NSSet *deletedObjects = [[notification userInfo] objectForKey:NSDeletedObjectsKey];
 										[deletedObjects makeObjectsPerformSelector:@selector(didDelete)];
 

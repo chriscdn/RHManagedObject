@@ -106,6 +106,9 @@ static UITableViewRowAnimation deleteRowAnimation = UITableViewRowAnimationAutom
     [self.tableView reloadData];
 }
 
+-(void)dismissSearchBar {
+    [self.searchController setActive:NO];
+}
 
 #pragma mark -
 #pragma mark UISearchResultsUpdating (delegate)

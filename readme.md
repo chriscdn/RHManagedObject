@@ -2,8 +2,8 @@
 
 RHManagedObject is a library for iOS to simplify your life with Core Data.  It was motivated by the following:
 
-- Core Data is verbose.  Have a look at [Listing 1](http://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/CoreData/Articles/cdFetching.html) from the Apple Documentation and you'll see it takes ~14 lines of code for a single fetch request. RHManagedObject reduces this to a single line.
-
+- Core Data is verbose.  Have a look at [Listing 1](http://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/CoreData/Articles/cdFetching.html) from the Apple documentation and you'll see it takes ~14 lines of code for a single fetch request. RHManagedObject reduces this to one line.
+		
 - Each managed object has an object context associated with it, and for some operations you must first fetch the object context in order to operate on the object. For example:
 	
 		NSManagedObjectContext *moc = [myManagedObject managedObjectContext];
@@ -12,18 +12,12 @@ RHManagedObject is a library for iOS to simplify your life with Core Data.  It w
 	This is more verbose than necessary since it introduces the object context when its existence is implied by the managed object. RHManagedObject simplifies the above code to:
 
 		[myManagedObject delete];
-		
-- Core Data is not thread safe. If you wish to mutate your objects off the main thread you need to create a managed object context in that thread, attach a `NSManagedObjectContextDidSaveNotification` notification to it, and merge the context into the main object context in an observer method on the main thread.  Bleh.  RHManagedObject does this for you so that you can work with your objects in any thread without having to think about this.
+				
+- Core Data is not thread safe. If you wish to mutate an object off the main thread you must create a managed object context in that thread, attach a `NSManagedObjectContextDidSaveNotification` notification to it, and merge the context into the main object context in an observer method on the main thread.  Bleh.  RHManagedObject does this for you such that you can work with your objects in different threads without having to think about this.
 
-- A common Core Data design pattern is to pass the managed object context between each `UIViewController` that requires it.  This gets cumbersome to maintain, so RHManagedObject puts all the Core Data boilerplate code into a singleton, which becomes accessible from anywhere in your code.  Best of all, the singleton encapsulates the entire `NSManagedObjectContext` lifecycle for you: constructing, merging, and saving (even in a multi-threaded app) such that you never need to interact with `NSManagedObjectContext` directly.  RHManagedObject lets you focus on your objects with simple methods to fetch, modify, and save without having to think about `NSManagedObjectContext`.
+- A common Core Data design pattern is to pass the managed object context between each `UIViewController` that requires it.  This gets cumbersome to maintain, so RHManagedObject puts all the Core Data boilerplate code into a singleton that becomes accessible from anywhere in your code.  Best of all, the singleton encapsulates the entire `NSManagedObjectContext` lifecycle for you: constructing, merging, and saving (also in different threads) such that you never need to interact with `NSManagedObjectContext` directly.  RHManagedObject lets you focus on your objects with simple methods to fetch, modify, and save without having to think about `NSManagedObjectContext`.
 
-- The generated managed object classes leave little room to add additional methods. You can't (or shouldn't) add extra methods to the generated classes since they will be overwritten when the classes are regenerated. RHManagedObject provides a place for additional class and instance methods.
-
-- Managing multiple models becomes tricky with the standard Core Data design pattern.  RHManagedObject (since v0.7) supports multiple models to make this simple and transparent.
-
-## Upgrading
-
-After some review and discussion with users of the library, I decided to accept a pull request that added stronger error handling to most methods in the RHManagedObject class. In order to keep things consistent and enforce better programming practices, I decided to remove the old methods that do not return errors. This will cause errors in your project until you port your method calls to the new syntax. However, if you are lazy like me, you can use the included `RHManagedObject+legacy.h` category to get the old interface back.
+- Managing multiple models becomes tricky with the standard Core Data design pattern.  RHManagedObject supports multiple models to make it simple and transparent.
 
 ## Overview
 
@@ -31,75 +25,102 @@ This brief overview assumes you have some experience with Core Data.
 
 A typical Core Data "Employee" entity (say, with attributes `firstName` and `lastName`) has an inheritance hierarchy of:
 
-	NSObject :: NSManagedObject :: EmployeeEntity
-
-RHManagedObject changes this to:
-
-	NSObject :: NSManagedObject :: RHManagedObject :: EmployeeEntity :: Employee
+	NSObject :: NSManagedObject :: Employee
 	
-You'll notice that the `RHManagedObject` and `Employee` classes have been added to the hierarchy. The `RHManagedObject` class adds generic methods (i.e., not specific to your model) that simplifies interacting with Core Data. Its main features are:
+RHManagedObject changes this (when using [mogenerator](https://github.com/rentzsch/mogenerator)) to:
 
-- It manages the object context.
-- It adds easier methods for fetching, creating, cloning, and deleting managed objects.
-- It provides a simplified interface for saving the context, and works the same regardless from which thread it's called.
+	NSObject :: NSManagedObject :: RHManagedObject :: _Employee :: Employee
+	
+This hierarchy is a deviation from previous versions of RHManagedObject.  See the section on [upgrading](#upgrading) for more information.
 
-For example, the `+newEntityWithError:` method introduced in RHManagedObject lets you create a new managed object with a single line:
+The `RHManagedObject` base class extends NSManagedObject to make Core Data easier to use.  Specifically, it:
+
+- manages the object context;
+- provides easy methods for fetching, creating, cloning, and deleting managed objects; and
+- provides a simple method for saving the context, which has the same interface regardless from which thread it's called.
+
+For example, the `+newEntityWithError:` method introduced in RHManagedObject lets you create a new managed object with one line:
 
 	Employee *newEmployee = [Employee newEntityWithError:&error];
 
-Fetching all employees with first name "John" is also a single line:
+Fetching all employees with first name "John" is also one line:
 
 	NSArray *employees = [Employee fetchWithPredicate:[NSPredicate predicateWithFormat:@"firstName=%@", @"John"] error:&error];
 
-The `-delete` method lets you delete an existing managed object:
+The `-delete` method deletes an existing managed object:
 
 	[firedEmployee delete];
 
-Changes can be saved with the `+commit` method, which will handle the merging of contexts from the different threads. In other words, you can call `+commit` from your thread and forget about it:
+Changes can be saved with the `+commit` method, which automatically handles the merging of the context into the main thread. In other words, you can call `+commit` from any thread and be done:
 
 	[Employee commit];
 
-You'll notice that none of these examples require direct use of an `NSManagedObjectContext` instance. That's handled for you within the library. Of course, a method is available to fetch the object context for the current thread if it's required:
+Notice that none of the examples require use of an `NSManagedObjectContext` instance. That's handled for you within the library. Of course, a method is available to fetch the context for the current thread if required:
 
 	NSManagedObjectContext *moc = [Employee managedObjectContextForCurrentThreadWithError:&error];
+	
+The `_Employee` class is an artefact of mogenerator, which will be discussed later in [Setup](#setup).
 
-## How To Get Started
+## Installation
 
-- [Download RHManagedObject](https://github.com/chriscdn/RHManagedObject/zipball/master).
-- Copy `RHManagedObject.h`, `RHManagedObject.m`, `RHManagedObjectContextManager.h`, and `RHManagedObjectContextManager.m` into your project.
-- Include the CoreData framework in your project.
+### Cocoapods
 
-If you're using [Cocoapods](http://cocoapods.org/) you can just include RHManagedObject in your Podfile:
+[Cocoapods](http://cocoapods.org/) is a package manager, which greatly simplifies the inclusion of 3rd party libraries in your project.  RHManagedObject can be added to your Podfile as follows:
 
 	pod 'RHManagedObject'
 
+### Manual Installation
+
+- [Download RHManagedObject](https://github.com/chriscdn/RHManagedObject/zipball/master);
+- copy `RHManagedObject.h`, `RHManagedObject.m`, `RHManagedObjectContextManager.h`, and `RHManagedObjectContextManager.m` to your project; and
+- include the CoreData framework in your project.
+
 ## Setup
 
-Recall the new object hierarchy from the overview:
+The easiest way to begin using RHManagedObject is to use [mogenerator](https://github.com/rentzsch/mogenerator).  Mogenerator automates the generation of the model classes, but also provides a place for additional methods that won't conflict with the generated files.
+
+Follow [these instructions](http://raptureinvenice.com/getting-started-with-mogenerator/) for installing and setting up mogenerator.
+
+Once mogenator is setup you need to add `--base-class RHManagedObject` to the command, which ensures RHManagedObject is the superclass of the generated classes. This could look as follows:
+
+	/usr/local/bin/mogenerator -m "${PROJECT_DIR}/path/to/model.xcdatamodeld" -O "${PROJECT_DIR}/Model" --template-var arc=true --base-class RHManagedObject
+
+This ensures the following class hierarchy as described in the [Overview](#overview):
+
+	NSObject :: NSManagedObject :: RHManagedObject :: _Employee :: Employee
+
+The `_Employee` class is generated by mogenerator and is overwritten whenever the model is regenerated.  For this reason it should never be manually edited.  The `Employee` class is generated once (unless the file already exits) and provides a place where additional methods can be added without disrupting the generated entity class.  RHManagedObject requires the `+modelName` method be overwritten to return the name of the model it belongs to.  This is just the filename of the `xcdatamodeld` file, and would look like the following for the `Employee` example:
+
+	@implementation Employee
+		
+	// This returns the name of your xcdatamodeld model, without the extension
+	+(NSString *)modelName {
+		return @"SimplifiedCoreDataExample";
+	}
+		
+	@end
+		
+The `Employee` class is also the place where additional methods can be added. For example:
+		
+	-(NSString *)fullName {
+		return [NSString stringWithFormat:@"%@ %@", self.firstName, self.lastName];
+	}
+	
+## Upgrading to mogenerator
+
+If upgrading from a previous version of RHManagedObject you might have used the originally proposed object hierarchy:
 
 	NSObject :: NSManagedObject :: RHManagedObject :: EmployeeEntity :: Employee
 
-Your entity class (e.g., EmployeeEntity) is generated by XCode as usual (CMD-N, NSManagedObject subclass, etc.).  However, there are a few manual tasks before and after generation.
+However, the new proposed hierarchy (using mogenerator) is:
 
-- Before generation you must ensure the `Class` setting on your entity is set to the entity name.  That is, open the `xcdatamodeld` in XCode, select the entity, and set the `Class` property (at the right) to the entity name. In the employee example this would be `EmployeeEntity`.  Repeat for each entity to be generated.
-- After your entity classes have been generated you must go back to the `xcdatamodeld` and change the `Class` property to your entity subclass.  In the employee example this would be `Employee`.
-- The generated classes must be modified to inherit from `RHManagedObject` instead of `NSManagedObject`.  It's a small hack, but only requires changing two lines of code (if anyone has an easier way of doing this then please let me know).
-- The entity subclass (e.g., `Employee`) is created by normal means and is just a normal subclass, but requires a method to identify to which model it belongs. This is  used by the `RHManagedObject` superclass and looks like the following in the `Employee` example:
+	NSObject :: NSManagedObject :: RHManagedObject :: _Employee :: Employee
 
-		@implementation Employee
-		
-		// This returns the name of your xcdatamodeld model, without the extension
-		+(NSString *)modelName {
-			return @"SimplifiedCoreDataExample";
-		}
-		
-		@end
-		
-	However, it's also the place where additional methods can be added without disrupting the generated entity class. For example:
-		
-		-(NSString *)fullName {
-			return [NSString stringWithFormat:@"%@ %@", self.firstName, self.lastName];
-		}
+This should be mostly transparent to the rest of your application, but will require a little work:
+
+- You'll need to perform a lightweight migration of your model (see [Lightweight Migration](#lightweight-migration) for details).  This will involve versioning your schema and  renaming the entities (e.g., `EmployeeEntity` to `Employee`).  For this you can use the "Renaming ID" field in XCode, which tells the migration how your models get renamed. 
+- As described in the [mogenerator documentation](http://raptureinvenice.com/getting-started-with-mogenerator/), the `Class` property for each entity in the `xcdatamodeld` should now be the same as the `Name` field (in the example "Employee").
+- Your classes no longer need to override the `-entityName` method.  This is handled by mogenerator. 
 
 ## Other Features
 

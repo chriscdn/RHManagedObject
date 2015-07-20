@@ -6,9 +6,9 @@
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
 //
 
-#import "EmployeeEntity.h"
+#import "_Employee.h"
 
-@interface Employee : EmployeeEntity
+@interface Employee : _Employee
 
 -(NSString *)fullName;
 

@@ -7,16 +7,16 @@
 	objects = {
 
 /* Begin PBXAggregateTarget section */
-		41A008C8199B840A0097FAA9 /* Documentation */ = {
+		83FC32D21B5D8BBE00ECAF05 /* mogenerator */ = {
 			isa = PBXAggregateTarget;
-			buildConfigurationList = 41A008CB199B840A0097FAA9 /* Build configuration list for PBXAggregateTarget "Documentation" */;
+			buildConfigurationList = 83FC32D31B5D8BBE00ECAF05 /* Build configuration list for PBXAggregateTarget "mogenerator" */;
 			buildPhases = (
-				41A008CC199B84100097FAA9 /* ShellScript */,
+				83FC32D61B5D8BD600ECAF05 /* ShellScript */,
 			);
 			dependencies = (
 			);
-			name = Documentation;
-			productName = Documentation;
+			name = mogenerator;
+			productName = mogenerator;
 		};
 /* End PBXAggregateTarget section */
 
@@ -30,12 +30,12 @@
 		8305CAA8148565290066AB52 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 8305CAA7148565290066AB52 /* main.m */; };
 		8305CAAC148565290066AB52 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 8305CAAB148565290066AB52 /* AppDelegate.m */; };
 		8305CAAF148565290066AB52 /* SimplifiedCoreDataExample.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 8305CAAD148565290066AB52 /* SimplifiedCoreDataExample.xcdatamodeld */; };
-		8305CAD2148565F80066AB52 /* EmployeeEntity.m in Sources */ = {isa = PBXBuildFile; fileRef = 8305CAD1148565F80066AB52 /* EmployeeEntity.m */; };
 		8305CAD5148566420066AB52 /* Employee.m in Sources */ = {isa = PBXBuildFile; fileRef = 8305CAD4148566420066AB52 /* Employee.m */; };
 		831517C8190CE7080019F7A6 /* RHCoreDataTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 831517BE190CE7080019F7A6 /* RHCoreDataTableViewController.m */; };
 		831517CA190CE7080019F7A6 /* RHManagedObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 831517C2190CE7080019F7A6 /* RHManagedObject.m */; };
 		831517CC190CE7080019F7A6 /* RHManagedObjectContextManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 831517C6190CE7080019F7A6 /* RHManagedObjectContextManager.m */; };
 		831517D0190CE9B70019F7A6 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 831517CF190CE9B70019F7A6 /* Images.xcassets */; };
+		83FC32D91B5D8C4600ECAF05 /* _Employee.m in Sources */ = {isa = PBXBuildFile; fileRef = 83FC32D81B5D8C4600ECAF05 /* _Employee.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -53,8 +53,6 @@
 		8305CAAA148565290066AB52 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		8305CAAB148565290066AB52 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		8305CAAE148565290066AB52 /* SimplifiedCoreDataExample.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SimplifiedCoreDataExample.xcdatamodel; sourceTree = "<group>"; };
-		8305CAD0148565F80066AB52 /* EmployeeEntity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EmployeeEntity.h; path = SimplifiedCoreDataExample/EmployeeEntity.h; sourceTree = "<group>"; };
-		8305CAD1148565F80066AB52 /* EmployeeEntity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = EmployeeEntity.m; path = SimplifiedCoreDataExample/EmployeeEntity.m; sourceTree = "<group>"; };
 		8305CAD3148566420066AB52 /* Employee.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Employee.h; path = SimplifiedCoreDataExample/Employee.h; sourceTree = "<group>"; };
 		8305CAD4148566420066AB52 /* Employee.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Employee.m; path = SimplifiedCoreDataExample/Employee.m; sourceTree = "<group>"; };
 		831517BD190CE7080019F7A6 /* RHCoreDataTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RHCoreDataTableViewController.h; path = ../RHManagedObject/RHCoreDataTableViewController.h; sourceTree = "<group>"; };
@@ -64,6 +62,9 @@
 		831517C5190CE7080019F7A6 /* RHManagedObjectContextManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RHManagedObjectContextManager.h; path = ../RHManagedObject/RHManagedObjectContextManager.h; sourceTree = "<group>"; };
 		831517C6190CE7080019F7A6 /* RHManagedObjectContextManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RHManagedObjectContextManager.m; path = ../RHManagedObject/RHManagedObjectContextManager.m; sourceTree = "<group>"; };
 		831517CF190CE9B70019F7A6 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		83FC32D11B5D8B6100ECAF05 /* SimplifiedCoreDataExample2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SimplifiedCoreDataExample2.xcdatamodel; sourceTree = "<group>"; };
+		83FC32D71B5D8C4600ECAF05 /* _Employee.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = _Employee.h; path = SimplifiedCoreDataExample/_Employee.h; sourceTree = "<group>"; };
+		83FC32D81B5D8C4600ECAF05 /* _Employee.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = _Employee.m; path = SimplifiedCoreDataExample/_Employee.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -85,8 +86,8 @@
 			isa = PBXGroup;
 			children = (
 				8305CAAD148565290066AB52 /* SimplifiedCoreDataExample.xcdatamodeld */,
-				8305CAD0148565F80066AB52 /* EmployeeEntity.h */,
-				8305CAD1148565F80066AB52 /* EmployeeEntity.m */,
+				83FC32D71B5D8C4600ECAF05 /* _Employee.h */,
+				83FC32D81B5D8C4600ECAF05 /* _Employee.m */,
 				8305CAD3148566420066AB52 /* Employee.h */,
 				8305CAD4148566420066AB52 /* Employee.m */,
 			);
@@ -186,7 +187,12 @@
 		8305CA8C148565280066AB52 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0510;
+				LastUpgradeCheck = 0640;
+				TargetAttributes = {
+					83FC32D21B5D8BBE00ECAF05 = {
+						CreatedOnToolsVersion = 6.4;
+					};
+				};
 			};
 			buildConfigurationList = 8305CA8F148565280066AB52 /* Build configuration list for PBXProject "SimplifiedCoreDataExample" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -201,7 +207,7 @@
 			projectRoot = "";
 			targets = (
 				8305CA94148565290066AB52 /* SimplifiedCoreDataExample */,
-				41A008C8199B840A0097FAA9 /* Documentation */,
+				83FC32D21B5D8BBE00ECAF05 /* mogenerator */,
 			);
 		};
 /* End PBXProject section */
@@ -219,7 +225,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		41A008CC199B84100097FAA9 /* ShellScript */ = {
+		83FC32D61B5D8BD600ECAF05 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -230,7 +236,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "/usr/local/bin/appledoc \\\n--project-name \"RHManagedObject\" \\\n--project-company \"chriscdn\" \\\n--company-id \"com.chriscdn\" \\\n--output \"${PROJECT_DIR}/../Documentation/RHManagedObject\" \\\n--install-docset \\\n--logformat xcode \\\n--keep-undocumented-objects \\\n--keep-undocumented-members \\\n--keep-intermediate-files \\\n--no-repeat-first-par \\\n--no-warn-invalid-crossref \\\n--merge-categories \\\n--exit-threshold 2 \\\n--docset-platform-family iphoneos \\\n--ignore \"*.m\" \\\n--index-desc \"${PROJECT_DIR}/../readme.md\" \\\n\"${PROJECT_DIR}/../RHManagedObject\"";
+			shellScript = "/usr/local/bin/mogenerator -m \"${PROJECT_DIR}/SimplifiedCoreDataExample/SimplifiedCoreDataExample.xcdatamodeld\" -O \"${PROJECT_DIR}/SimplifiedCoreDataExample\" --template-var arc=true --base-class RHManagedObject";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -242,8 +248,8 @@
 				8305CAA8148565290066AB52 /* main.m in Sources */,
 				8305CAAC148565290066AB52 /* AppDelegate.m in Sources */,
 				8305CAAF148565290066AB52 /* SimplifiedCoreDataExample.xcdatamodeld in Sources */,
-				8305CAD2148565F80066AB52 /* EmployeeEntity.m in Sources */,
 				8305CAD5148566420066AB52 /* Employee.m in Sources */,
+				83FC32D91B5D8C4600ECAF05 /* _Employee.m in Sources */,
 				831517CA190CE7080019F7A6 /* RHManagedObject.m in Sources */,
 				831517CC190CE7080019F7A6 /* RHManagedObjectContextManager.m in Sources */,
 				831517C8190CE7080019F7A6 /* RHCoreDataTableViewController.m in Sources */,
@@ -265,20 +271,6 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		41A008C9199B840A0097FAA9 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Debug;
-		};
-		41A008CA199B840A0097FAA9 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Release;
-		};
 		8305CABC148565290066AB52 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -288,11 +280,14 @@
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -307,7 +302,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 			};
@@ -322,10 +317,13 @@
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
@@ -334,7 +332,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
@@ -369,18 +367,23 @@
 			};
 			name = Release;
 		};
+		83FC32D41B5D8BBE00ECAF05 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		83FC32D51B5D8BBE00ECAF05 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		41A008CB199B840A0097FAA9 /* Build configuration list for PBXAggregateTarget "Documentation" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				41A008C9199B840A0097FAA9 /* Debug */,
-				41A008CA199B840A0097FAA9 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		8305CA8F148565280066AB52 /* Build configuration list for PBXProject "SimplifiedCoreDataExample" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -399,15 +402,25 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		83FC32D31B5D8BBE00ECAF05 /* Build configuration list for PBXAggregateTarget "mogenerator" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				83FC32D41B5D8BBE00ECAF05 /* Debug */,
+				83FC32D51B5D8BBE00ECAF05 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
 
 /* Begin XCVersionGroup section */
 		8305CAAD148565290066AB52 /* SimplifiedCoreDataExample.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				83FC32D11B5D8B6100ECAF05 /* SimplifiedCoreDataExample2.xcdatamodel */,
 				8305CAAE148565290066AB52 /* SimplifiedCoreDataExample.xcdatamodel */,
 			);
-			currentVersion = 8305CAAE148565290066AB52 /* SimplifiedCoreDataExample.xcdatamodel */;
+			currentVersion = 83FC32D11B5D8B6100ECAF05 /* SimplifiedCoreDataExample2.xcdatamodel */;
 			name = SimplifiedCoreDataExample.xcdatamodeld;
 			path = SimplifiedCoreDataExample/SimplifiedCoreDataExample.xcdatamodeld;
 			sourceTree = "<group>";

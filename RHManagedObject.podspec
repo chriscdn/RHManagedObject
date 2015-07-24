@@ -6,7 +6,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = "RHManagedObject"
-  s.version          = "0.15"
+  s.version          = "0.16"
   s.summary          = "RHManagedObject is a library for iOS to simplify your life with Core Data."
   s.homepage         = "https://github.com/chriscdn/RHManagedObject"
   s.license          = 'MIT'

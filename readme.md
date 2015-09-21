@@ -31,7 +31,7 @@ RHManagedObject changes this (when using [mogenerator](https://github.com/rentzs
 
 	NSObject :: NSManagedObject :: RHManagedObject :: _Employee :: Employee
 	
-This hierarchy is a deviation from previous versions of RHManagedObject.  See the section on [upgrading](#upgrading) for more information.
+This hierarchy is a deviation from previous versions of RHManagedObject.  See the section on [upgrading](#upgrading-to-mogenerator) for more information.
 
 The `RHManagedObject` base class extends NSManagedObject to make Core Data easier to use.  Specifically, it:
 

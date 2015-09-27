@@ -290,8 +290,12 @@ static UITableViewRowAnimation deleteRowAnimation = UITableViewRowAnimationAutom
             break;
             
         case NSFetchedResultsChangeMove:
-            [self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:deleteRowAnimation];
-            [self.tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:newIndexPath] withRowAnimation:insertRowAnimation];
+            if (indexPath == newIndexPath) {
+                // iOS9 seems to call when these are matching.
+            } else {
+                [self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:deleteRowAnimation];
+                [self.tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:newIndexPath] withRowAnimation:insertRowAnimation];
+            }
             break;
     }
 }
@@ -310,7 +314,6 @@ static UITableViewRowAnimation deleteRowAnimation = UITableViewRowAnimationAutom
         case NSFetchedResultsChangeInsert:
             [self.tableView insertSections:[NSIndexSet indexSetWithIndex:sectionIndex] withRowAnimation:insertRowAnimation];
             break;
-            
         case NSFetchedResultsChangeDelete:
             [self.tableView deleteSections:[NSIndexSet indexSetWithIndex:sectionIndex] withRowAnimation:deleteRowAnimation];
             break;

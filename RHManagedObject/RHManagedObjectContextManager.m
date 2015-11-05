@@ -64,31 +64,36 @@
 @property (nonatomic, strong) NSManagedObjectModel *managedObjectModel;
 @property (nonatomic, strong) NSPersistentStoreCoordinator *persistentStoreCoordinator;
 @property (nonatomic, strong) NSString *modelName;
+@property (nonatomic, strong) NSBundle *bundle;
 @property (nonatomic, strong) NSString *guid;
+@property (nonatomic, strong) id localChangeObserver;
 
 +(NSMutableDictionary *)sharedInstances;
 -(NSString *)storePath;
 -(NSURL *)storeURL;
 -(NSString *)databaseName;
 
-@property (nonatomic, strong) id localChangeObserver;
 @end
 
 @implementation RHManagedObjectContextManager
-@synthesize managedObjectContextForMainThread;
-@synthesize managedObjectModel;
-@synthesize persistentStoreCoordinator;
-@synthesize modelName;
-@synthesize guid;
+// @synthesize managedObjectContextForMainThread;
+// @synthesize managedObjectModel;
+// @synthesize persistentStoreCoordinator;
+// @synthesize modelName;
+// @synthesize guid;
 
 #pragma mark -
 #pragma mark Singleton Methods
 +(RHManagedObjectContextManager *)sharedInstanceWithModelName:(NSString *)modelName {
+    return [self sharedInstanceWithModelName:modelName bundle:[NSBundle mainBundle]];
+}
+
++(RHManagedObjectContextManager *)sharedInstanceWithModelName:(NSString *)modelName bundle:(NSBundle *)bundle {
     if ([[self sharedInstances] objectForKey:modelName] == nil) {
-        RHManagedObjectContextManager *contextManager = [[RHManagedObjectContextManager alloc] initWithModelName:modelName];
+        RHManagedObjectContextManager *contextManager = [[RHManagedObjectContextManager alloc] initWithModelName:modelName bundle:bundle];
         [[self sharedInstances] setObject:contextManager forKey:modelName];
     }
-
+    
     return [[self sharedInstances] objectForKey:modelName];
 }
 
@@ -112,9 +117,10 @@
 	return error;
 }
 
--(id)initWithModelName:(NSString *)_modelName {
+-(id)initWithModelName:(NSString *)modelName bundle:(NSBundle *)bundle {
     if (self=[super init]) {
-        self.modelName = _modelName;
+        self.modelName = modelName;
+        self.bundle = bundle;
     }
     return self;
 }
@@ -125,9 +131,9 @@
 -(NSError *)deleteStore {
 	NSError *error = nil;
 
-	if (persistentStoreCoordinator == nil) {
+	if (_persistentStoreCoordinator == nil) {
+        
 		NSString *storePath = [self storePath];
-
 		[self deleteStoreFiles:storePath];
 
 	} else {
@@ -170,14 +176,14 @@
 }
 
 -(NSString *)guid {
-	if (guid == nil) {
+	if (_guid == nil) {
 		CFUUIDRef uuid = CFUUIDCreate(kCFAllocatorDefault);
 		NSString *uuidStr = (__bridge_transfer NSString *)CFUUIDCreateString(kCFAllocatorDefault, uuid);
 		CFRelease(uuid);
 
 		self.guid = [uuidStr lowercaseString];
 	}
-	return guid;
+	return _guid;
 }
 
 -(NSUInteger)pendingChangesCountWithError:(NSError **)error {
@@ -219,15 +225,15 @@
 #pragma mark -
 #pragma mark Core Data stack
 -(NSManagedObjectContext *)managedObjectContextForMainThreadWithError:(NSError **)error {
-	if (managedObjectContextForMainThread == nil) {
+	if (_managedObjectContextForMainThread == nil) {
 		NSAssert([NSThread isMainThread], @"Must be instantiated on main thread.");
 		self.managedObjectContextForMainThread = [[NSManagedObjectContext alloc] init];
-		[managedObjectContextForMainThread setPersistentStoreCoordinator:[self persistentStoreCoordinatorWithError:error]];
-		[managedObjectContextForMainThread setMergePolicy:kMergePolicy];
+		[_managedObjectContextForMainThread setPersistentStoreCoordinator:[self persistentStoreCoordinatorWithError:error]];
+		[_managedObjectContextForMainThread setMergePolicy:kMergePolicy];
 
 		self.localChangeObserver = [[NSNotificationCenter defaultCenter]
 									addObserverForName:NSManagedObjectContextObjectsDidChangeNotification
-									object:managedObjectContextForMainThread
+									object:_managedObjectContextForMainThread
 									queue:[NSOperationQueue mainQueue]
 									usingBlock:^(NSNotification *notification) {
 
@@ -246,7 +252,7 @@
 									}];
 	}
 
-	return managedObjectContextForMainThread;
+	return _managedObjectContextForMainThread;
 }
 
 -(NSManagedObjectContext *)managedObjectContextForCurrentThreadWithError:(NSError **)error {
@@ -279,14 +285,14 @@
  * If the model doesn't already exist, it is created from the application's model.
  */
 -(NSManagedObjectModel *)managedObjectModel {
-	if (managedObjectModel == nil) {
-		NSString *modelPath = [[NSBundle mainBundle] pathForResource:self.modelName ofType:@"momd"];
+	if (_managedObjectModel == nil) {
+        NSString *modelPath = [self.bundle pathForResource:self.modelName ofType:@"momd"];
 		NSURL *modelURL = [NSURL fileURLWithPath:modelPath];
 
 		self.managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
 	}
 
-	return managedObjectModel;
+	return _managedObjectModel;
 }
 
 -(void)mocDidSave:(NSNotification *)saveNotification {
@@ -335,7 +341,7 @@
  */
 -(NSPersistentStoreCoordinator *)persistentStoreCoordinatorWithError:(NSError **)error {
 
-	if (persistentStoreCoordinator == nil) {
+	if (_persistentStoreCoordinator == nil) {
 		@synchronized(self) {
 			// This next block is useful when the store is initialized for the first time.  If the DB doesn't already
 			// exist and a copy of the db (with the same name) exists in the bundle, it'll be copied over and used.  This
@@ -361,7 +367,7 @@
 									 [NSNumber numberWithBool:YES], NSMigratePersistentStoresAutomaticallyOption,
 									 [NSNumber numberWithBool:YES], NSInferMappingModelAutomaticallyOption, nil];
 
-			if (![persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType
+			if (![_persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType
                                                           configuration:nil
                                                                     URL:storeURL
                                                                 options:options
@@ -395,7 +401,7 @@
 		} // end @synchronized
 	}
 
-	return persistentStoreCoordinator;
+	return _persistentStoreCoordinator;
 }
 
 #pragma mark -

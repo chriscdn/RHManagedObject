@@ -72,7 +72,8 @@ static UITableViewRowAnimation deleteRowAnimation = UITableViewRowAnimationAutom
     
     self.searchController.delegate = self;
     self.searchController.searchResultsUpdater = self;
-    self.searchController.dimsBackgroundDuringPresentation = NO;
+    self.searchController.dimsBackgroundDuringPresentation = NO;    
+    self.searchController.hidesNavigationBarDuringPresentation = NO;
     
     // self.searchController.searchBar.showsScopeBar = NO;
     // self.searchController.searchBar.scopeButtonTitles = @[NSLocalizedString(@"ScopeButtonCountry",@"Country")];

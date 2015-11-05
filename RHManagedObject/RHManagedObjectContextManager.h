@@ -39,7 +39,7 @@
  
  __Found__: 2012-04-20
  
- __Last update__: 2014-08-13
+ __Last update__: 2015-11-03
  
  __Developer__: Christopher Meyer
  
@@ -61,15 +61,27 @@
  */
 +(RHManagedObjectContextManager *)sharedInstanceWithModelName:(NSString *)modelName;
 
+
 /**
- *  Initialize an RHManagedObjectContextManager instance for a specific data model. This method should not be used directly, use sharedInstanceWithModelName: instead.
+ *  Returns the shared instance for a specific data model.
+ *
+ *  @param modelName The name of the data model.
+ *  @param bundle The bundle of this model.
+ *
+ *  @return The shared instance for the data model.
+ */
++(RHManagedObjectContextManager *)sharedInstanceWithModelName:(NSString *)modelName bundle:(NSBundle *)bundle;
+
+/**
+ *  Initialize an RHManagedObjectContextManager instance for a specific data model. This method should not be used directly, use sharedInstanceWithModelName:bundle: instead.
  *
  *  @param _modelName The name of the data model.
+ *  @parm bundle The bundle of this model.
  *
  *  @return An initialized RHManagedObjectContextManager object or nil if an error occurs.
  *  @see sharedInstanceWithModelName:
  */
--(id)initWithModelName:(NSString *)_modelName;
+-(id)initWithModelName:(NSString *)modelName bundle:(NSBundle *)bundle;
 
 
 

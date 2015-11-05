@@ -407,7 +407,7 @@
 }
 
 +(RHManagedObjectContextManager *)managedObjectContextManager {
-    return [RHManagedObjectContextManager sharedInstanceWithModelName:[self modelName]];
+    return [RHManagedObjectContextManager sharedInstanceWithModelName:[self modelName] bundle:[NSBundle bundleForClass:[self class]]];
 }
 
 +(BOOL)doesRequireMigrationWithError:(NSError **)error {

@@ -292,7 +292,9 @@ static UITableViewRowAnimation deleteRowAnimation = UITableViewRowAnimationAutom
             
         case NSFetchedResultsChangeMove:
             if (indexPath == newIndexPath) {
-                // iOS9 seems to call when these are matching.
+                // iOS9 seems to call then also when it moves to the same location.  However, it's possible for something to be moved and updated,
+                // so we call the update in that case.
+                [self configureCell:[self.tableView cellForRowAtIndexPath:indexPath] atIndexPath:indexPath];
             } else {
                 [self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:deleteRowAnimation];
                 [self.tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:newIndexPath] withRowAnimation:insertRowAnimation];

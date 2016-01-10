@@ -30,7 +30,7 @@ static UITableViewRowAnimation deleteRowAnimation = UITableViewRowAnimationAutom
 
 @interface RHCoreDataTableViewController()
 
-@property (nonatomic, assign, getter = isSearching) BOOL searching;
+// @property (nonatomic, assign, getter = isSearching) BOOL searching;
 
 @end
 
@@ -54,16 +54,9 @@ static UITableViewRowAnimation deleteRowAnimation = UITableViewRowAnimationAutom
                                                    object:nil];
         [self resetMassUpdate];
         [self setEnableSectionIndex:NO];
-        [self setSearching:NO];
-
     }
     
     return self;
-}
-
--(void)viewWillDisappear:(BOOL)animated {
-    [super viewWillDisappear:animated];
-
 }
 
 -(void)addSearchBarWithPlaceHolder:(NSString *)placeholder {
@@ -72,38 +65,29 @@ static UITableViewRowAnimation deleteRowAnimation = UITableViewRowAnimationAutom
     
     self.searchController.delegate = self;
     self.searchController.searchResultsUpdater = self;
-    self.searchController.dimsBackgroundDuringPresentation = NO;    
-    self.searchController.hidesNavigationBarDuringPresentation = NO;
+    self.searchController.dimsBackgroundDuringPresentation = NO;
     
-    // self.searchController.searchBar.showsScopeBar = NO;
-    // self.searchController.searchBar.scopeButtonTitles = @[NSLocalizedString(@"ScopeButtonCountry",@"Country")];
-    
-    // required to render correctly
-    self.searchController.searchBar.scopeButtonTitles = @[];
+    // Setting this to YES causes problems when presenting the search controller in a UINavigationController.
+    // Tapping the Back button will not deallocate the controller due to a regain loop (source of loop not clear).
+    // By keeping this NO (default) we are forced to close the search controller before hitting the back button.
+    // self.searchController.hidesNavigationBarDuringPresentation = NO;
     
     self.searchController.searchBar.delegate = self;
     self.searchController.searchBar.placeholder = placeholder;
+    // self.searchController.searchBar.showsScopeBar = YES;
+    // self.searchController.searchBar.scopeButtonTitles = @[];
+    
     self.definesPresentationContext = YES;
     
-    [self.tableView setTableHeaderView:self.searchController.searchBar];
-    
-    // needed?
     // [self.searchController.searchBar sizeToFit];
+    
+    [self.tableView setTableHeaderView:self.searchController.searchBar];
 }
-
-/*
- -(void)removeSearchBar {
-	self.searchController = nil;
-	[self.tableView setTableHeaderView:nil];
- }
- */
 
 #pragma mark -
 #pragma mark UISearchBarDelegate
 -(void)searchBarCancelButtonClicked:(UISearchBar *)searchBar {
-    [self setSearching:NO];
     [self setSearchString:nil];
-    
     [self.tableView reloadData];
 }
 
@@ -120,13 +104,6 @@ static UITableViewRowAnimation deleteRowAnimation = UITableViewRowAnimationAutom
 }
 
 #pragma mark -
-#pragma mark UISearchControllerDelegate
-
-
-
-
-
-#pragma mark -
 -(void)setSearchString:(NSString *)searchString {
     if (_searchString == searchString) {
         // do nothing
@@ -136,12 +113,6 @@ static UITableViewRowAnimation deleteRowAnimation = UITableViewRowAnimationAutom
         _searchString = searchString;
     }
 }
-
-/*
- -(void)searchBar:(UISearchBar *)searchBar selectedScopeButtonIndexDidChange:(NSInteger)selectedScope {
- [self updateSearchResultsForSearchController:self.searchController];
- }
- */
 
 #pragma mark -
 -(void)reload {
@@ -344,7 +315,10 @@ static UITableViewRowAnimation deleteRowAnimation = UITableViewRowAnimationAutom
 }
 
 -(void)dealloc {
+    // NSLog(@"%@", @"dealloc - RHCoreDataTableViewController");
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    // http://stackoverflow.com/questions/32282401/attempting-to-load-the-view-of-a-view-controller-while-it-is-deallocating-uis
+    [self.searchController.view removeFromSuperview];
 }
 
 @end

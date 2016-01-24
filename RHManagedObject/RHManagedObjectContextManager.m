@@ -227,7 +227,7 @@
 -(NSManagedObjectContext *)managedObjectContextForMainThreadWithError:(NSError **)error {
 	if (_managedObjectContextForMainThread == nil) {
 		NSAssert([NSThread isMainThread], @"Must be instantiated on main thread.");
-		self.managedObjectContextForMainThread = [[NSManagedObjectContext alloc] init];
+        self.managedObjectContextForMainThread = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSConfinementConcurrencyType];
 		[_managedObjectContextForMainThread setPersistentStoreCoordinator:[self persistentStoreCoordinatorWithError:error]];
 		[_managedObjectContextForMainThread setMergePolicy:kMergePolicy];
 
@@ -268,8 +268,9 @@
 	NSString *threadKey = [NSString stringWithFormat:@"RHManagedObjectContext_%@_%@", self.modelName, self.guid];
 
 	if ( [[thread threadDictionary] objectForKey:threadKey] == nil ) {
-		// create a moc for this thread
-        RHManagedObjectContext *threadContext = [[RHManagedObjectContext alloc] init];
+		// create a moc for this thread... NSPrivateQueueConcurrencyType doesn't work here due to legacy dependent code
+        // NSPrivateQueueConcurrencyType expects everything to happen in the performBlock call, which is not the case with legacy code
+        RHManagedObjectContext *threadContext = [[RHManagedObjectContext alloc] initWithConcurrencyType:NSConfinementConcurrencyType];
         [threadContext setPersistentStoreCoordinator:[self persistentStoreCoordinatorWithError:error]];
 		[threadContext setMergePolicy:kMergePolicy];
 		[threadContext setObserver:self];
@@ -302,13 +303,13 @@
 
 		NSDictionary *userInfo = saveNotification.userInfo;
 
-		NSArray *updates = [[userInfo objectForKey:@"updated"] allObjects];
+		NSSet *updates = [userInfo objectForKey:NSUpdatedObjectsKey];
 		for (RHManagedObject *item in updates) {
 			[[item objectInCurrentThreadContextWithError:nil] willAccessValueForKey:nil];
 		}
 
 		// 2013-04-14 - This hack is also required on the "inserted" key to ensure NSFetchedResultsController works properly
-		NSArray *inserted = [[userInfo objectForKey:@"inserted"] allObjects];
+		NSSet *inserted = [userInfo objectForKey:NSInsertedObjectsKey];
 		for (RHManagedObject *item in inserted) {
 			[[item objectInCurrentThreadContextWithError:nil] willAccessValueForKey:nil];
 		}

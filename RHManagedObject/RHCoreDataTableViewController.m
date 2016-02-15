@@ -248,6 +248,9 @@ static UITableViewRowAnimation deleteRowAnimation = UITableViewRowAnimationAutom
         return;
     }
     
+    UITableViewRowAnimation myDeleteAnimation = deleteRowAnimation;
+    UITableViewRowAnimation myInsertAnimation = insertRowAnimation;
+    
     switch(type) {
         case NSFetchedResultsChangeInsert:
             [self.tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:newIndexPath] withRowAnimation:insertRowAnimation];
@@ -262,6 +265,9 @@ static UITableViewRowAnimation deleteRowAnimation = UITableViewRowAnimationAutom
             break;
             
         case NSFetchedResultsChangeMove:
+            
+            
+            /*
             if (indexPath == newIndexPath) {
                 // iOS9 seems to call then also when it moves to the same location.  However, it's possible for something to be moved and updated,
                 // so we call the update in that case.
@@ -269,7 +275,19 @@ static UITableViewRowAnimation deleteRowAnimation = UITableViewRowAnimationAutom
             } else {
                 [self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:deleteRowAnimation];
                 [self.tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:newIndexPath] withRowAnimation:insertRowAnimation];
+            }*/
+            
+            // This works around an iOS9 bug where updates are sent as moves.
+            // http://stackoverflow.com/questions/31383760/ios-9-attempt-to-delete-and-reload-the-same-index-path
+            if ([indexPath isEqual:newIndexPath]) {
+                myDeleteAnimation = UITableViewRowAnimationNone;
+                myInsertAnimation = UITableViewRowAnimationNone;
             }
+            
+            [self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath]    withRowAnimation:myDeleteAnimation];
+            [self.tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:newIndexPath] withRowAnimation:myInsertAnimation];
+            
+            
             break;
     }
 }

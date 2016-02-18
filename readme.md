@@ -118,7 +118,7 @@ However, the new proposed hierarchy (using mogenerator) is:
 
 This should be mostly transparent to the rest of your application, but will require a little work:
 
-- You'll need to perform a lightweight migration of your model (see [Lightweight Migration](#lightweight-migration) for details).  This will involve versioning your schema and  renaming the entities (e.g., `EmployeeEntity` to `Employee`).  For this you can use the "Renaming ID" field in XCode, which tells the migration how your models get renamed. 
+- You'll need to perform a lightweight migration of your model (see [Lightweight Migration](#lightweight-migration) for details).  This will involve versioning your schema and  renaming the entities (e.g., `EmployeeEntity` to `Employee`).  For this you can use the "Renaming ID" field in Xcode, which tells the migration how your models get renamed. 
 - As described in the [mogenerator documentation](http://raptureinvenice.com/getting-started-with-mogenerator/), the `Class` property for each entity in the `xcdatamodeld` should now be the same as the `Name` field (in the example "Employee").
 - Your classes no longer need to override the `-entityName` method.  This is handled by mogenerator. 
 

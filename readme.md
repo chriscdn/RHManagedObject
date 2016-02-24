@@ -289,8 +289,8 @@ Are you using RHManagedObject in your project?  I'd love to hear from you!
 
 profile: [Christopher Meyer](https://github.com/chriscdn)  
 e-mail: [chris@schwiiz.org](mailto:chris@schwiiz.org)  
-twitter: [@chriscdn](http://twitter.com/chriscdn)  
+twitter: [@chriscdn](https://twitter.com/chriscdn)  
 blog: [schwiiz.org](http://schwiiz.org/)
 
 ## License
-RHManagedObject is available under the MIT license. See the LICENSE file for more info.
+RHManagedObject is available under the MIT license. See the LICENSE file for more information.

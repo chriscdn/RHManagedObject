@@ -39,7 +39,7 @@ The `RHManagedObject` base class extends NSManagedObject to make Core Data easie
 - provides easy methods for fetching, creating, cloning, and deleting managed objects; and
 - provides a simple method for saving the context, which has the same interface regardless from which thread it's called.
 
-For example, the `+newEntityWithError:` method introduced in `RHManagedObject lets you create a new managed object with one line:
+For example, the `+newEntityWithError:` method introduced in `RHManagedObject` lets you create a new managed object with one line:
 
 	Employee *newEmployee = [Employee newEntityWithError:&error];
 
@@ -55,7 +55,7 @@ Changes can be saved with the `+commit` method, which automatically handles the 
 
 	[Employee commit];
 
-Notice that none of the examples require use of an `NSManagedObjectContext` instance. That's handled for you within the library. Of course, a method is available to fetch the context for the current thread if required:
+Notice that none of the examples require use of an `NSManagedObjectContext` instance. That's handled for you within the library. Of course, a method is available to fetch the context for the current thread if you need it:
 
 	NSManagedObjectContext *moc = [Employee managedObjectContextForCurrentThreadWithError:&error];
 	
@@ -65,7 +65,7 @@ The `_Employee` class is an artefact of mogenerator, which will be discussed lat
 
 ### Cocoapods
 
-[Cocoapods](http://cocoapods.org/) is a package manager, which greatly simplifies the inclusion of 3rd party libraries in your project.  `RHManagedObject can be added to your Podfile as follows:
+[Cocoapods](http://cocoapods.org/) is a package manager, which greatly simplifies the inclusion of 3rd party libraries in your project.  `RHManagedObject` can be added to your Podfile as follows:
 
 	pod 'RHManagedObject'
 

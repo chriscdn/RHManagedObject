@@ -25,6 +25,9 @@
 #import "RHFetchedResultsManager.h"
 #import "RHManagedObject.h"
 
+static UITableViewRowAnimation insertRowAnimation = UITableViewRowAnimationAutomatic;
+static UITableViewRowAnimation deleteRowAnimation = UITableViewRowAnimationAutomatic;
+
 @interface RHFetchedResultsManager()
 @end
 
@@ -166,16 +169,43 @@
 
 -(void)controller:(NSFetchedResultsController *)controller didChangeObject:(id)anObject atIndexPath:(NSIndexPath *)indexPath forChangeType:(NSFetchedResultsChangeType)type newIndexPath:(NSIndexPath *)newIndexPath {
     
-    UITableViewRowAnimation myDeleteAnimation = UITableViewRowAnimationAutomatic;
-    UITableViewRowAnimation myInsertAnimation = UITableViewRowAnimationAutomatic;
+    UITableViewRowAnimation myDeleteAnimation = deleteRowAnimation;
+    UITableViewRowAnimation myInsertAnimation = insertRowAnimation;
     
+    
+    // this block fixes a few bugs in iOS
     switch(type) {
         case NSFetchedResultsChangeInsert:
-            [self.tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:newIndexPath] withRowAnimation:myInsertAnimation];
             break;
             
         case NSFetchedResultsChangeDelete:
-            [self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:myDeleteAnimation];
+            break;
+            
+        case NSFetchedResultsChangeUpdate:
+            // 2016-11-12 bug with iOS10.1 (?) where section change is registered as an update and not a move..
+            if ([indexPath isEqual:newIndexPath] == false) {
+                type = NSFetchedResultsChangeMove;
+            }
+            
+            break;
+            
+        case NSFetchedResultsChangeMove:
+            // This works around an iOS9 bug where updates are sent as moves.
+            if ([indexPath isEqual:newIndexPath]) {
+                myDeleteAnimation = UITableViewRowAnimationNone;
+                myInsertAnimation = UITableViewRowAnimationNone;
+            }
+            break;
+    }
+    
+    
+    switch(type) {
+        case NSFetchedResultsChangeInsert:
+            [self.tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:newIndexPath] withRowAnimation:insertRowAnimation];
+            break;
+            
+        case NSFetchedResultsChangeDelete:
+            [self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:deleteRowAnimation];
             break;
             
         case NSFetchedResultsChangeUpdate:
@@ -183,17 +213,8 @@
             break;
             
         case NSFetchedResultsChangeMove:
-            
-            // This works around an iOS9 bug where updates are sent as moves.
-            // http://stackoverflow.com/questions/31383760/ios-9-attempt-to-delete-and-reload-the-same-index-path
-            if ([indexPath isEqual:newIndexPath]) {
-                myDeleteAnimation = UITableViewRowAnimationNone;
-                myInsertAnimation = UITableViewRowAnimationNone;
-            }
-            
-            [self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath]    withRowAnimation:myDeleteAnimation];
+            [self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:myDeleteAnimation];
             [self.tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:newIndexPath] withRowAnimation:myInsertAnimation];
-            
             break;
     }
     

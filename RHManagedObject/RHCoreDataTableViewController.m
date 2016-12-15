@@ -262,7 +262,7 @@ static UITableViewRowAnimation deleteRowAnimation = UITableViewRowAnimationAutom
             
         case NSFetchedResultsChangeUpdate:
             // 2016-11-12 bug with iOS10.1 (?) where section change is registered as an update and not a move..
-            if ([indexPath isEqual:newIndexPath] == false) {
+            if (newIndexPath && ![indexPath isEqual:newIndexPath]) {
                 type = NSFetchedResultsChangeMove;
             }
             

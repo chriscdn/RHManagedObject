@@ -75,7 +75,7 @@
 /**
  *  Initialize an RHManagedObjectContextManager instance for a specific data model. This method should not be used directly, use sharedInstanceWithModelName:bundle: instead.
  *
- *  @param _modelName The name of the data model.
+ *  @param modelName The name of the data model.
  *  @parm bundle The bundle of this model.
  *
  *  @return An initialized RHManagedObjectContextManager object or nil if an error occurs.

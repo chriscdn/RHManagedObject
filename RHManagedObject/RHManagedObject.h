@@ -29,8 +29,8 @@ typedef enum {
 	RHAggregateSum
 } RHAggregate;
 
-typedef void (^RHDidUpdateBlock)();
-typedef void (^RHDidDeleteBlock)();
+typedef void (^RHDidUpdateBlock)(void);
+typedef void (^RHDidDeleteBlock)(void);
 
 #import <CoreData/CoreData.h>
 @class RHManagedObjectContextManager;

@@ -130,6 +130,8 @@
 // Used to flush and reset the database.
 -(NSError *)deleteStore {
 	NSError *error = nil;
+    
+    [self.managedObjectContextForMainThread reset];
 
 	if (_persistentStoreCoordinator == nil) {
         

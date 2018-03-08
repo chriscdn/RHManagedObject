@@ -252,7 +252,7 @@ static UITableViewRowAnimation deleteRowAnimation = UITableViewRowAnimationAutom
     UITableViewRowAnimation myInsertAnimation = insertRowAnimation;
     
     
-    // this block fixes a few bugs in iOS
+    // this block fixes a few bugs in iOS - not sure what is still applicable for iOS11
     switch(type) {
         case NSFetchedResultsChangeInsert:
             break;

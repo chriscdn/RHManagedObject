@@ -203,6 +203,9 @@
  */
 -(NSString *)applicationCachesDirectory;
 
+-(NSString *)storePath;
+-(NSURL *)storeURL;
+-(NSString *)databaseName;
 
 #pragma mark - Other Methods
 /**---------------------------------------------------------------------------------------

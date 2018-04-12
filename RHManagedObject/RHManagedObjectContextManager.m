@@ -69,9 +69,6 @@
 @property (nonatomic, strong) id localChangeObserver;
 
 +(NSMutableDictionary *)sharedInstances;
--(NSString *)storePath;
--(NSURL *)storeURL;
--(NSString *)databaseName;
 
 @end
 

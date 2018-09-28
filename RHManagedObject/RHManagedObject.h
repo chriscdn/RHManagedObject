@@ -209,8 +209,6 @@ typedef void (^RHDidDeleteBlock)(void);
  */
 @property (nonatomic, copy) RHDidDeleteBlock didDeleteBlock;
 
-
-
 #pragma mark - Fetching a Single Object
 /**---------------------------------------------------------------------------------------
  * @name Fetching a Single Object
@@ -517,6 +515,9 @@ typedef void (^RHDidDeleteBlock)(void);
  */
 +(BOOL)doesRequireMigrationWithError:(NSError **)error;
 
+
++(void)undo;
++(void)rollback;
 
 
 #pragma mark - Lookup Attribute Values

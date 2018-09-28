@@ -85,10 +85,40 @@
     [self.sectionChanges addObject:change];
 }
 
--(void)controller:(NSFetchedResultsController *)controller didChangeObject:(id)anObject
-	  atIndexPath:(NSIndexPath *)indexPath forChangeType:(NSFetchedResultsChangeType)type
+-(void)controller:(NSFetchedResultsController *)controller
+  didChangeObject:(id)anObject
+	  atIndexPath:(NSIndexPath *)indexPath
+    forChangeType:(NSFetchedResultsChangeType)type
 	 newIndexPath:(NSIndexPath *)newIndexPath {
 
+    
+    
+    // this block fixes a few bugs in iOS - not sure what is still applicable for iOS11
+    switch(type) {
+        case NSFetchedResultsChangeInsert:
+            break;
+            
+        case NSFetchedResultsChangeDelete:
+            break;
+            
+        case NSFetchedResultsChangeUpdate:
+            // 2016-11-12 bug with iOS10.1 (?) where section change is registered as an update and not a move..
+            if (newIndexPath && ![indexPath isEqual:newIndexPath]) {
+                type = NSFetchedResultsChangeMove;
+            }
+            
+            break;
+            
+        case NSFetchedResultsChangeMove:
+            break;
+    }
+    
+    
+    
+    
+    
+    
+    
     NSMutableDictionary *change = [NSMutableDictionary dictionary];
 
     switch(type) {

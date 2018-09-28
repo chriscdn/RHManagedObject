@@ -414,6 +414,14 @@
 	return [[self managedObjectContextManager] doesRequireMigrationWithError:error];
 }
 
++(void)undo {
+    [[self managedObjectContextForCurrentThreadWithError:nil] undo];
+}
+
++(void)rollback {
+    [[self managedObjectContextForCurrentThreadWithError:nil] rollback];
+}
+
 -(void)delete {
 	[[self managedObjectContext] deleteObject:self];
 }

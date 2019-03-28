@@ -32,6 +32,12 @@ static UITableViewRowAnimation deleteRowAnimation = UITableViewRowAnimationAutom
 
 // @property (nonatomic, assign, getter = isSearching) BOOL searching;
 
+@property (nonatomic, strong) NSMutableIndexSet *deletedSectionIndexes;
+@property (nonatomic, strong) NSMutableIndexSet *insertedSectionIndexes;
+@property (nonatomic, strong) NSMutableArray *deletedRowIndexPaths;
+@property (nonatomic, strong) NSMutableArray *insertedRowIndexPaths;
+@property (nonatomic, strong) NSMutableArray *updatedRowIndexPaths;
+
 @end
 
 @implementation RHCoreDataTableViewController
@@ -54,6 +60,7 @@ static UITableViewRowAnimation deleteRowAnimation = UITableViewRowAnimationAutom
                                                    object:nil];
         [self resetMassUpdate];
         [self setEnableSectionIndex:NO];
+        
     }
     
     return self;
@@ -183,12 +190,14 @@ static UITableViewRowAnimation deleteRowAnimation = UITableViewRowAnimationAutom
      */
 }
 
--(void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath {
+-(void)configureCell:(UITableViewCell *)cell
+         atIndexPath:(NSIndexPath *)indexPath {
     NSLog(@"Implement configureCell:atIndexPath: in subclass.");
     abort();
 }
 
--(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+-(UITableViewCell *)tableView:(UITableView *)tableView
+        cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     NSLog(@"Implement tableView:cellForRowAtIndexPath: in subclass.");
     abort();
     
@@ -212,13 +221,14 @@ static UITableViewRowAnimation deleteRowAnimation = UITableViewRowAnimationAutom
     return [[self.fetchedResultsController sections] count];
 }
 
--(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+-(NSInteger)tableView:(UITableView *)tableView
+numberOfRowsInSection:(NSInteger)section {
     id <NSFetchedResultsSectionInfo> sectionInfo = [[self.fetchedResultsController sections] objectAtIndex:section];
     return [sectionInfo numberOfObjects];
 }
 
-
--(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+-(NSString *)tableView:(UITableView *)tableView
+titleForHeaderInSection:(NSInteger)section {
     id <NSFetchedResultsSectionInfo> sectionInfo = [[self.fetchedResultsController sections] objectAtIndex:section];
     return [sectionInfo name];
     
@@ -235,107 +245,166 @@ static UITableViewRowAnimation deleteRowAnimation = UITableViewRowAnimationAutom
 #pragma mark -
 #pragma mark Core Data
 -(void)controllerWillChangeContent:(NSFetchedResultsController *)controller {
-    if (self.massUpdate) {
-        return;
-    }
-    
-    [self.tableView beginUpdates];
+    //  [self.tableView beginUpdates];
 }
 
--(void)controller:(NSFetchedResultsController *)controller didChangeObject:(id)anObject atIndexPath:(NSIndexPath *)indexPath forChangeType:(NSFetchedResultsChangeType)type newIndexPath:(NSIndexPath *)newIndexPath {
-    
-    if (self.massUpdate) {
-        return;
-    }
-    
-    UITableViewRowAnimation myDeleteAnimation = deleteRowAnimation;
-    UITableViewRowAnimation myInsertAnimation = insertRowAnimation;
+-(void)controller:(NSFetchedResultsController *)controller
+  didChangeObject:(id)anObject
+      atIndexPath:(NSIndexPath *)indexPath
+    forChangeType:(NSFetchedResultsChangeType)type
+     newIndexPath:(NSIndexPath *)newIndexPath {
     
     
-    // this block fixes a few bugs in iOS - not sure what is still applicable for iOS11
-    switch(type) {
+    switch (type) {
         case NSFetchedResultsChangeInsert:
+            if ([self.insertedSectionIndexes containsIndex:newIndexPath.section]) {
+                // If we've already been told that we're adding a section for this inserted row we skip it since it will handled by the section insertion.
+                return;
+            }
+            
+            [self.insertedRowIndexPaths addObject:newIndexPath];
+            
             break;
             
         case NSFetchedResultsChangeDelete:
-            break;
-            
-        case NSFetchedResultsChangeUpdate:
-            // 2016-11-12 bug with iOS10.1 (?) where section change is registered as an update and not a move..
-            if (newIndexPath && ![indexPath isEqual:newIndexPath]) {
-                type = NSFetchedResultsChangeMove;
+            if ([self.deletedSectionIndexes containsIndex:indexPath.section]) {
+                // If we've already been told that we're deleting a section for this deleted row we skip it since it will handled by the section deletion.
+                return;
             }
             
+            [self.deletedRowIndexPaths addObject:indexPath];
             break;
             
         case NSFetchedResultsChangeMove:
-            // This works around an iOS9 bug where updates are sent as moves.
-            if ([indexPath isEqual:newIndexPath]) {
-                myDeleteAnimation = UITableViewRowAnimationNone;
-                myInsertAnimation = UITableViewRowAnimationNone;
+            if ([self.insertedSectionIndexes containsIndex:newIndexPath.section] == NO) {
+                [self.insertedRowIndexPaths addObject:newIndexPath];
             }
-            break;
-    }
-    
-    
-    switch(type) {
-        case NSFetchedResultsChangeInsert:
-            [self.tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:newIndexPath] withRowAnimation:insertRowAnimation];
-            break;
             
-        case NSFetchedResultsChangeDelete:
-            [self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:myDeleteAnimation];
+            if ([self.deletedSectionIndexes containsIndex:indexPath.section] == NO) {
+                [self.deletedRowIndexPaths addObject:indexPath];
+            }
             break;
             
         case NSFetchedResultsChangeUpdate:
-            [self configureCell:[self.tableView cellForRowAtIndexPath:indexPath] atIndexPath:indexPath];
+            [self.updatedRowIndexPaths addObject:indexPath];
             break;
-            
-        case NSFetchedResultsChangeMove:
-            [self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:myDeleteAnimation];
-            [self.tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:newIndexPath] withRowAnimation:myInsertAnimation];
+        default:
             break;
     }
 }
 
--(void)controller:(NSFetchedResultsController *)controller didChangeSection:(id <NSFetchedResultsSectionInfo>)sectionInfo atIndex:(NSUInteger)sectionIndex forChangeType:(NSFetchedResultsChangeType)type {
+-(void)controller:(NSFetchedResultsController *)controller
+ didChangeSection:(id )sectionInfo
+          atIndex:(NSUInteger)sectionIndex
+    forChangeType:(NSFetchedResultsChangeType)type {
     
-    if (self.massUpdate) {
-        return;
-    }
-    
-    switch(type) {
-        case NSFetchedResultsChangeMove:
-            break;
-        case NSFetchedResultsChangeUpdate:
-            break;
+    switch (type) {
         case NSFetchedResultsChangeInsert:
-            [self.tableView insertSections:[NSIndexSet indexSetWithIndex:sectionIndex] withRowAnimation:insertRowAnimation];
+            [self.insertedSectionIndexes addIndex:sectionIndex];
             break;
         case NSFetchedResultsChangeDelete:
-            [self.tableView deleteSections:[NSIndexSet indexSetWithIndex:sectionIndex] withRowAnimation:deleteRowAnimation];
+            [self.deletedSectionIndexes addIndex:sectionIndex];
+            break;
+        default:
+            ; // Shouldn't have a default
             break;
     }
 }
 
 -(void)controllerDidChangeContent:(NSFetchedResultsController *)controller {
-    if (self.massUpdate) {
-        [self.tableView reloadData];
-        [self resetMassUpdate];
-        return;
-    }
+    NSInteger totalChanges = [self.deletedSectionIndexes count] +
+    [self.insertedSectionIndexes count] + [self.deletedRowIndexPaths count] +
+    [self.insertedRowIndexPaths count] + [self.updatedRowIndexPaths count];
     
-    // The fetch controller has sent all current change notifications, so tell the table view to process all updates.
-    [self.tableView endUpdates];
+//    if (totalChanges > 50) {
+//        [self.tableView reloadData];
+//        return;
+//    }
+    
+    // based on https://gist.github.com/MrRooni/4988922
+    
+    // iOS11/12 is buggy as hell when inserting and removing sections while changing indexes
+    // creates ghosts
+    if ((totalChanges > 50) || self.deletedSectionIndexes.count || self.insertedSectionIndexes.count) {
+    
+        [self.tableView reloadData];
+        
+    } else {
+        
+        [self.tableView beginUpdates];
+        
+        [self.tableView deleteSections:self.deletedSectionIndexes
+                      withRowAnimation:UITableViewRowAnimationAutomatic];
+        
+        [self.tableView insertSections:self.insertedSectionIndexes
+                      withRowAnimation:UITableViewRowAnimationAutomatic];
+        
+        [self.tableView deleteRowsAtIndexPaths:self.deletedRowIndexPaths
+                              withRowAnimation:UITableViewRowAnimationLeft];
+        
+        [self.tableView insertRowsAtIndexPaths:self.insertedRowIndexPaths
+                              withRowAnimation:UITableViewRowAnimationRight];
+        
+        [self.tableView reloadRowsAtIndexPaths:self.updatedRowIndexPaths
+                              withRowAnimation:UITableViewRowAnimationAutomatic];
+        
+         [self.tableView endUpdates];
+    }
+ 
+    // nil out the collections so their ready for their next use.
+    self.insertedSectionIndexes = nil;
+    self.deletedSectionIndexes = nil;
+    self.deletedRowIndexPaths = nil;
+    self.insertedRowIndexPaths = nil;
+    self.updatedRowIndexPaths = nil;
 }
 
 -(NSArray *)sectionIndexTitlesForTableView:(UITableView *)tableView {
-    
-    if ( self.enableSectionIndex && (self.searchString == nil) ) {
+    if (self.enableSectionIndex && (self.searchString == nil)) {
         return [[UILocalizedIndexedCollation currentCollation] sectionIndexTitles];
     }
     
     return nil;
+}
+
+-(NSMutableIndexSet *)deletedSectionIndexes {
+    if (_deletedSectionIndexes == nil) {
+        _deletedSectionIndexes = [NSMutableIndexSet indexSet];
+    }
+    
+    return _deletedSectionIndexes;
+}
+
+-(NSMutableIndexSet *)insertedSectionIndexes {
+    if (_insertedSectionIndexes == nil) {
+        _insertedSectionIndexes = [NSMutableIndexSet indexSet];
+    }
+    
+    return _insertedSectionIndexes;
+}
+
+-(NSMutableArray *)deletedRowIndexPaths {
+    if (_deletedRowIndexPaths == nil) {
+        _deletedRowIndexPaths = [[NSMutableArray alloc] init];
+    }
+    
+    return _deletedRowIndexPaths;
+}
+
+-(NSMutableArray *)insertedRowIndexPaths {
+    if (_insertedRowIndexPaths == nil) {
+        _insertedRowIndexPaths = [[NSMutableArray alloc] init];
+    }
+    
+    return _insertedRowIndexPaths;
+}
+
+-(NSMutableArray *)updatedRowIndexPaths {
+    if (_updatedRowIndexPaths == nil) {
+        _updatedRowIndexPaths = [[NSMutableArray alloc] init];
+    }
+    
+    return _updatedRowIndexPaths;
 }
 
 -(void)dealloc {
